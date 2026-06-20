@@ -5,9 +5,10 @@
   --text:       #d0d0d0;
   --text-muted: #888;
   --text-dim:   #555;
-  --accent:     #569cd6;
+  --accent:     #4db6c4;
   --font-sans:  system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono:  'Consolas', 'Menlo', 'Courier New', monospace;
+  --font-size:  15px;
   --max-w:      660px;
 }
 
@@ -89,6 +90,7 @@ nav {
 .nav-links a {
   font-size: 0.8rem;
   color: var(--text-dim);
+  font-family: var(--font-mono);
   opacity: 1 !important;
 }
 

@@ -5,93 +5,122 @@ import Layout from '../layouts/Layout.astro';
 <Layout title="Simon Holm" description="AI student at SDU. Chairperson of IMADA Fagråd.">
   <div class="container page">
 
-    <section class="hero">
-      <img src="/profile.png" alt="Simon Holm" class="photo" />
-      <div>
-        <h1>Simon Holm</h1>
-        <p class="tagline">AI · SDU · Odense</p>
+    <div class="layout">
+      <div class="content">
+        <h1><strong>Simon</strong> Holm</h1>
+
+        <p>
+          5th-semester AI student at SDU. I'm interested in interpretability and what
+          Danish and European AI sovereignty actually means in practice.
+        </p>
+        <p>
+          I chair the <a href="https://imada.sdu.dk" target="_blank">IMADA Fagråd</a> — the student council
+          for math &amp; CS at my faculty. Outside that: sim racing, music, gaming.
+        </p>
+        <p>
+          I write study notes in <a href="https://typst.app" target="_blank">Typst</a>.
+          If you want to learn the syntax there's a game I made:
+          <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique</a>.
+        </p>
+
+        <div class="links">
+          <a href="/projects">Projects</a>
+          <a href="/cv">CV</a>
+          <a href="/notes">Notes</a>
+          <a href="/contact">Contact</a>
+        </div>
       </div>
-    </section>
 
-    <div class="bio">
-      <p>
-        5th-semester AI student at SDU. I'm interested in interpretability and what
-        Danish and European AI sovereignty actually means in practice.
-      </p>
-      <p>
-        I chair the <a href="https://imada.sdu.dk" target="_blank">IMADA Fagråd</a> — the student council
-        for math &amp; CS at my faculty. Outside that: sim racing, music, gaming.
-      </p>
-      <p>
-        I write study notes in <a href="https://typst.app" target="_blank">Typst</a>.
-        If you want to learn the syntax there's a game I made:
-        <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique</a>.
-      </p>
-    </div>
-
-    <div class="links">
-      <a href="/projects">Projects</a>
-      <a href="/cv">CV</a>
-      <a href="/notes">Notes</a>
-      <a href="/contact">Contact</a>
+      <div class="sidebar">
+        <img src="/profile.png" alt="Simon Holm" class="photo" />
+        <p class="address">IMADA, SDU<br />Odense, Denmark</p>
+      </div>
     </div>
 
   </div>
 </Layout>
 
 <style>
-.hero {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 2rem 0 1.75rem;
-}
-
-.photo {
-  width: 64px;
-  height: 64px;
-  border-radius: 4px;
-  object-fit: cover;
-  flex-shrink: 0;
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 3rem;
+  align-items: start;
+  padding-top: 1.5rem;
 }
 
 h1 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 0.1rem;
+  font-size: 2.2rem;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem;
+  line-height: 1.2;
 }
 
-.tagline {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  margin: 0;
+h1 strong {
+  font-weight: 700;
 }
 
-.bio {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: 2rem;
-}
-
-.bio p {
-  font-size: 0.875rem;
-  margin: 0;
+p {
+  font-size: 0.9rem;
+  margin-bottom: 0.9rem;
+  color: var(--text-muted);
 }
 
 .links {
   display: flex;
-  gap: 1.25rem;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .links a {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
 .links a:hover {
   color: var(--text);
   text-decoration: none;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding-top: 0.5rem;
+}
+
+.photo {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.address {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-align: center;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .photo {
+    width: 80px;
+    height: 80px;
+  }
+  .address { text-align: left; }
 }
 </style>
