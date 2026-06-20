@@ -1,0 +1,179 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allNotes = (await getCollection('notes'))
+  .filter(n => !n.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const currentlyStudying = [
+  'Knowledge Representation & Reasoning (A(RC), propositional logic, FOL)',
+  'Optimisation — KKT conditions, Lagrangian duality',
+  'AI safety & interpretability',
+];
+---
+
+<Layout title="Notes" description="Study notes and short explainers by Simon Holm.">
+  <div class="container page">
+
+    <p class="section-label">Writing</p>
+    <h1>Notes</h1>
+    <p class="subtitle">
+      Short explainers and study writeups on topics I'm exploring. Written primarily for my own
+      understanding — like <a href="https://www.gillescastel.com/" target="_blank">Gilles Castel</a>-style
+      notes but in <a href="https://typst.app" target="_blank">Typst</a>.
+      If you want to learn Typst syntax, try my <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique game</a>.
+    </p>
+
+    <!-- Currently studying -->
+    <div class="studying-box">
+      <p class="section-label" style="margin-bottom: 0.6rem;">Currently studying</p>
+      <ul>
+        {currentlyStudying.map(s => (
+          <li>
+            <span class="dot"></span>
+            {s}
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <!-- Notes list -->
+    {allNotes.length > 0 ? (
+      <div class="notes-list">
+        {allNotes.map(note => (
+          <a href={`/notes/${note.slug}`} class="note-card">
+            <div class="note-top">
+              <strong>{note.data.title}</strong>
+              <time>{note.data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' })}</time>
+            </div>
+            <p>{note.data.summary}</p>
+            <div class="note-tags">
+              {note.data.tags.map(t => <span class="tag">{t}</span>)}
+            </div>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="empty">
+        <p class="mono">// notes coming soon</p>
+        <p>I'm setting up this section. Check back soon.</p>
+      </div>
+    )}
+
+  </div>
+</Layout>
+
+<style>
+h1 {
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  max-width: 520px;
+  margin-bottom: 2rem;
+}
+
+.studying-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.studying-box ul {
+  list-style: none;
+  margin: 0;
+}
+
+.studying-box li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  padding: 0.2rem 0;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  flex-shrink: 0;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.note-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  display: block;
+  color: var(--text);
+  transition: border-color 0.2s, transform 0.2s;
+  opacity: 1 !important;
+}
+
+.note-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+.note-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.35rem;
+  gap: 1rem;
+}
+
+.note-top strong {
+  font-size: 0.9rem;
+}
+
+.note-top time {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.note-card p {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin: 0 0 0.6rem;
+}
+
+.note-tags {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.empty {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.empty .mono {
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  opacity: 0.5;
+}
+
+.empty p {
+  color: var(--text-dim);
+  font-size: 0.875rem;
+}
+</style>

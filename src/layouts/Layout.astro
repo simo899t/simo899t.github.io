@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Simon Holm',
+  description = 'AI student at SDU. Builder. Chairperson of IMADA Fagråd.',
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title === 'Simon Holm' ? 'Simon Holm' : `${title} — Simon Holm`}</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+<body>
+  <nav>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">simon holm</a>
+      <ul class="nav-links">
+        <li><a href="/"         class={isActive('/')         ? 'active' : ''}>About</a></li>
+        <li><a href="/projects" class={isActive('/projects') ? 'active' : ''}>Projects</a></li>
+        <li><a href="/cv"       class={isActive('/cv')       ? 'active' : ''}>CV</a></li>
+        <li><a href="/notes"    class={isActive('/notes')    ? 'active' : ''}>Notes</a></li>
+        <li><a href="/contact"  class={isActive('/contact')  ? 'active' : ''}>Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <slot />
+  </main>
+
+  <footer>
+    <p>© 2026 Simon Holm · <a href="mailto:simon@cogito.dk">simon@cogito.dk</a> · <a href="https://github.com/simo899t" target="_blank">GitHub</a></p>
+  </footer>
+</body>
+</html>

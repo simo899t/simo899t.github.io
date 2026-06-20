@@ -1,0 +1,87 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes');
+  return notes.map(note => ({
+    params: { slug: note.slug },
+    props: { note },
+  }));
+}
+
+const { note } = Astro.props;
+const { Content } = await note.render();
+const dateStr = note.data.date.toLocaleDateString('en-GB', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+
+<Layout title={note.data.title} description={note.data.summary}>
+  <div class="container page">
+    <a href="/notes" class="back">← Notes</a>
+
+    <header>
+      <p class="section-label">Note</p>
+      <h1>{note.data.title}</h1>
+      <div class="meta">
+        <time>{dateStr}</time>
+        <div class="tags">
+          {note.data.tags.map(t => <span class="tag">{t}</span>)}
+        </div>
+      </div>
+    </header>
+
+    <hr />
+
+    <article class="prose">
+      <Content />
+    </article>
+  </div>
+</Layout>
+
+<style>
+.back {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  opacity: 1 !important;
+}
+
+.back:hover {
+  color: var(--text);
+}
+
+header {
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+time {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.tags {
+  display: flex;
+  gap: 0.35rem;
+}
+
+article {
+  margin-top: 2rem;
+}
+</style>

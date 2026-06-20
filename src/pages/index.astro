@@ -1,0 +1,251 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const interests = ['Sim racing', 'Music', 'Gaming', 'Mathematics', 'Sci-fi'];
+const skills    = ['Python', 'Java', 'Haskell', 'SQL', 'PyTorch', 'Git', 'Machine Learning', 'Optimization'];
+---
+
+<Layout title="Simon Holm" description="AI student at SDU. Builder. Chairperson of IMADA Fagråd.">
+  <div class="container page">
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-text">
+        <span class="mono">hi, i'm</span>
+        <h1>Simon Holm</h1>
+        <p class="tagline">AI Student · Builder · IMADA Fagråd Chair</p>
+        <p class="bio">
+          5th-semester Artificial Intelligence student at the University of Southern Denmark (SDU).
+          I'm interested in machine learning interpretability and Danish &amp; EU technology
+          sovereignty. Outside academia I chair the IMADA Fagråd — the student council for
+          Mathematics &amp; Computer Science — advocating for students across the institute.
+        </p>
+        <div class="hero-actions">
+          <a href="/projects" class="btn-primary">Projects</a>
+          <a href="/cv" class="btn-secondary">CV</a>
+          <a href="/contact" class="btn-secondary">Contact</a>
+        </div>
+      </div>
+      <div class="hero-photo">
+        <img src="/profile.png" alt="Simon Holm" />
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- About -->
+    <section class="about-grid">
+      <div>
+        <p class="section-label">Background</p>
+        <h2>About me</h2>
+        <p style="margin-top: 0.75rem;">
+          I study AI at SDU's IMADA faculty in Odense. My coursework spans algorithms &amp;
+          data structures, machine learning, functional programming, knowledge representation,
+          and optimisation. I write my study notes in Typst — you can play with Typst syntax
+          in a game I built: <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique</a>.
+        </p>
+        <p style="margin-top: 0.75rem;">
+          As Chairperson of the IMADA Fagråd (since March 2025), I represent AI and
+          Mathematics students in meetings with faculty and university leadership.
+        </p>
+      </div>
+
+      <div class="aside-grid">
+        <div>
+          <p class="section-label">Interests</p>
+          <div class="chips">
+            {interests.map(i => <span class="tag">{i}</span>)}
+          </div>
+        </div>
+        <div>
+          <p class="section-label" style="margin-top: 1.5rem;">Skills</p>
+          <div class="chips">
+            {skills.map(s => <span class="tag accent">{s}</span>)}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Quick links -->
+    <section>
+      <p class="section-label">Explore</p>
+      <div class="quick-links">
+        <a href="/projects" class="ql-card">
+          <span class="ql-icon">&#x7B;&#x7D;</span>
+          <div>
+            <strong>Projects</strong>
+            <p>Python, Java, Haskell &amp; web experiments</p>
+          </div>
+        </a>
+        <a href="/cv" class="ql-card">
+          <span class="ql-icon">&#x1F4C4;</span>
+          <div>
+            <strong>CV</strong>
+            <p>Education, experience &amp; skills</p>
+          </div>
+        </a>
+        <a href="/notes" class="ql-card">
+          <span class="ql-icon">&#x270F;&#xFE0F;</span>
+          <div>
+            <strong>Notes</strong>
+            <p>Short explainers on topics I study</p>
+          </div>
+        </a>
+      </div>
+    </section>
+
+  </div>
+</Layout>
+
+<style>
+.hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 3rem;
+  padding: 3rem 0 2.5rem;
+}
+
+.hero-text {
+  flex: 1;
+}
+
+.hero-text h1 {
+  font-size: 2.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.tagline {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+
+.bio {
+  font-size: 0.95rem;
+  max-width: 520px;
+  margin-bottom: 1.75rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary {
+  display: inline-block;
+  padding: 0.55rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #09090b;
+  opacity: 1 !important;
+}
+
+.btn-primary:hover {
+  background: #7dd3fc;
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.btn-secondary:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+  opacity: 1;
+}
+
+.hero-photo {
+  flex-shrink: 0;
+}
+
+.hero-photo img {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding: 1rem 0;
+}
+
+.about-grid h2 {
+  font-size: 1.2rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.ql-card {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  color: var(--text);
+  transition: border-color 0.2s, transform 0.2s;
+  opacity: 1 !important;
+}
+
+.ql-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.ql-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.ql-card strong {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.2rem;
+}
+
+.ql-card p {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .hero { flex-direction: column-reverse; gap: 1.5rem; }
+  .hero-text h1 { font-size: 2rem; }
+  .about-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .quick-links { grid-template-columns: 1fr; }
+}
+</style>

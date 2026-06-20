@@ -1,0 +1,218 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const groups = [
+  {
+    lang: 'Python',
+    color: '#3b82f6',
+    projects: [
+      {
+        title: 'Sorting Network Generator',
+        desc: 'Generating optimal sorting networks for lists.',
+        note: '1st semester exam',
+        url: 'https://github.com/simo899t/sortnet',
+      },
+      {
+        title: 'C3Paw — Cat & Dog Classifier',
+        desc: 'CNN-based image classification of cats and dogs using PyTorch.',
+        note: '4th semester exam',
+        url: 'https://github.com/simo899t/cat_dog_classification',
+      },
+      {
+        title: 'Path & CNN Optimization',
+        desc: 'Shortest-path algorithms and convolutional neural network optimisation.',
+        note: '4th semester exam',
+        url: 'https://github.com/simo899t/optimization_assignment_1',
+      },
+      {
+        title: 'Mood2-D2 — Emotion Classifier',
+        desc: 'Classifying human emotions from facial expressions.',
+        note: '4th semester exam',
+        url: 'https://github.com/simo899t/emotion_classifier',
+      },
+      {
+        title: 'Simplex Environment Search',
+        desc: 'Simplex method environment search and roar-net-api solver.',
+        note: '4th semester exam',
+        url: 'https://github.com/simo899t/optimization_assignment_2',
+      },
+      {
+        title: 'SundAdmin API',
+        desc: 'Personal REST API project — first foray into backend development.',
+        note: 'Personal project',
+        url: 'https://github.com/simo899t/SundAdmin',
+      },
+    ],
+  },
+  {
+    lang: 'Java',
+    color: '#f97316',
+    projects: [
+      {
+        title: 'Pacman',
+        desc: 'Pacman-like game built with JavaFX. Custom game engine with entity logic, collision detection, and AI ghosts.',
+        note: '2nd semester exam',
+        url: 'https://github.com/simo899t/pacman',
+      },
+    ],
+  },
+  {
+    lang: 'Haskell',
+    color: '#a855f7',
+    projects: [
+      {
+        title: 'snakey',
+        desc: 'A domain-specific language for defining and running 1v1 snake-like games.',
+        note: '3rd semester exam',
+        url: 'https://github.com/simo899t/snakey',
+      },
+    ],
+  },
+  {
+    lang: 'Web',
+    color: '#22c55e',
+    projects: [
+      {
+        title: 'Typstnique',
+        desc: 'An interactive game for learning Typst syntax. Built for fun and to help fellow students.',
+        note: 'Personal project',
+        url: 'https://simo899t.github.io/typstnique',
+      },
+      {
+        title: 'Practice Quiz App',
+        desc: 'A self-hosted quiz app for SDU exam practice — multiple-choice and free-response, with MathJax.',
+        note: 'Personal project',
+        url: 'https://github.com/simo899t',
+      },
+    ],
+  },
+  {
+    lang: 'Coursework',
+    color: '#38bdf8',
+    projects: [
+      {
+        title: 'SDU Notes',
+        desc: 'Typst-formatted lecture notes covering semesters 2–5: algorithms, ML, linear algebra, KR, and more.',
+        note: '2nd–5th semester',
+        url: 'https://github.com/simo899t/SDU',
+      },
+    ],
+  },
+];
+---
+
+<Layout title="Projects" description="Simon Holm's programming projects.">
+  <div class="container page">
+
+    <p class="section-label">Work</p>
+    <h1>Projects</h1>
+    <p class="subtitle">A collection of coursework and personal projects, mostly in Python, Java, Haskell, and the web.</p>
+
+    <div class="groups">
+      {groups.map(group => (
+        <section class="group">
+          <div class="group-header">
+            <span class="lang-dot" style={`background: ${group.color}`}></span>
+            <h2>{group.lang}</h2>
+          </div>
+          <div class="project-list">
+            {group.projects.map(p => (
+              <a href={p.url} target="_blank" class="project-card">
+                <div class="project-top">
+                  <strong>{p.title}</strong>
+                  <span class="tag">{p.note}</span>
+                </div>
+                <p>{p.desc}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+
+  </div>
+</Layout>
+
+<style>
+h1 {
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  max-width: 500px;
+  margin-bottom: 3rem;
+}
+
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.lang-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.group-header h2 {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.project-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.75rem;
+}
+
+.project-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  display: block;
+  color: var(--text);
+  transition: border-color 0.2s, transform 0.2s;
+  opacity: 1 !important;
+}
+
+.project-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.project-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.project-top strong {
+  font-size: 0.9rem;
+}
+
+.project-card p {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin: 0;
+  line-height: 1.5;
+}
+</style>
