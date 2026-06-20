@@ -29,14 +29,19 @@ const isActive = (href: string) =>
     <div class="nav-inner">
       <a href="/" class="nav-logo">simon holm</a>
       <ul class="nav-links">
-        <li><a href="/"         class={isActive('/')         ? 'active' : ''}>About</a></li>
-        <li><a href="/projects" class={isActive('/projects') ? 'active' : ''}>Projects</a></li>
-        <li><a href="/cv"       class={isActive('/cv')       ? 'active' : ''}>CV</a></li>
-        <li><a href="/notes"    class={isActive('/notes')    ? 'active' : ''}>Notes</a></li>
-        <li><a href="/contact"  class={isActive('/contact')  ? 'active' : ''}>Contact</a></li>
+        <li><a href="/"         class={isActive('/')         ? 'active' : ''}>about</a></li>
+        <li><a href="/projects" class={isActive('/projects') ? 'active' : ''}>projects</a></li>
+        <li><a href="/cv"       class={isActive('/cv')       ? 'active' : ''}>cv</a></li>
+        <li><a href="/notes"    class={isActive('/notes')    ? 'active' : ''}>notes</a></li>
+        <li><a href="/contact"  class={isActive('/contact')  ? 'active' : ''}>contact</a></li>
       </ul>
     </div>
   </nav>
+
+  <!-- Neural net sidebar — only rendered on wide screens via CSS -->
+  <div class="nn-sidebar" aria-hidden="true">
+    <canvas id="nn-canvas"></canvas>
+  </div>
 
   <main>
     <slot />
@@ -47,3 +52,146 @@ const isActive = (href: string) =>
   </footer>
 </body>
 </html>
+
+<script>
+const canvas = document.getElementById('nn-canvas') as HTMLCanvasElement;
+const ctx    = canvas.getContext('2d')!;
+const dpr    = window.devicePixelRatio || 1;
+
+// Network architecture
+const LAYERS = [3, 5, 4, 5, 2];
+const W_PX   = 110;
+const LAYER_GAP  = (W_PX - 20) / (LAYERS.length - 1);
+const MAX_N      = Math.max(...LAYERS);
+const NODE_R     = 4;
+const V_GAP      = 18;
+const H_PAD      = 10;
+const V_PAD      = 16;
+const H_PX       = MAX_N * V_GAP + V_PAD * 2;
+
+// Colors
+const C_EDGE_DIM    = 'rgba(60,60,60,0.7)';
+const C_EDGE_ACTIVE = 'rgba(77,182,196,0.35)';
+const C_NODE_EMPTY  = '#222';
+const C_NODE_LIT    = '#4db6c4';
+const C_NODE_FIRED  = '#1a3540';
+const C_BORDER_DIM  = '#333';
+const C_BORDER_LIT  = '#4db6c4';
+
+// Node positions
+function nodePos(layer: number, idx: number, total: number) {
+  const x = H_PAD + layer * LAYER_GAP;
+  const totalH = (total - 1) * V_GAP;
+  const startY = V_PAD + (MAX_N - 1) * V_GAP / 2 - totalH / 2;
+  return { x, y: startY + idx * V_GAP };
+}
+
+// Animation state
+let activations: number[][] = LAYERS.map(n => new Array(n).fill(0));
+let pulseLayer = -1;
+let frame = 0;
+const PULSE_INTERVAL = 55; // frames between pulses
+
+function stepAnimation() {
+  frame++;
+  if (frame % PULSE_INTERVAL === 0) {
+    // Start new forward pass
+    pulseLayer = 0;
+    activations = LAYERS.map(n => new Array(n).fill(0));
+    // random sparse activations for input
+    LAYERS[0] && activations[0].forEach((_, i) => {
+      activations[0][i] = Math.random() > 0.3 ? Math.random() * 0.7 + 0.3 : 0;
+    });
+  }
+
+  if (pulseLayer >= 0 && frame % 12 === 0) {
+    pulseLayer++;
+    if (pulseLayer < LAYERS.length) {
+      // Propagate: each node in this layer fires based on previous layer
+      for (let j = 0; j < LAYERS[pulseLayer]; j++) {
+        const prev = activations[pulseLayer - 1];
+        const sum  = prev.reduce((s, v) => s + v, 0) / prev.length;
+        activations[pulseLayer][j] = Math.random() > 0.25
+          ? Math.max(0, sum * (0.6 + Math.random() * 0.8))
+          : 0;
+      }
+    } else {
+      pulseLayer = -1;
+    }
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W_PX, H_PX);
+
+  // Edges
+  for (let l = 0; l < LAYERS.length - 1; l++) {
+    for (let i = 0; i < LAYERS[l]; i++) {
+      for (let j = 0; j < LAYERS[l + 1]; j++) {
+        const a = nodePos(l, i, LAYERS[l]);
+        const b = nodePos(l + 1, j, LAYERS[l + 1]);
+        const active = activations[l][i] > 0.1 && pulseLayer === l + 1;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.strokeStyle = active ? C_EDGE_ACTIVE : C_EDGE_DIM;
+        ctx.lineWidth   = active ? 1.2 : 0.5;
+        ctx.stroke();
+      }
+    }
+  }
+
+  // Nodes
+  for (let l = 0; l < LAYERS.length; l++) {
+    for (let i = 0; i < LAYERS[l]; i++) {
+      const { x, y } = nodePos(l, i, LAYERS[l]);
+      const act = activations[l][i];
+      const lit = act > 0.1;
+
+      ctx.beginPath();
+      ctx.arc(x, y, NODE_R, 0, Math.PI * 2);
+      if (lit) {
+        ctx.fillStyle = `rgba(77,182,196,${0.15 + act * 0.6})`;
+      } else {
+        ctx.fillStyle = C_NODE_EMPTY;
+      }
+      ctx.fill();
+      ctx.strokeStyle = lit ? C_NODE_LIT : C_BORDER_DIM;
+      ctx.lineWidth   = 0.75;
+      ctx.stroke();
+    }
+  }
+}
+
+function setup() {
+  canvas.width        = W_PX * dpr;
+  canvas.height       = H_PX * dpr;
+  canvas.style.width  = W_PX + 'px';
+  canvas.style.height = H_PX + 'px';
+  ctx.scale(dpr, dpr);
+}
+
+function loop() {
+  stepAnimation();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+setup();
+loop();
+</script>
+
+<style is:global>
+.nn-sidebar {
+  display: none;
+  position: fixed;
+  right: calc(50% - 330px - 130px);
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+}
+
+@media (min-width: 980px) {
+  .nn-sidebar { display: block; }
+}
+</style>
