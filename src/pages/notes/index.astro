@@ -23,13 +23,24 @@ const studying = [
     </p>
 
     <div class="typst-demo">
-      <div class="demo-pane demo-src">
-        <div class="pane-label">source.typ</div>
-        <pre id="typst-src"><span class="cursor">▮</span></pre>
+      <div class="demo-src">
+        <div class="pane-bar">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="pane-title">notes.typ</span>
+        </div>
+        <div class="editor">
+          <div class="line-nums" id="line-nums"></div>
+          <pre id="typst-src"></pre>
+        </div>
       </div>
-      <div class="demo-pane demo-out">
-        <div class="pane-label">output</div>
-        <canvas id="typst-canvas"></canvas>
+      <div class="demo-out">
+        <div class="pane-bar">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="pane-title">notes.pdf</span>
+        </div>
+        <div class="paper-wrap">
+          <div class="paper" id="paper"></div>
+        </div>
       </div>
     </div>
 
@@ -59,210 +70,193 @@ const studying = [
 </Layout>
 
 <script>
-// ── Typst live demo ──────────────────────────────────────────────────────────
-const srcEl    = document.getElementById('typst-src')!;
-const outCanvas = document.getElementById('typst-canvas') as HTMLCanvasElement;
-const ctx2     = outCanvas.getContext('2d')!;
-const dpr2     = window.devicePixelRatio || 1;
+const srcEl   = document.getElementById('typst-src')!;
+const lineEl  = document.getElementById('line-nums')!;
+const paperEl = document.getElementById('paper')!;
 
-// Snippets to cycle through: [source lines, rendered lines]
-const DEMOS: Array<{ src: string[]; out: Array<{text:string; style:string; x?:number}> }> = [
+// Each demo: array of source lines + the rendered HTML for the paper side
+const DEMOS = [
   {
     src: [
-      '= KKT Conditions',
-      '',
-      'For a minimisation problem,',
-      'the stationarity condition:',
-      '',
-      '$nabla f(x^*) + sum_i mu_i$',
-      '$quad nabla g_i(x^*) = 0$',
+      `#import "template.typ": note`,
+      `#show: note.with(`,
+      `  title: "KKT Conditions",`,
+      `  date: 2026-06-01,`,
+      `)`,
+      ``,
+      `= Stationarity`,
+      ``,
+      `For a minimisation problem with`,
+      `inequality constraints $g_i(x) <= 0$:`,
+      ``,
+      `$ nabla f(x^*) + sum_i mu_i nabla g_i(x^*) = 0 $`,
+      ``,
+      `== Complementary slackness`,
+      ``,
+      `$ mu_i dot g_i(x^*) = 0, quad mu_i >= 0 $`,
     ],
-    out: [
-      { text: 'KKT Conditions',        style: 'heading' },
-      { text: '',                       style: 'gap' },
-      { text: 'For a minimisation problem,', style: 'body' },
-      { text: 'the stationarity condition:', style: 'body' },
-      { text: '',                       style: 'gap' },
-      { text: '∇f(x*) + Σᵢ μᵢ ∇gᵢ(x*) = 0', style: 'math' },
-    ],
+    out: `
+      <h1>KKT Conditions</h1>
+      <h2>Stationarity</h2>
+      <p>For a minimisation problem with inequality constraints <em>g<sub>i</sub>(x) ≤ 0</em>:</p>
+      <div class="math">∇f(x*) + Σᵢ μᵢ ∇gᵢ(x*) = 0</div>
+      <h2>Complementary slackness</h2>
+      <div class="math">μᵢ · gᵢ(x*) = 0,&ensp; μᵢ ≥ 0</div>
+    `,
   },
   {
     src: [
-      '#import "template.typ": *',
-      '#show: note.with(',
-      '  title: "Gradient Descent",',
-      '  date: datetime.today(),',
-      ')',
-      '',
-      '== Update rule',
-      '$theta <- theta - alpha nabla L$',
+      `#import "template.typ": note`,
+      `#show: note.with(title: "Attention")`,
+      ``,
+      `= Scaled Dot-Product Attention`,
+      ``,
+      `Given queries $Q$, keys $K$, values $V$`,
+      `with dimension $d_k$:`,
+      ``,
+      `$ "Attn"(Q, K, V) = "softmax"`,
+      `  (Q K^T / sqrt(d_k)) V $`,
+      ``,
+      `The $sqrt(d_k)$ scaling prevents`,
+      `vanishing gradients in large $d_k$.`,
     ],
-    out: [
-      { text: 'Gradient Descent',  style: 'heading' },
-      { text: '',                  style: 'gap' },
-      { text: 'Update rule',       style: 'subheading' },
-      { text: '',                  style: 'gap' },
-      { text: 'θ ← θ − α ∇L(θ)',  style: 'math' },
-    ],
+    out: `
+      <h1>Scaled Dot-Product Attention</h1>
+      <p>Given queries <em>Q</em>, keys <em>K</em>, values <em>V</em> with dimension <em>d<sub>k</sub></em>:</p>
+      <div class="math">Attn(Q, K, V) = softmax( QKᵀ / √d<sub>k</sub> ) V</div>
+      <p>The √d<sub>k</sub> scaling prevents vanishing gradients in large d<sub>k</sub>.</p>
+    `,
   },
   {
     src: [
-      '== Attention mechanism',
-      '',
-      'Given queries $Q$, keys $K$,',
-      'values $V$:',
-      '',
-      '$"Attention"(Q,K,V) =$',
-      '$"softmax"(Q K^T / sqrt(d_k)) V$',
+      `#import "template.typ": note`,
+      `#show: note.with(title: "Entailment")`,
+      ``,
+      `= Entailment in $cal(A)$`,
+      ``,
+      `A model $cal(M)$ _satisfies_ All $p q$ iff`,
+      `$[|p|] subset.eq [|q|]$.`,
+      ``,
+      `#definition[`,
+      `  $Gamma models phi$ iff every model`,
+      `  satisfying all of $Gamma$ also`,
+      `  satisfies $phi$.`,
+      `]`,
+      ``,
+      `This is a *universal* statement.`,
     ],
-    out: [
-      { text: 'Attention mechanism', style: 'subheading' },
-      { text: '',                    style: 'gap' },
-      { text: 'Given Q, K, V:',      style: 'body' },
-      { text: '',                    style: 'gap' },
-      { text: 'Attention(Q,K,V) =',  style: 'math' },
-      { text: 'softmax(QKᵀ/√dₖ)·V', style: 'math' },
-    ],
+    out: `
+      <h1>Entailment in 𝒜</h1>
+      <p>A model ℳ <em>satisfies</em> All <em>p q</em> iff ⟦p⟧ ⊆ ⟦q⟧.</p>
+      <div class="def-box">
+        <strong>Definition.</strong> Γ ⊨ φ iff every model satisfying all of Γ also satisfies φ.
+      </div>
+      <p>This is a <strong>universal</strong> statement.</p>
+    `,
   },
 ];
 
-let demoIdx   = 0;
-let charIdx   = 0;
-let lineIdx   = 0;
-let phase: 'typing' | 'pause' | 'erasing' = 'typing';
-let tick2     = 0;
-const CHAR_DELAY = 2;  // ticks per character
-const PAUSE_TICKS = 80;
+let demoIdx = 0;
+let charPos = 0;       // absolute char position across all lines
+let phase: 'typing' | 'hold' | 'clearing' = 'typing';
+let holdTick = 0;
+let clearTick = 0;
 
-function fullSrc(d: typeof DEMOS[0], lines: number, chars: number) {
-  const parts: string[] = [];
-  for (let i = 0; i < lines; i++) {
-    parts.push(d.src[i]);
-  }
-  if (chars < d.src[lines]?.length ?? 0) {
-    parts.push(d.src[lines].slice(0, chars));
-  }
-  return parts.join('\n');
+const CHAR_MS   = 28;
+const HOLD_MS   = 2200;
+const CLEAR_MS  = 400;
+
+function currentSrc() {
+  const lines = DEMOS[demoIdx].src;
+  const full  = lines.join('\n');
+  return full.slice(0, charPos);
 }
 
-function coloriseLine(line: string): string {
-  return line
-    .replace(/^(=+\s)/g, '<span class="kw">$1</span>')
-    .replace(/(#\w+)/g, '<span class="fn">$1</span>')
-    .replace(/(".*?")/g, '<span class="str">$1</span>')
-    .replace(/(\$[^$]+\$)/g, '<span class="math2">$1</span>');
+function highlight(text: string): string {
+  // colour by token type, VS Code dark theme inspired
+  return text
+    .replace(/^(#\w+)/gm, '<span style="color:#4db6c4">$1</span>')
+    .replace(/(\"[^\"]*\")/g,        '<span style="color:#ce9178">$1</span>')
+    .replace(/(\$[^\$\n]+\$)/g,      '<span style="color:#b5cea8">$1</span>')
+    .replace(/\b(true|false)\b/g,    '<span style="color:#569cd6">$1</span>')
+    .replace(/(\/\/[^\n]*)/g,        '<span style="color:#555">$1</span>')
+    .replace(/^(=+\s[^\n]*)/gm,      '<span style="color:#dcdcaa; font-weight:600">$1</span>');
 }
 
-function renderSrc(text: string) {
+function render() {
+  const text  = currentSrc();
   const lines = text.split('\n');
-  srcEl.innerHTML = lines.map(l => coloriseLine(l)).join('\n') + '<span class="cursor">▮</span>';
-}
+  const totalLines = DEMOS[demoIdx].src.length;
 
-function setupOutCanvas() {
-  const w = outCanvas.parentElement!.clientWidth;
-  const h = 180;
-  outCanvas.width  = w * dpr2;
-  outCanvas.height = h * dpr2;
-  outCanvas.style.width  = w + 'px';
-  outCanvas.style.height = h + 'px';
-  ctx2.scale(dpr2, dpr2);
-}
+  // source pane
+  srcEl.innerHTML = highlight(text) + '<span class="cursor">▮</span>';
 
-function renderOut(demo: typeof DEMOS[0], progress: number) {
-  const w = outCanvas.clientWidth;
-  const h = outCanvas.clientHeight;
-  ctx2.fillStyle = '#0f1a1c';
-  ctx2.fillRect(0, 0, w, h);
+  // line numbers
+  lineEl.innerHTML = lines.map((_, i) =>
+    `<span>${i + 1}</span>`
+  ).join('');
 
-  // page-like inner rect
-  ctx2.fillStyle = '#f8f6f0';
-  ctx2.fillRect(12, 10, w - 24, h - 20);
-
-  let y = 28;
-  const totalChars = demo.src.slice(0, Math.ceil(progress * demo.src.length)).join('').length;
-  const outLines   = Math.ceil((progress * demo.out.length));
-
-  for (let i = 0; i < Math.min(outLines, demo.out.length); i++) {
-    const row = demo.out[i];
-    if (row.style === 'gap') { y += 6; continue; }
-    ctx2.textBaseline = 'top';
-    if (row.style === 'heading') {
-      ctx2.font = 'bold 13px Georgia, serif';
-      ctx2.fillStyle = '#111';
-      ctx2.fillText(row.text, 20, y);
-      y += 18;
-      ctx2.fillStyle = '#bbb';
-      ctx2.fillRect(20, y, w - 44, 0.5);
-      y += 6;
-    } else if (row.style === 'subheading') {
-      ctx2.font = 'bold 10px Georgia, serif';
-      ctx2.fillStyle = '#222';
-      ctx2.fillText(row.text, 20, y);
-      y += 15;
-    } else if (row.style === 'math') {
-      ctx2.font = 'italic 10px Georgia, serif';
-      ctx2.fillStyle = '#1a1a6e';
-      ctx2.fillText(row.text, 20, y);
-      y += 14;
-    } else {
-      ctx2.font = '9px system-ui, sans-serif';
-      ctx2.fillStyle = '#333';
-      ctx2.fillText(row.text, 20, y);
-      y += 13;
-    }
+  // paper — show progressively as typing advances
+  const progress = charPos / DEMOS[demoIdx].src.join('\n').length;
+  if (phase === 'hold') {
+    paperEl.innerHTML = DEMOS[demoIdx].out;
+    paperEl.style.opacity = '1';
+  } else {
+    // fade in paper content as typing progresses past halfway
+    const opacity = Math.max(0, (progress - 0.3) / 0.7);
+    paperEl.innerHTML = DEMOS[demoIdx].out;
+    paperEl.style.opacity = String(Math.min(opacity, 1));
   }
 }
 
-function animLoop() {
-  tick2++;
-  const demo = DEMOS[demoIdx];
-  const totalSrcLen = demo.src.join('').length;
+function step() {
+  const fullLen = DEMOS[demoIdx].src.join('\n').length;
 
   if (phase === 'typing') {
-    if (tick2 % CHAR_DELAY === 0) {
-      const curLineLen = demo.src[lineIdx]?.length ?? 0;
-      if (charIdx < curLineLen) {
-        charIdx++;
-      } else if (lineIdx < demo.src.length - 1) {
-        lineIdx++;
-        charIdx = 0;
-      } else {
-        phase = 'pause';
-        tick2 = 0;
-      }
-      renderSrc(fullSrc(demo, lineIdx, charIdx));
-      const progress = (lineIdx * 10 + charIdx) / (demo.src.length * 10);
-      renderOut(demo, Math.min(progress * 1.4, 1));
+    if (charPos < fullLen) {
+      charPos += 2;
+      if (charPos > fullLen) charPos = fullLen;
+    } else {
+      phase = 'hold';
+      holdTick = 0;
     }
-  } else if (phase === 'pause') {
-    if (tick2 > PAUSE_TICKS) { phase = 'erasing'; tick2 = 0; }
-    renderOut(demo, 1);
+    render();
+    setTimeout(step, CHAR_MS);
+
+  } else if (phase === 'hold') {
+    holdTick += 16;
+    render();
+    if (holdTick < HOLD_MS) {
+      setTimeout(step, 16);
+    } else {
+      phase = 'clearing';
+      clearTick = 0;
+      setTimeout(step, 16);
+    }
+
   } else {
-    // erasing — just clear and move to next
-    if (tick2 > 20) {
-      demoIdx  = (demoIdx + 1) % DEMOS.length;
-      lineIdx  = 0;
-      charIdx  = 0;
-      phase    = 'typing';
-      tick2    = 0;
-      srcEl.textContent = '';
-      ctx2.clearRect(0, 0, outCanvas.clientWidth, outCanvas.clientHeight);
+    clearTick += 16;
+    const t = Math.min(clearTick / CLEAR_MS, 1);
+    paperEl.style.opacity = String(1 - t);
+    if (t < 1) {
+      setTimeout(step, 16);
+    } else {
+      demoIdx = (demoIdx + 1) % DEMOS.length;
+      charPos = 0;
+      phase   = 'typing';
+      paperEl.innerHTML = '';
+      srcEl.innerHTML   = '<span class="cursor">▮</span>';
+      lineEl.innerHTML  = '<span>1</span>';
+      setTimeout(step, 300);
     }
   }
-
-  requestAnimationFrame(animLoop);
 }
 
-setupOutCanvas();
-animLoop();
+step();
 </script>
 
 <style>
-h1 {
-  font-size: 1.6rem;
-  font-weight: 600;
-  margin-bottom: 0.35rem;
-}
+h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 
 .sub {
   font-size: 0.85rem;
@@ -270,69 +264,161 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
+/* ── Typst demo ─────────────────────── */
 .typst-demo {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 2rem;
+  margin-bottom: 2.25rem;
+  font-size: 0;   /* kill inline-block gaps */
 }
 
-.demo-pane {
+.pane-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  background: #1a1a1a;
+  border-bottom: 1px solid #262626;
+}
+
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot.red    { background: #ff5f57; }
+.dot.yellow { background: #febc2e; }
+.dot.green  { background: #28c840; }
+
+.pane-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #555;
+  margin-left: 6px;
+}
+
+/* source side */
+.demo-src {
+  border-right: 1px solid #222;
+  background: #111;
+}
+
+.editor {
+  display: flex;
+  min-height: 220px;
+  max-height: 280px;
+  overflow: hidden;
+}
+
+.line-nums {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 8px 10px 0;
+  min-width: 28px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.6;
+  color: #3a3a3a;
+  background: #111;
+  border-right: 1px solid #1e1e1e;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+#typst-src {
+  margin: 0;
+  padding: 10px 10px 10px 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: #ccc;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: #111;
+  flex: 1;
+  border: none;
+  outline: none;
+}
+
+.cursor {
+  color: #4db6c4;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* output side */
+.demo-out {
+  background: #e8e5dc;
   display: flex;
   flex-direction: column;
 }
 
-.pane-label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-dim);
-  padding: 0.4rem 0.75rem;
-  background: #0f0f0f;
-  border-bottom: 1px solid var(--border);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+.demo-out .pane-bar {
+  background: #d8d5cc;
+  border-bottom: 1px solid #c8c5bc;
 }
 
-.demo-src {
-  border-right: 1px solid var(--border);
+.demo-out .pane-title { color: #999; }
+
+.paper-wrap {
+  flex: 1;
+  padding: 16px 18px;
+  overflow: hidden;
 }
 
-.demo-src pre {
-  margin: 0;
-  padding: 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  line-height: 1.6;
-  color: #aaa;
-  min-height: 180px;
-  white-space: pre-wrap;
-  word-break: break-all;
-  background: #0d0d0d;
+.paper {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 11px;
+  color: #111;
+  line-height: 1.65;
+  transition: opacity 0.25s;
 }
 
-.cursor {
-  color: var(--accent);
-  animation: blink 1s step-end infinite;
+.paper :global(h1) {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0 0 10px;
+  padding-bottom: 4px;
+  border-bottom: 0.5px solid #bbb;
+  color: #111;
 }
 
-@keyframes blink { 50% { opacity: 0; } }
-
-:global(.kw)    { color: #569cd6; }
-:global(.fn)    { color: #4db6c4; }
-:global(.str)   { color: #ce9178; }
-:global(.math2) { color: #b5cea8; }
-
-#typst-canvas {
-  display: block;
-  width: 100%;
+.paper :global(h2) {
+  font-size: 11px;
+  font-weight: bold;
+  margin: 10px 0 4px;
+  color: #111;
 }
 
-.studying {
-  margin-bottom: 2rem;
+.paper :global(p) {
+  margin: 0 0 7px;
+  color: #222;
+  font-size: 10.5px;
 }
+
+.paper :global(.math) {
+  font-style: italic;
+  text-align: center;
+  margin: 8px 0;
+  font-size: 11px;
+  color: #111;
+}
+
+.paper :global(.def-box) {
+  border: 0.5px solid #aaa;
+  padding: 6px 10px;
+  margin: 8px 0;
+  font-size: 10.5px;
+  color: #222;
+  background: #f2efe6;
+}
+
+/* ── rest of page ───────────────────── */
+.studying { margin-bottom: 2rem; }
 
 .label {
   font-family: var(--font-mono);
@@ -344,12 +430,7 @@ h1 {
   margin-bottom: 0.6rem;
 }
 
-.studying ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
+.studying ul { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
 
 .studying li {
   font-size: 0.85rem;
@@ -358,15 +439,11 @@ h1 {
   gap: 0.5rem;
 }
 
-.bullet {
-  color: var(--accent);
-  flex-shrink: 0;
-}
+.bullet { color: var(--accent); flex-shrink: 0; }
 
 .note-list {
   display: flex;
   flex-direction: column;
-  gap: 0;
   border-top: 1px solid var(--border);
 }
 
@@ -382,10 +459,7 @@ h1 {
 
 .note-row:hover .note-title { color: var(--accent); }
 
-.note-title {
-  font-size: 0.875rem;
-  color: var(--text);
-}
+.note-title { font-size: 0.875rem; color: var(--text); }
 
 .note-meta {
   font-family: var(--font-mono);
