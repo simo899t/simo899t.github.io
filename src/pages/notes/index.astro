@@ -6,11 +6,6 @@ const allNotes = (await getCollection('notes'))
   .filter(n => !n.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const studying = [
-  'Knowledge Representation & Reasoning — A(RC), FOL, propositional logic',
-  'Optimisation — KKT conditions, Lagrangian duality, convex analysis',
-  'AI safety & interpretability',
-];
 ---
 
 <Layout title="Notes" description="Study notes by Simon Holm.">
@@ -21,6 +16,18 @@ const studying = [
       Written in <a href="https://typst.app" target="_blank">Typst</a> —
       try the syntax with <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique</a>.
     </p>
+
+    <div class="typst-blurb">
+      <p>
+        I write all my lecture notes in <a href="https://typst.app/open-source/" target="_blank">Typst</a> —
+        a modern typesetting system that compiles as you type, with real math, clean PDFs, and
+        no LaTeX boilerplate. I have a shared <code>temp.typ</code> that every course imports:
+        custom <code>#theorem</code> / <code>#definition</code> boxes, matrix shorthands like <code>succ</code> and <code>mat</code>,
+        calculus operators like <code>#dv(f,x)</code> and <code>#ppv(f,x)</code>, and a bunch of
+        symbol aliases so KR proofs don't look like line noise.
+        The demo below cycles through a few real snippets.
+      </p>
+    </div>
 
     <div class="typst-demo">
       <div class="demo-src">
@@ -42,13 +49,6 @@ const studying = [
           <div class="paper" id="paper"></div>
         </div>
       </div>
-    </div>
-
-    <div class="studying">
-      <span class="label">currently studying</span>
-      <ul>
-        {studying.map(s => <li><span class="bullet">▸</span>{s}</li>)}
-      </ul>
     </div>
 
     {allNotes.length > 0 ? (
@@ -77,107 +77,112 @@ const paperEl = document.getElementById('paper')!;
 // Each demo: array of source lines + the rendered HTML for the paper side
 const DEMOS = [
   {
+    // Linear algebra — positive definiteness, mat, succ
     src: [
-      `#import "template.typ": note`,
-      `#show: note.with(title: "Positive Definiteness")`,
+      `#import "../../temp.typ": *`,
+      `#show: note.with(`,
+      `  title:  "Linear Algebra",`,
+      `  course: "DM561",`,
+      `)`,
       ``,
-      `= Positive Definite Matrices`,
+      `= Positive Definiteness`,
       ``,
-      `A symmetric matrix $A in RR^(n times n)$`,
-      `is _positive definite_, written $A succ 0$,`,
-      `iff for all $x != 0$:`,
+      `A symmetric $A in RR^(n times n)$ is`,
+      `_positive definite_ ($A succ 0$) iff`,
+      `$x^T A x > 0$ for all $x != bold(0)$.`,
       ``,
-      `$ x^T A x > 0 $`,
+      `#definition[`,
+      `  $A succ 0 <==>$ all eigenvalues`,
+      `  $lambda_i > 0 <==>$ Cholesky`,
+      `  decomposition $A = L L^T$ exists.`,
+      `]`,
       ``,
-      `== Equivalent conditions`,
-      ``,
-      `- All eigenvalues $lambda_i > 0$`,
-      `- Cholesky: $A = L L^T$ exists`,
-      `- All leading minors $> 0$`,
-      ``,
-      `For $A = mat(2, 1; 1, 3)$, we check`,
-      `$det(A) = 5 > 0$ and $A_(11) = 2 > 0$,`,
-      `so $A succ 0$.`,
+      `*Example.* For`,
+      `$A = mat(4, 2; 2, 3)$`,
+      `we get $det(A) = 8 > 0$ and`,
+      `$A_11 = 4 > 0$, so $A succ 0$.`,
     ],
     out: `
-      <h1>Positive Definite Matrices</h1>
-      <p>A symmetric matrix <em>A ∈ ℝ<sup>n×n</sup></em> is <em>positive definite</em>, written <em>A ≻ 0</em>, iff for all <em>x ≠ 0</em>:</p>
-      <div class="math"><em>x</em><sup>T</sup><em>Ax</em> &gt; 0</div>
-      <h2>Equivalent conditions</h2>
-      <ul>
-        <li>All eigenvalues λ<sub>i</sub> &gt; 0</li>
-        <li>Cholesky: <em>A = LL</em><sup>T</sup> exists</li>
-        <li>All leading minors &gt; 0</li>
-      </ul>
-      <p>For <em>A = </em><span class="mat">⎡2 1⎤<br>⎣1 3⎦</span>, we check det(<em>A</em>) = 5 &gt; 0 and <em>A</em><sub>11</sub> = 2 &gt; 0, so <em>A ≻ 0</em>.</p>
+      <h1>Positive Definiteness</h1>
+      <p>A symmetric <em>A ∈ ℝ<sup>n×n</sup></em> is <em>positive definite</em> (<em>A ≻ 0</em>) iff <em>x<sup>T</sup>Ax &gt; 0</em> for all <em>x ≠ <strong>0</strong></em>.</p>
+      <div class="def-box">
+        <strong>Definition.</strong> <em>A ≻ 0</em> ⟺ all eigenvalues λ<sub>i</sub> &gt; 0 ⟺ Cholesky decomposition <em>A = LL<sup>T</sup></em> exists.
+      </div>
+      <p><strong>Example.</strong> For <em>A = </em><span class="imat">[4 2 / 2 3]</span> we get det(<em>A</em>) = 8 &gt; 0 and <em>A</em><sub>11</sub> = 4 &gt; 0, so <em>A ≻ 0</em>.</p>
     `,
   },
   {
+    // Gradient descent — #loss shorthand, nabla, weight update
     src: [
-      `#import "template.typ": note`,
-      `#show: note.with(title: "Gradient Descent")`,
+      `#import "../../temp.typ": *`,
+      `#show: note.with(`,
+      `  title:  "Optimisation",`,
+      `  course: "DM872",`,
+      `)`,
       ``,
-      `= Weight Update Rule`,
+      `= Gradient Descent`,
       ``,
-      `Given loss $cal(L)(theta)$, gradient`,
-      `descent updates parameters as:`,
+      `The gradient descent update for`,
+      `parameters $theta$ with loss $loss$:`,
       ``,
       `$ theta_(t+1) = theta_t`,
-      `  - eta nabla_theta cal(L)(theta_t) $`,
+      `  - eta nabla_theta loss(theta_t) $`,
       ``,
       `where $eta > 0$ is the learning rate.`,
       ``,
-      `== Mini-batch estimate`,
+      `== Mini-batch SGD`,
       ``,
-      `In practice we approximate the`,
-      `full gradient over a batch $cal(B)$:`,
+      `Approximate $nabla_theta loss$ over`,
+      `a batch $cal(B) subset cal(D)$:`,
       ``,
-      `$ nabla_theta cal(L) approx`,
-      `  1/|cal(B)| sum_(i in cal(B))`,
-      `  nabla_theta ell_i (theta) $`,
+      `$ nabla_theta loss`,
+      `  approx 1 / |cal(B)|`,
+      `  sum_(i in cal(B)) nabla_theta ell_i $`,
     ],
     out: `
-      <h1>Weight Update Rule</h1>
-      <p>Given loss <em>ℒ(θ)</em>, gradient descent updates parameters as:</p>
+      <h1>Gradient Descent</h1>
+      <p>The gradient descent update for parameters <em>θ</em> with loss <em>ℒ</em>:</p>
       <div class="math">θ<sub>t+1</sub> = θ<sub>t</sub> − η ∇<sub>θ</sub> ℒ(θ<sub>t</sub>)</div>
       <p>where <em>η &gt; 0</em> is the learning rate.</p>
-      <h2>Mini-batch estimate</h2>
-      <p>In practice we approximate the full gradient over a batch <em>ℬ</em>:</p>
-      <div class="math">∇<sub>θ</sub> ℒ ≈ <sup>1</sup>/<sub>|ℬ|</sub> Σ<sub>i∈ℬ</sub> ∇<sub>θ</sub> ℓ<sub>i</sub>(θ)</div>
+      <h2>Mini-batch SGD</h2>
+      <p>Approximate ∇<sub>θ</sub>ℒ over a batch <em>ℬ ⊆ 𝒟</em>:</p>
+      <div class="math">∇<sub>θ</sub>ℒ ≈ <sup>1</sup>/<sub>|ℬ|</sub> Σ<sub>i∈ℬ</sub> ∇<sub>θ</sub> ℓ<sub>i</sub></div>
     `,
   },
   {
+    // Calculus — FTC with #int shorthand, chain rule with #dv and #ppv
     src: [
-      `#import "template.typ": note`,
-      `#show: note.with(title: "Calculus")`,
+      `#import "../../temp.typ": *`,
+      `#show: note.with(`,
+      `  title:  "Calculus",`,
+      `  course: "MM536",`,
+      `)`,
       ``,
-      `= Fundamental Theorem of Calculus`,
+      `= Fundamental Theorem`,
       ``,
-      `If $f$ is continuous on $[a, b]$ and`,
+      `If $f$ is continuous on $[a,b]$ and`,
       `$F' = f$, then:`,
       ``,
-      `$ integral_a^b f(x) dif x = F(b) - F(a) $`,
+      `$ int(a, b, f(x) dx) = F(b) - F(a) $`,
       ``,
-      `== Chain Rule`,
+      `= Chain Rule`,
       ``,
-      `For $h = f compose g$, i.e.\ $h(x) = f(g(x))$:`,
+      `For $h(x) = f(g(x))$:`,
       ``,
-      `$ (dif h)/(dif x) = (dif f)/(dif g)`,
-      `  dot (dif g)/(dif x) $`,
+      `$ dv(h, x) = dv(f, g) dot dv(g, x) $`,
       ``,
-      `In ML: backprop is the chain rule`,
-      `applied layer by layer — $partial cal(L)`,
-      `\/ partial W = partial cal(L) \/ partial z`,
-      `dot partial z \/ partial W$.`,
+      `In backprop: $ppv(loss, W)`,
+      `= ppv(loss, z) dot ppv(z, W)$`,
+      `applied layer by layer.`,
     ],
     out: `
-      <h1>Fundamental Theorem of Calculus</h1>
+      <h1>Fundamental Theorem</h1>
       <p>If <em>f</em> is continuous on [<em>a, b</em>] and <em>F′ = f</em>, then:</p>
       <div class="math">∫<sub>a</sub><sup>b</sup> f(x) dx = F(b) − F(a)</div>
-      <h2>Chain Rule</h2>
-      <p>For <em>h = f ∘ g</em>, i.e. <em>h(x) = f(g(x))</em>:</p>
+      <h1 style="margin-top:10px">Chain Rule</h1>
+      <p>For <em>h(x) = f(g(x))</em>:</p>
       <div class="math">dh/dx = (df/dg) · (dg/dx)</div>
-      <p>In ML: backprop is the chain rule applied layer by layer — <em>∂ℒ/∂W = (∂ℒ/∂z)(∂z/∂W)</em>.</p>
+      <p>In backprop: <em>∂ℒ/∂W = (∂ℒ/∂z)(∂z/∂W)</em> applied layer by layer.</p>
     `,
   },
 ];
@@ -463,28 +468,25 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 }
 
 /* ── rest of page ───────────────────── */
-.studying { margin-bottom: 2rem; }
-
-.label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  display: block;
-  margin-bottom: 0.6rem;
+.typst-blurb {
+  margin-bottom: 1.25rem;
 }
 
-.studying ul { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; }
-
-.studying li {
+.typst-blurb p {
   font-size: 0.85rem;
   color: var(--text-muted);
-  display: flex;
-  gap: 0.5rem;
+  line-height: 1.7;
+  margin: 0;
 }
 
-.bullet { color: var(--accent); flex-shrink: 0; }
+.typst-blurb code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: rgba(77,182,196,0.08);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
 
 .note-list {
   display: flex;
