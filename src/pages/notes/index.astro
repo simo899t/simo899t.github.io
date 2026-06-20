@@ -6,174 +6,267 @@ const allNotes = (await getCollection('notes'))
   .filter(n => !n.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
-const currentlyStudying = [
-  'Knowledge Representation & Reasoning (A(RC), propositional logic, FOL)',
-  'Optimisation — KKT conditions, Lagrangian duality',
+const studying = [
+  'Knowledge Representation & Reasoning — A(RC), FOL, propositional logic',
+  'Optimisation — KKT conditions, Lagrangian duality, convex analysis',
   'AI safety & interpretability',
 ];
 ---
 
-<Layout title="Notes" description="Study notes and short explainers by Simon Holm.">
+<Layout title="Notes" description="Study notes by Simon Holm.">
   <div class="container page">
-
-    <p class="section-label">Writing</p>
     <h1>Notes</h1>
-    <p class="subtitle">
-      Short explainers and study writeups on topics I'm exploring. Written primarily for my own
-      understanding — like <a href="https://www.gillescastel.com/" target="_blank">Gilles Castel</a>-style
-      notes but in <a href="https://typst.app" target="_blank">Typst</a>.
-      If you want to learn Typst syntax, try my <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique game</a>.
+    <p class="sub">
+      Short write-ups on things I'm figuring out.
+      Written in <a href="https://typst.app" target="_blank">Typst</a> —
+      try the syntax with <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique</a>.
     </p>
 
-    <!-- Currently studying -->
-    <div class="studying-box">
-      <p class="section-label" style="margin-bottom: 0.6rem;">Currently studying</p>
+    <canvas id="tree-canvas"></canvas>
+
+    <div class="studying">
+      <span class="label">currently studying</span>
       <ul>
-        {currentlyStudying.map(s => (
-          <li>
-            <span class="dot"></span>
-            {s}
-          </li>
-        ))}
+        {studying.map(s => <li><span class="bullet">▸</span>{s}</li>)}
       </ul>
     </div>
 
-    <!-- Notes list -->
     {allNotes.length > 0 ? (
-      <div class="notes-list">
-        {allNotes.map(note => (
-          <a href={`/notes/${note.slug}`} class="note-card">
-            <div class="note-top">
-              <strong>{note.data.title}</strong>
-              <time>{note.data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' })}</time>
-            </div>
-            <p>{note.data.summary}</p>
-            <div class="note-tags">
-              {note.data.tags.map(t => <span class="tag">{t}</span>)}
-            </div>
+      <div class="note-list">
+        {allNotes.map(n => (
+          <a href={`/notes/${n.slug}`} class="note-row">
+            <span class="note-title">{n.data.title}</span>
+            <span class="note-meta">
+              {n.data.tags.join(' · ')} &nbsp;·&nbsp;
+              {n.data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short' })}
+            </span>
           </a>
         ))}
       </div>
     ) : (
-      <div class="empty">
-        <p class="mono">// notes coming soon</p>
-        <p>I'm setting up this section. Check back soon.</p>
-      </div>
+      <p class="empty">more coming soon</p>
     )}
-
   </div>
 </Layout>
 
-<style>
-h1 {
-  font-size: 2rem;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.5rem;
+<script>
+const canvas = document.getElementById('tree-canvas') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d')!;
+const dpr = window.devicePixelRatio || 1;
+
+const BG    = '#141414';
+const LINE  = '#2a2a2a';
+const NODE_EMPTY = '#1e1e1e';
+const NODE_FILL  = '#1a2a2d';
+const NODE_CUR   = '#4db6c4';
+const TEXT_COL   = '#555';
+
+interface TreeNode {
+  val: number;
+  x: number; y: number;
+  left: TreeNode | null;
+  right: TreeNode | null;
 }
 
-.subtitle {
-  font-size: 0.9rem;
-  max-width: 520px;
+const H = 120;
+let W: number;
+let root: TreeNode | null = null;
+let insertQueue: number[] = [];
+let animating: TreeNode | null = null;
+let animPath: TreeNode[] = [];
+let animStep = 0;
+let frame = 0;
+
+function setup() {
+  W = canvas.parentElement!.clientWidth;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+  reset();
+}
+
+function reset() {
+  root = null;
+  insertQueue = shuffle([...Array(15)].map((_, i) => i + 1));
+  animating = null;
+  animPath = [];
+  animStep = 0;
+  frame = 0;
+}
+
+function shuffle<T>(a: T[]) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function layout(node: TreeNode | null, x: number, y: number, spread: number) {
+  if (!node) return;
+  node.x = x; node.y = y;
+  layout(node.left,  x - spread, y + 28, spread / 2);
+  layout(node.right, x + spread, y + 28, spread / 2);
+}
+
+function insert(node: TreeNode | null, val: number, path: TreeNode[]): TreeNode {
+  if (!node) {
+    const n: TreeNode = { val, x: 0, y: 0, left: null, right: null };
+    path.push(n);
+    return n;
+  }
+  path.push(node);
+  if (val < node.val) node.left  = insert(node.left,  val, path);
+  else                node.right = insert(node.right, val, path);
+  return node;
+}
+
+function drawTree(node: TreeNode | null) {
+  if (!node) return;
+  ctx.strokeStyle = LINE;
+  ctx.lineWidth = 1;
+  if (node.left)  { ctx.beginPath(); ctx.moveTo(node.x, node.y); ctx.lineTo(node.left.x,  node.left.y);  ctx.stroke(); }
+  if (node.right) { ctx.beginPath(); ctx.moveTo(node.x, node.y); ctx.lineTo(node.right.x, node.right.y); ctx.stroke(); }
+  drawTree(node.left);
+  drawTree(node.right);
+
+  const isAnim = animPath.slice(0, animStep).includes(node);
+  const isCur  = animPath[animStep - 1] === node;
+  ctx.beginPath();
+  ctx.arc(node.x, node.y, 9, 0, Math.PI * 2);
+  ctx.fillStyle = isCur ? NODE_CUR : isAnim ? NODE_FILL : NODE_EMPTY;
+  ctx.fill();
+  ctx.strokeStyle = isCur ? NODE_CUR : '#2a2a2a';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.fillStyle = isCur ? '#141414' : TEXT_COL;
+  ctx.font = `${7 * dpr / dpr}px Consolas, monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(String(node.val), node.x, node.y + 0.5);
+}
+
+function tick() {
+  frame++;
+
+  // Every 18 frames: advance animation step or start a new insertion
+  if (frame % 18 === 0) {
+    if (animating && animStep < animPath.length) {
+      animStep++;
+    } else if (insertQueue.length > 0) {
+      const val = insertQueue.shift()!;
+      const path: TreeNode[] = [];
+      root = insert(root, val, path);
+      layout(root, W / 2, 18, W / 5);
+      animPath = path;
+      animStep = 1;
+      animating = path[path.length - 1];
+    } else {
+      // all inserted — pause then reset
+      setTimeout(reset, 1500);
+    }
+  }
+
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, W, H);
+  if (root) drawTree(root);
+  requestAnimationFrame(tick);
+}
+
+setup();
+tick();
+window.addEventListener('resize', setup);
+</script>
+
+<style>
+h1 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.sub {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+}
+
+#tree-canvas {
+  display: block;
+  border-radius: 3px;
+  margin-bottom: 1.5rem;
+}
+
+.studying {
   margin-bottom: 2rem;
 }
 
-.studying-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
-  padding: 1.1rem 1.25rem;
-  margin-bottom: 2.5rem;
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  display: block;
+  margin-bottom: 0.6rem;
 }
 
-.studying-box ul {
+.studying ul {
   list-style: none;
-  margin: 0;
-}
-
-.studying-box li {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  padding: 0.2rem 0;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
+.studying li {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bullet {
+  color: var(--accent);
   flex-shrink: 0;
 }
 
-.notes-list {
+.note-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0;
+  border-top: 1px solid var(--border);
 }
 
-.note-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.1rem 1.25rem;
-  display: block;
-  color: var(--text);
-  transition: border-color 0.2s, transform 0.2s;
-  opacity: 1 !important;
-}
-
-.note-card:hover {
-  border-color: var(--border-hover);
-  transform: translateY(-1px);
-}
-
-.note-top {
+.note-row {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 0.35rem;
   gap: 1rem;
+  padding: 0.8rem 0;
+  border-bottom: 1px solid var(--border);
+  opacity: 1 !important;
 }
 
-.note-top strong {
-  font-size: 0.9rem;
+.note-row:hover .note-title { color: var(--accent); }
+
+.note-title {
+  font-size: 0.875rem;
+  color: var(--text);
 }
 
-.note-top time {
+.note-meta {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   color: var(--text-dim);
-  flex-shrink: 0;
-}
-
-.note-card p {
-  font-size: 0.82rem;
-  color: var(--text-dim);
-  margin: 0 0 0.6rem;
-}
-
-.note-tags {
-  display: flex;
-  gap: 0.35rem;
-  flex-wrap: wrap;
+  white-space: nowrap;
 }
 
 .empty {
-  text-align: center;
-  padding: 4rem 0;
-}
-
-.empty .mono {
-  font-size: 0.9rem;
-  margin-bottom: 0.75rem;
-  opacity: 0.5;
-}
-
-.empty p {
+  font-size: 0.85rem;
   color: var(--text-dim);
-  font-size: 0.875rem;
+  font-family: var(--font-mono);
 }
 </style>
