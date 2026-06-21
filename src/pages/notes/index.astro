@@ -70,9 +70,10 @@ const allNotes = (await getCollection('notes'))
 </Layout>
 
 <script>
-const srcEl   = document.getElementById('typst-src')!;
-const lineEl  = document.getElementById('line-nums')!;
-const paperEl = document.getElementById('paper')!;
+const srcEl   = document.getElementById('typst-src');
+const lineEl  = document.getElementById('line-nums');
+const paperEl = document.getElementById('paper');
+if (!srcEl || !lineEl || !paperEl) throw new Error('demo elements missing');;
 
 // Each demo: src lines + chunks { atLine, html } that appear as that line finishes typing
 const DEMOS = [
@@ -132,8 +133,8 @@ const DEMOS = [
       `a batch $cal(B) subset cal(D)$:`,  // 19
       ``,                                 // 20
       `$ nabla_theta loss`,               // 21
-      `  approx 1 / |cal(B)|`,           // 22
-      `  sum_(i in cal(B)) nabla_theta ell_i $`, // 23
+      `  approx 1 / abs(cal(B))`,           // 22
+      `  sum_(i in cal(B)) nabla_theta loss_i $`, // 23
     ],
     chunks: [
       { atLine: 6,  html: `<h1>Gradient Descent</h1>` },
@@ -158,7 +159,7 @@ const DEMOS = [
       `If $f$ is continuous on $[a,b]$ and`, // 8
       `$F' = f$, then:`,                  // 9
       ``,                                 // 10
-      `$ int(a, b, f(x) dx) = F(b) - F(a) $`, // 11
+      `$ integral_a^b  f(x) dx = F(b) - F(a) $`, // 11
       ``,                                 // 12
       `= Chain Rule`,                     // 13
       ``,                                 // 14
@@ -184,7 +185,7 @@ const DEMOS = [
 
 let demoIdx = 0;
 let charPos = 0;
-let phase: 'typing' | 'hold' | 'clearing' = 'typing';
+let phase = 'typing';   // 'typing' | 'hold' | 'clearing'
 let holdTick = 0;
 let clearTick = 0;
 let lastRenderedLine = -1;
@@ -199,15 +200,15 @@ function currentSrc() {
 }
 
 // how many complete lines have been typed so far
-function completedLines(): number {
+function completedLines() {
   const full    = DEMOS[demoIdx].src.join('\n');
   const partial = full.slice(0, charPos);
   // a line is complete once the newline after it has been typed
   return partial.split('\n').length - 1;
 }
 
-function highlight(text: string): string {
-  const esc = (s: string) =>
+function highlight(text) {
+  const esc = (s) =>
     s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
   return text.split('\n').map(line => {
