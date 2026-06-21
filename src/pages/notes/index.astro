@@ -74,133 +74,136 @@ const srcEl   = document.getElementById('typst-src')!;
 const lineEl  = document.getElementById('line-nums')!;
 const paperEl = document.getElementById('paper')!;
 
-// Each demo: array of source lines + the rendered HTML for the paper side
+// Each demo: src lines + chunks { atLine, html } that appear as that line finishes typing
 const DEMOS = [
   {
-    // Linear algebra — positive definiteness, mat, succ
     src: [
-      `#import "../../temp.typ": *`,
-      `#show: note.with(`,
-      `  title:  "Linear Algebra",`,
-      `  course: "DM561",`,
-      `)`,
-      ``,
-      `= Positive Definiteness`,
-      ``,
-      `A symmetric $A in RR^(n times n)$ is`,
-      `_positive definite_ ($A succ 0$) iff`,
-      `$x^T A x > 0$ for all $x != bold(0)$.`,
-      ``,
-      `#definition[`,
-      `  $A succ 0 bi$ all eigenvalues`,
-      `  $lambda_i > 0 bi$ Cholesky`,
-      `  decomposition $A = L L^T$ exists.`,
-      `]`,
-      ``,
-      `*Example.* For`,
-      `$A = mat(4, 2; 2, 3)$`,
-      `we get $det(A) = 8 > 0$ and`,
-      `$A_11 = 4 > 0$, so $A succ 0$.`,
+      `#import "../../temp.typ": *`,      // 0
+      `#show: note.with(`,                // 1
+      `  title:  "Linear Algebra",`,      // 2
+      `  course: "DM561",`,               // 3
+      `)`,                                // 4
+      ``,                                 // 5
+      `= Positive Definiteness`,          // 6
+      ``,                                 // 7
+      `A symmetric $A in RR^(n times n)$ is`,  // 8
+      `_positive definite_ ($A succ 0$) iff`,  // 9
+      `$x^T A x > 0$ for all $x != bold(0)$.`, // 10
+      ``,                                 // 11
+      `#definition[`,                     // 12
+      `  $A succ 0 bi$ all eigenvalues`,  // 13
+      `  $lambda_i > 0 bi$ Cholesky`,    // 14
+      `  decomposition $A = L L^T$ exists.`, // 15
+      `]`,                                // 16
+      ``,                                 // 17
+      `*Example.* For`,                   // 18
+      `$A = mat(4, 2; 2, 3)$`,           // 19
+      `we get $det(A) = 8 > 0$ and`,     // 20
+      `$A_11 = 4 > 0$, so $A succ 0$.`,  // 21
     ],
-    out: `
-      <h1>Positive Definiteness</h1>
-      <p>A symmetric <em>A ∈ ℝ<sup>n×n</sup></em> is <em>positive definite</em> (<em>A ≻ 0</em>) iff <em>x<sup>T</sup>Ax &gt; 0</em> for all <em>x ≠ <strong>0</strong></em>.</p>
-      <div class="def-box">
-        <strong>Definition.</strong> <em>A ≻ 0</em> ⟺ all eigenvalues λ<sub>i</sub> &gt; 0 ⟺ Cholesky decomposition <em>A = LL<sup>T</sup></em> exists.
-      </div>
-      <p><strong>Example.</strong> For <em>A = </em><span class="imat">[4 2 / 2 3]</span> we get det(<em>A</em>) = 8 &gt; 0 and <em>A</em><sub>11</sub> = 4 &gt; 0, so <em>A ≻ 0</em>.</p>
-    `,
+    chunks: [
+      { atLine: 6,  html: `<h1>Positive Definiteness</h1>` },
+      { atLine: 10, html: `<p>A symmetric <em>A</em> ∈ ℝ<sup><em>n</em>×<em>n</em></sup> is <em>positive definite</em> (<em>A</em> ≻ 0) iff <em>x</em><sup>T</sup><em>Ax</em> &gt; 0 for all <em>x</em> ≠ <strong>0</strong>.</p>` },
+      { atLine: 16, html: `<div class="def-box"><strong>Definition.</strong> <em>A</em> ≻ 0 ⟺ all eigenvalues λ<sub><em>i</em></sub> &gt; 0 ⟺ Cholesky decomposition <em>A</em> = <em>LL</em><sup>T</sup> exists.</div>` },
+      { atLine: 21, html: `<p><strong>Example.</strong> For <em>A</em> = <span style="font-family:serif">[<sup>4 2</sup>/<sub>2 3</sub>]</span> we get det(<em>A</em>) = 8 &gt; 0 and <em>A</em><sub>11</sub> = 4 &gt; 0, so <em>A</em> ≻ 0.</p>` },
+    ],
   },
   {
-    // Gradient descent — #loss shorthand, nabla, weight update
     src: [
-      `#import "../../temp.typ": *`,
-      `#show: note.with(`,
-      `  title:  "Optimisation",`,
-      `  course: "DM872",`,
-      `)`,
-      ``,
-      `= Gradient Descent`,
-      ``,
-      `The gradient descent update for`,
-      `parameters $theta$ with loss $loss$:`,
-      ``,
-      `$ theta_(t+1) = theta_t`,
-      `  - eta nabla_theta loss(theta_t) $`,
-      ``,
-      `where $eta > 0$ is the learning rate.`,
-      ``,
-      `== Mini-batch SGD`,
-      ``,
-      `Approximate $nabla_theta loss$ over`,
-      `a batch $cal(B) subset cal(D)$:`,
-      ``,
-      `$ nabla_theta loss`,
-      `  approx 1 / |cal(B)|`,
-      `  sum_(i in cal(B)) nabla_theta ell_i $`,
+      `#import "../../temp.typ": *`,      // 0
+      `#show: note.with(`,                // 1
+      `  title:  "Optimisation",`,        // 2
+      `  course: "DM872",`,               // 3
+      `)`,                                // 4
+      ``,                                 // 5
+      `= Gradient Descent`,               // 6
+      ``,                                 // 7
+      `The gradient descent update for`,  // 8
+      `parameters $theta$ with loss $loss$:`, // 9
+      ``,                                 // 10
+      `$ theta_(t+1) = theta_t`,          // 11
+      `  - eta nabla_theta loss(theta_t) $`, // 12
+      ``,                                 // 13
+      `where $eta > 0$ is the learning rate.`, // 14
+      ``,                                 // 15
+      `== Mini-batch SGD`,                // 16
+      ``,                                 // 17
+      `Approximate $nabla_theta loss$ over`, // 18
+      `a batch $cal(B) subset cal(D)$:`,  // 19
+      ``,                                 // 20
+      `$ nabla_theta loss`,               // 21
+      `  approx 1 / |cal(B)|`,           // 22
+      `  sum_(i in cal(B)) nabla_theta ell_i $`, // 23
     ],
-    out: `
-      <h1>Gradient Descent</h1>
-      <p>The gradient descent update for parameters <em>θ</em> with loss <em>ℒ</em>:</p>
-      <div class="math">θ<sub>t+1</sub> = θ<sub>t</sub> − η ∇<sub>θ</sub> ℒ(θ<sub>t</sub>)</div>
-      <p>where <em>η &gt; 0</em> is the learning rate.</p>
-      <h2>Mini-batch SGD</h2>
-      <p>Approximate ∇<sub>θ</sub>ℒ over a batch <em>ℬ ⊆ 𝒟</em>:</p>
-      <div class="math">∇<sub>θ</sub>ℒ ≈ <sup>1</sup>/<sub>|ℬ|</sub> Σ<sub>i∈ℬ</sub> ∇<sub>θ</sub> ℓ<sub>i</sub></div>
-    `,
+    chunks: [
+      { atLine: 6,  html: `<h1>Gradient Descent</h1>` },
+      { atLine: 9,  html: `<p>The gradient descent update for parameters θ with loss ℒ:</p>` },
+      { atLine: 12, html: `<div class="math">θ<sub>t+1</sub> = θ<sub>t</sub> − η ∇<sub>θ</sub> ℒ(θ<sub>t</sub>)</div>` },
+      { atLine: 14, html: `<p>where η &gt; 0 is the learning rate.</p>` },
+      { atLine: 16, html: `<h2>Mini-batch SGD</h2>` },
+      { atLine: 19, html: `<p>Approximate ∇<sub>θ</sub> ℒ over a batch ℬ ⊆ 𝒟:</p>` },
+      { atLine: 23, html: `<div class="math">∇<sub>θ</sub> ℒ ≈ (1/|ℬ|) Σ<sub>i∈ℬ</sub> ∇<sub>θ</sub> ℓ<sub>i</sub></div>` },
+    ],
   },
   {
-    // Calculus — FTC with #int shorthand, chain rule with #dv and #ppv
     src: [
-      `#import "../../temp.typ": *`,
-      `#show: note.with(`,
-      `  title:  "Calculus",`,
-      `  course: "MM536",`,
-      `)`,
-      ``,
-      `= Fundamental Theorem`,
-      ``,
-      `If $f$ is continuous on $[a,b]$ and`,
-      `$F' = f$, then:`,
-      ``,
-      `$ int(a, b, f(x) dx) = F(b) - F(a) $`,
-      ``,
-      `= Chain Rule`,
-      ``,
-      `For $h(x) = f(g(x))$:`,
-      ``,
-      `$ dv(h, x) = dv(f, g) dot dv(g, x) $`,
-      ``,
-      `In backprop: $ppv(loss, W)`,
-      `= ppv(loss, z) dot ppv(z, W)$`,
-      `applied layer by layer.`,
+      `#import "../../temp.typ": *`,      // 0
+      `#show: note.with(`,                // 1
+      `  title:  "Calculus",`,            // 2
+      `  course: "MM536",`,               // 3
+      `)`,                                // 4
+      ``,                                 // 5
+      `= Fundamental Theorem`,            // 6
+      ``,                                 // 7
+      `If $f$ is continuous on $[a,b]$ and`, // 8
+      `$F' = f$, then:`,                  // 9
+      ``,                                 // 10
+      `$ int(a, b, f(x) dx) = F(b) - F(a) $`, // 11
+      ``,                                 // 12
+      `= Chain Rule`,                     // 13
+      ``,                                 // 14
+      `For $h(x) = f(g(x))$:`,            // 15
+      ``,                                 // 16
+      `$ dv(h, x) = dv(f, g) dot dv(g, x) $`, // 17
+      ``,                                 // 18
+      `In backprop: $ppv(loss, W)`,       // 19
+      `= ppv(loss, z) dot ppv(z, W)$`,   // 20
+      `applied layer by layer.`,          // 21
     ],
-    out: `
-      <h1>Fundamental Theorem</h1>
-      <p>If <em>f</em> is continuous on [<em>a, b</em>] and <em>F′ = f</em>, then:</p>
-      <div class="math">∫<sub>a</sub><sup>b</sup> f(x) dx = F(b) − F(a)</div>
-      <h1 style="margin-top:10px">Chain Rule</h1>
-      <p>For <em>h(x) = f(g(x))</em>:</p>
-      <div class="math">dh/dx = (df/dg) · (dg/dx)</div>
-      <p>In backprop: <em>∂ℒ/∂W = (∂ℒ/∂z)(∂z/∂W)</em> applied layer by layer.</p>
-    `,
+    chunks: [
+      { atLine: 6,  html: `<h1>Fundamental Theorem</h1>` },
+      { atLine: 9,  html: `<p>If <em>f</em> is continuous on [<em>a</em>, <em>b</em>] and <em>F</em>′ = <em>f</em>, then:</p>` },
+      { atLine: 11, html: `<div class="math">∫<sub><em>a</em></sub><sup><em>b</em></sup> <em>f</em>(<em>x</em>) d<em>x</em> = <em>F</em>(<em>b</em>) − <em>F</em>(<em>a</em>)</div>` },
+      { atLine: 13, html: `<h1>Chain Rule</h1>` },
+      { atLine: 15, html: `<p>For <em>h</em>(<em>x</em>) = <em>f</em>(<em>g</em>(<em>x</em>)):</p>` },
+      { atLine: 17, html: `<div class="math">d<em>h</em>/d<em>x</em> = (d<em>f</em>/d<em>g</em>) · (d<em>g</em>/d<em>x</em>)</div>` },
+      { atLine: 21, html: `<p>In neural nets: ∂ℒ/∂<em>W</em> = (∂ℒ/∂<em>z</em>)(∂<em>z</em>/∂<em>W</em>) applied layer by layer.</p>` },
+    ],
   },
 ];
 
 let demoIdx = 0;
-let charPos = 0;       // absolute char position across all lines
+let charPos = 0;
 let phase: 'typing' | 'hold' | 'clearing' = 'typing';
 let holdTick = 0;
 let clearTick = 0;
+let lastRenderedLine = -1;
 
-const CHAR_MS   = 28;
-const HOLD_MS   = 2200;
-const CLEAR_MS  = 400;
+const CHAR_MS   = 48;   // ms per character
+const HOLD_MS   = 2800;
+const CLEAR_MS  = 350;
 
 function currentSrc() {
-  const lines = DEMOS[demoIdx].src;
-  const full  = lines.join('\n');
+  const full = DEMOS[demoIdx].src.join('\n');
   return full.slice(0, charPos);
+}
+
+// how many complete lines have been typed so far
+function completedLines(): number {
+  const full    = DEMOS[demoIdx].src.join('\n');
+  const partial = full.slice(0, charPos);
+  // a line is complete once the newline after it has been typed
+  return partial.split('\n').length - 1;
 }
 
 function highlight(text: string): string {
@@ -257,26 +260,25 @@ function highlight(text: string): string {
 function render() {
   const text  = currentSrc();
   const lines = text.split('\n');
-  const totalLines = DEMOS[demoIdx].src.length;
 
   // source pane
   srcEl.innerHTML = highlight(text) + '<span class="cursor">▮</span>';
 
-  // line numbers
-  lineEl.innerHTML = lines.map((_, i) =>
-    `<span>${i + 1}</span>`
+  // line numbers (always show all lines of the demo, grey out future ones)
+  const total = DEMOS[demoIdx].src.length;
+  lineEl.innerHTML = Array.from({ length: total }, (_, i) =>
+    `<span style="opacity:${i < lines.length ? 1 : 0.2}">${i + 1}</span>`
   ).join('');
 
-  // paper — show progressively as typing advances
-  const progress = charPos / DEMOS[demoIdx].src.join('\n').length;
-  if (phase === 'hold') {
-    paperEl.innerHTML = DEMOS[demoIdx].out;
-    paperEl.style.opacity = '1';
-  } else {
-    // fade in paper content as typing progresses past halfway
-    const opacity = Math.max(0, (progress - 0.3) / 0.7);
-    paperEl.innerHTML = DEMOS[demoIdx].out;
-    paperEl.style.opacity = String(Math.min(opacity, 1));
+  // paper — append chunks as their trigger line completes
+  const done = completedLines();
+  if (done !== lastRenderedLine) {
+    lastRenderedLine = done;
+    const visible = DEMOS[demoIdx].chunks
+      .filter(c => c.atLine <= done)
+      .map(c => c.html)
+      .join('');
+    paperEl.innerHTML = visible;
   }
 }
 
@@ -285,8 +287,7 @@ function step() {
 
   if (phase === 'typing') {
     if (charPos < fullLen) {
-      charPos += 2;
-      if (charPos > fullLen) charPos = fullLen;
+      charPos += 1;
     } else {
       phase = 'hold';
       holdTick = 0;
@@ -296,7 +297,6 @@ function step() {
 
   } else if (phase === 'hold') {
     holdTick += 16;
-    render();
     if (holdTick < HOLD_MS) {
       setTimeout(step, 16);
     } else {
@@ -309,13 +309,19 @@ function step() {
     clearTick += 16;
     const t = Math.min(clearTick / CLEAR_MS, 1);
     paperEl.style.opacity = String(1 - t);
+    srcEl.style.opacity   = String(1 - t);
+    lineEl.style.opacity  = String(1 - t);
     if (t < 1) {
       setTimeout(step, 16);
     } else {
-      demoIdx = (demoIdx + 1) % DEMOS.length;
-      charPos = 0;
-      phase   = 'typing';
+      demoIdx           = (demoIdx + 1) % DEMOS.length;
+      charPos           = 0;
+      lastRenderedLine  = -1;
+      phase             = 'typing';
       paperEl.innerHTML = '';
+      paperEl.style.opacity = '1';
+      srcEl.style.opacity   = '1';
+      lineEl.style.opacity  = '1';
       srcEl.innerHTML   = '<span class="cursor">▮</span>';
       lineEl.innerHTML  = '<span>1</span>';
       setTimeout(step, 300);
@@ -379,8 +385,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 
 .editor {
   display: flex;
-  min-height: 220px;
-  max-height: 280px;
+  height: 310px;
   overflow: hidden;
 }
 
@@ -436,9 +441,10 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 .demo-out .pane-title { color: #999; }
 
 .paper-wrap {
-  flex: 1;
+  height: 310px;
   padding: 16px 18px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .paper {
