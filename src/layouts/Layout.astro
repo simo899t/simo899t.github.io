@@ -38,7 +38,7 @@ const isActive = (href: string) =>
     </div>
   </nav>
 
-  <canvas id="loss-canvas" aria-hidden="true"></canvas>
+  <canvas id="plexus" aria-hidden="true"></canvas>
 
   <main>
     <slot />
@@ -51,116 +51,104 @@ const isActive = (href: string) =>
 </html>
 
 <script>
-const canvas = document.getElementById('loss-canvas') as HTMLCanvasElement;
+const canvas = document.getElementById('plexus') as HTMLCanvasElement;
 const ctx    = canvas.getContext('2d')!;
 const dpr    = window.devicePixelRatio || 1;
 
-const W = 100, H = 90;
-canvas.width  = W * dpr;
-canvas.height = H * dpr;
-canvas.style.width  = W + 'px';
-canvas.style.height = H + 'px';
-ctx.scale(dpr, dpr);
+const W = 200;
+let H = window.innerHeight;
 
-const PAD = { t: 8, r: 6, b: 18, l: 18 };
-const PW  = W - PAD.l - PAD.r;
-const PH  = H - PAD.t - PAD.b;
-const N   = 80; // epochs
+function resize() {
+  H = window.innerHeight;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+}
+resize();
+window.addEventListener('resize', resize);
 
-function makeLoss(start: number, end: number, noise: number): number[] {
-  const pts: number[] = [];
-  for (let i = 0; i < N; i++) {
-    const t    = i / (N - 1);
-    const base = start * Math.exp(-4 * t) + end;
-    pts.push(base + (Math.random() - 0.5) * noise * (1 - t * 0.7));
-  }
-  return pts;
+// Node type
+interface Node {
+  x: number; y: number;
+  vx: number; vy: number;
+  r: number;
 }
 
-let trainLoss: number[] = [];
-let valLoss:   number[] = [];
-let progress   = 0;
-let pauseTicks = 0;
+const NODE_COUNT = 38;
+const LINK_DIST  = 90;
+const SPEED      = 0.22;
 
-function newRun() {
-  const end = 0.08 + Math.random() * 0.12;
-  trainLoss = makeLoss(1.2 + Math.random() * 0.4, end,            0.06);
-  valLoss   = makeLoss(1.3 + Math.random() * 0.3, end + 0.05,    0.09);
-  progress  = 0;
-}
+const nodes: Node[] = Array.from({ length: NODE_COUNT }, () => ({
+  x:  Math.random() * W,
+  y:  Math.random() * window.innerHeight,
+  vx: (Math.random() - 0.5) * SPEED,
+  vy: (Math.random() - 0.5) * SPEED,
+  r:  1.5 + Math.random() * 1.5,
+}));
 
 function draw() {
-  ctx.clearRect(0, 0, W, H);
+  const h = canvas.height / dpr;
+  ctx.clearRect(0, 0, W, h);
 
-  // axes
-  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-  ctx.lineWidth   = 0.5;
-  ctx.beginPath(); ctx.moveTo(PAD.l, PAD.t); ctx.lineTo(PAD.l, PAD.t + PH); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(PAD.l, PAD.t + PH); ctx.lineTo(PAD.l + PW, PAD.t + PH); ctx.stroke();
-
-  // axis labels
-  ctx.fillStyle   = 'rgba(255,255,255,0.2)';
-  ctx.font        = '6px Consolas, monospace';
-  ctx.textAlign   = 'center';
-  ctx.fillText('epochs', PAD.l + PW / 2, H - 3);
-  ctx.save();
-  ctx.translate(6, PAD.t + PH / 2);
-  ctx.rotate(-Math.PI / 2);
-  ctx.fillText('loss', 0, 0);
-  ctx.restore();
-
-  const maxL = Math.max(...trainLoss, ...valLoss, 0.01);
-  const n    = Math.max(2, Math.floor(progress));
-
-  function plotLine(pts: number[], color: string) {
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth   = 1;
-    for (let i = 0; i < n && i < pts.length; i++) {
-      const x = PAD.l + (i / (N - 1)) * PW;
-      const y = PAD.t + PH - (pts[i] / maxL) * PH;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  // edges
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const d  = Math.sqrt(dx * dx + dy * dy);
+      if (d < LINK_DIST) {
+        const alpha = (1 - d / LINK_DIST) * 0.28;
+        ctx.strokeStyle = `rgba(77,182,196,${alpha})`;
+        ctx.lineWidth   = 0.6;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+      }
     }
-    ctx.stroke();
   }
 
-  plotLine(trainLoss, 'rgba(77,182,196,0.55)');
-  plotLine(valLoss,   'rgba(180,130,255,0.35)');
-
-  // legend
-  ctx.font      = '5.5px Consolas, monospace';
-  ctx.textAlign = 'left';
-  ctx.fillStyle = 'rgba(77,182,196,0.5)';  ctx.fillText('train', PAD.l + 2,      PAD.t + 7);
-  ctx.fillStyle = 'rgba(180,130,255,0.4)'; ctx.fillText('val',   PAD.l + 28, PAD.t + 7);
+  // nodes
+  for (const n of nodes) {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(77,182,196,0.55)';
+    ctx.fill();
+  }
 }
 
 function tick() {
-  if (progress < N) {
-    progress += 0.9;
-    draw();
-  } else {
-    pauseTicks++;
-    if (pauseTicks > 60) { newRun(); pauseTicks = 0; }
+  const h = canvas.height / dpr;
+  for (const n of nodes) {
+    n.x += n.vx;
+    n.y += n.vy;
+    if (n.x < 0 || n.x > W)  n.vx *= -1;
+    if (n.y < 0 || n.y > h)  n.vy *= -1;
   }
+  draw();
   requestAnimationFrame(tick);
 }
 
-newRun();
 tick();
 </script>
 
 <style is:global>
-#loss-canvas {
+#plexus {
   display: none;
   position: fixed;
-  right: calc(50% - 350px - 115px);
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.45;
+  right: calc(50% - 350px - 210px);
+  top: 0;
+  opacity: 0.5;
   pointer-events: none;
+  z-index: 0;
 }
 
-@media (min-width: 980px) {
-  #loss-canvas { display: block; }
+@media (min-width: 1020px) {
+  #plexus { display: block; }
 }
+
+main { position: relative; z-index: 1; }
+nav  { position: relative; z-index: 2; }
 </style>
