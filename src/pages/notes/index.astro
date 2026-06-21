@@ -70,10 +70,13 @@ const allNotes = (await getCollection('notes'))
 </Layout>
 
 <script>
-const srcEl   = document.getElementById('typst-src');
-const lineEl  = document.getElementById('line-nums');
-const paperEl = document.getElementById('paper');
-if (!srcEl || !lineEl || !paperEl) throw new Error('demo elements missing');;
+// Wait for full page load before touching DOM — guards against edge cases
+// where Astro's module bundling runs the script before layout is inserted.
+function initDemo() {
+  const srcEl   = document.getElementById('typst-src');
+  const lineEl  = document.getElementById('line-nums');
+  const paperEl = document.getElementById('paper');
+  if (!srcEl || !lineEl || !paperEl) return;;
 
 // Each demo: src lines + chunks { atLine, html } that appear as that line finishes typing
 const DEMOS = [
@@ -330,7 +333,10 @@ function step() {
   }
 }
 
-step();
+  step();
+} // end initDemo
+
+document.addEventListener('DOMContentLoaded', initDemo);
 </script>
 
 <style>
