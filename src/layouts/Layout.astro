@@ -55,82 +55,171 @@ const canvas = document.getElementById('plexus') as HTMLCanvasElement;
 const ctx    = canvas.getContext('2d')!;
 const dpr    = window.devicePixelRatio || 1;
 
-const W = 200;
-let H = window.innerHeight;
+const W = 220;
+let   H = window.innerHeight;
 
 function resize() {
   H = window.innerHeight;
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
+  canvas.width        = W * dpr;
+  canvas.height       = H * dpr;
   canvas.style.width  = W + 'px';
   canvas.style.height = H + 'px';
-  ctx.scale(dpr, dpr);
-}
-resize();
-window.addEventListener('resize', resize);
-
-// Node type
-interface Node {
-  x: number; y: number;
-  vx: number; vy: number;
-  r: number;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  buildNet();
 }
 
-const NODE_COUNT = 38;
-const LINK_DIST  = 90;
-const SPEED      = 0.22;
+// ── network architecture ──────────────────────────────
+const LAYERS = [3, 5, 5, 4, 2];   // neurons per layer
+const NR     = 5;                  // neuron radius
+const COL_GAP = W / (LAYERS.length + 1);
 
-const nodes: Node[] = Array.from({ length: NODE_COUNT }, () => ({
-  x:  Math.random() * W,
-  y:  Math.random() * window.innerHeight,
-  vx: (Math.random() - 0.5) * SPEED,
-  vy: (Math.random() - 0.5) * SPEED,
-  r:  1.5 + Math.random() * 1.5,
-}));
+interface Neuron { x: number; y: number; act: number; }
+type Edge = { a: Neuron; b: Neuron; w: number; pulse: number; active: boolean; };
 
-function draw() {
-  const h = canvas.height / dpr;
-  ctx.clearRect(0, 0, W, h);
+let neurons: Neuron[][] = [];
+let edges:   Edge[]     = [];
 
-  // edges
-  for (let i = 0; i < nodes.length; i++) {
-    for (let j = i + 1; j < nodes.length; j++) {
-      const dx = nodes[i].x - nodes[j].x;
-      const dy = nodes[i].y - nodes[j].y;
-      const d  = Math.sqrt(dx * dx + dy * dy);
-      if (d < LINK_DIST) {
-        const alpha = (1 - d / LINK_DIST) * 0.28;
-        ctx.strokeStyle = `rgba(77,182,196,${alpha})`;
-        ctx.lineWidth   = 0.6;
-        ctx.beginPath();
-        ctx.moveTo(nodes[i].x, nodes[i].y);
-        ctx.lineTo(nodes[j].x, nodes[j].y);
-        ctx.stroke();
+function buildNet() {
+  neurons = LAYERS.map((count, li) => {
+    const x      = COL_GAP * (li + 1);
+    const totalH = (count - 1) * 44;
+    const startY = H / 2 - totalH / 2;
+    return Array.from({ length: count }, (_, ni) => ({
+      x,
+      y: startY + ni * 44,
+      act: 0,
+    }));
+  });
+
+  edges = [];
+  for (let li = 0; li < neurons.length - 1; li++) {
+    for (const a of neurons[li]) {
+      for (const b of neurons[li + 1]) {
+        edges.push({
+          a, b,
+          w:      0.3 + Math.random() * 0.5,
+          pulse:  -1,
+          active: false,
+        });
       }
     }
   }
+}
 
-  // nodes
-  for (const n of nodes) {
-    ctx.beginPath();
-    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(77,182,196,0.55)';
-    ctx.fill();
+// ── forward pass animation ────────────────────────────
+const PULSE_SPEED = 0.018;
+let   passTimer   = 0;
+
+function firePass() {
+  // reset
+  for (const layer of neurons) for (const n of layer) n.act = 0;
+  for (const e of edges) { e.pulse = -1; e.active = false; }
+
+  // activate input layer
+  for (const n of neurons[0]) n.act = 0.4 + Math.random() * 0.6;
+
+  // schedule edge pulses layer by layer
+  let delay = 0;
+  for (let li = 0; li < neurons.length - 1; li++) {
+    const layerEdges = edges.filter(e => e.a === neurons[li].find(n => n === e.a) || neurons[li].includes(e.a));
+    const d = delay;
+    setTimeout(() => {
+      for (const e of layerEdges) {
+        e.active = true;
+        e.pulse  = 0;
+      }
+      // activate next layer neurons when pulses arrive
+      setTimeout(() => {
+        for (const n of neurons[li + 1]) {
+          n.act = 0.35 + Math.random() * 0.55;
+        }
+      }, 1000 / PULSE_SPEED * 0.001 * 1000);
+    }, d);
+    delay += 900;
   }
 }
 
-function tick() {
-  const h = canvas.height / dpr;
-  for (const n of nodes) {
-    n.x += n.vx;
-    n.y += n.vy;
-    if (n.x < 0 || n.x > W)  n.vx *= -1;
-    if (n.y < 0 || n.y > h)  n.vy *= -1;
+firePass();
+setInterval(firePass, LAYERS.length * 900 + 1400);
+
+// ── draw ─────────────────────────────────────────────
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  // edges
+  for (const e of edges) {
+    if (e.active && e.pulse >= 0 && e.pulse <= 1) {
+      e.pulse += PULSE_SPEED;
+
+      // draw the travelling dot
+      const px = e.a.x + (e.b.x - e.a.x) * e.pulse;
+      const py = e.a.y + (e.b.y - e.a.y) * e.pulse;
+
+      // trail
+      const grad = ctx.createLinearGradient(e.a.x, e.a.y, px, py);
+      grad.addColorStop(0, 'rgba(77,182,196,0)');
+      grad.addColorStop(1, `rgba(77,182,196,${e.w * 0.35})`);
+      ctx.beginPath();
+      ctx.moveTo(e.a.x, e.a.y);
+      ctx.lineTo(px, py);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth   = 0.8;
+      ctx.stroke();
+
+      // pulse dot
+      ctx.beginPath();
+      ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(77,182,196,${e.w * 0.9})`;
+      ctx.fill();
+    } else {
+      // resting edge — very dim
+      ctx.beginPath();
+      ctx.moveTo(e.a.x, e.a.y);
+      ctx.lineTo(e.b.x, e.b.y);
+      ctx.strokeStyle = `rgba(77,182,196,${e.w * 0.06})`;
+      ctx.lineWidth   = 0.5;
+      ctx.stroke();
+    }
   }
-  draw();
-  requestAnimationFrame(tick);
+
+  // neurons
+  for (const layer of neurons) {
+    for (const n of layer) {
+      const alpha = 0.12 + n.act * 0.5;
+
+      // glow
+      if (n.act > 0.1) {
+        const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, NR * 3);
+        g.addColorStop(0, `rgba(77,182,196,${n.act * 0.18})`);
+        g.addColorStop(1, 'rgba(77,182,196,0)');
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, NR * 3, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+      }
+
+      // ring
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, NR, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(77,182,196,${0.18 + n.act * 0.55})`;
+      ctx.lineWidth   = 1;
+      ctx.stroke();
+
+      // fill
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, NR - 1, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(77,182,196,${alpha})`;
+      ctx.fill();
+
+      // decay activation slowly
+      n.act *= 0.993;
+    }
+  }
 }
 
+function tick() { draw(); requestAnimationFrame(tick); }
+resize();
+window.addEventListener('resize', resize);
 tick();
 </script>
 
@@ -138,9 +227,9 @@ tick();
 #plexus {
   display: none;
   position: fixed;
-  right: calc(50% - 350px - 210px);
+  right: calc(50% - 350px - 230px);
   top: 0;
-  opacity: 0.5;
+  opacity: 0.85;
   pointer-events: none;
   z-index: 0;
 }

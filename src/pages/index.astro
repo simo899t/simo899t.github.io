@@ -30,8 +30,6 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
 
-    <canvas id="algo"></canvas>
-
     <div class="links">
       <a href="/projects">Projects</a>
       <a href="/cv">CV</a>
@@ -41,141 +39,6 @@ import Layout from '../layouts/Layout.astro';
 
   </div>
 </Layout>
-
-<script>
-const CELL = 11;
-const BG       = '#141414';
-const WALL     = '#2c2c2c';
-const VISITED  = '#1a2a2d';
-const CURRENT  = '#4db6c4';
-const PATH     = '#163040';
-
-let cols: number, rows: number, grid: Cell[][], stack: Cell[], current: Cell, done: boolean;
-let animId: number, resetTimer: ReturnType<typeof setTimeout>;
-
-interface Cell {
-  r: number; c: number;
-  visited: boolean;
-  walls: [boolean, boolean, boolean, boolean]; // top right bottom left
-}
-
-const canvas = document.getElementById('algo') as HTMLCanvasElement;
-const ctx = canvas.getContext('2d')!;
-const dpr = window.devicePixelRatio || 1;
-
-function resize() {
-  cancelAnimationFrame(animId);
-  clearTimeout(resetTimer);
-  const w = canvas.parentElement!.clientWidth;
-  cols = Math.floor(w / CELL);
-  rows = 9;
-  canvas.width  = cols * CELL * dpr;
-  canvas.height = rows * CELL * dpr;
-  canvas.style.width  = `${cols * CELL}px`;
-  canvas.style.height = `${rows * CELL}px`;
-  ctx.scale(dpr, dpr);
-  start();
-}
-
-function start() {
-  grid = [];
-  for (let r = 0; r < rows; r++) {
-    grid[r] = [];
-    for (let c = 0; c < cols; c++) {
-      grid[r][c] = { r, c, visited: false, walls: [true, true, true, true] };
-    }
-  }
-  current = grid[0][0];
-  current.visited = true;
-  stack = [];
-  done = false;
-  loop();
-}
-
-function loop() {
-  step();
-  step();
-  step();
-  draw();
-  if (!done) {
-    animId = requestAnimationFrame(loop);
-  } else {
-    resetTimer = setTimeout(() => { ctx.scale(1/dpr, 1/dpr); ctx.scale(dpr, dpr); start(); }, 1800);
-  }
-}
-
-function step() {
-  if (done) return;
-  const nb = neighbors(current);
-  if (nb.length) {
-    const next = nb[Math.floor(Math.random() * nb.length)];
-    stack.push(current);
-    removeWall(current, next);
-    next.visited = true;
-    current = next;
-  } else if (stack.length) {
-    current = stack.pop()!;
-  } else {
-    done = true;
-  }
-}
-
-function neighbors(cell: Cell): Cell[] {
-  const { r, c } = cell;
-  const out: Cell[] = [];
-  if (r > 0        && !grid[r-1][c].visited) out.push(grid[r-1][c]);
-  if (c < cols - 1 && !grid[r][c+1].visited) out.push(grid[r][c+1]);
-  if (r < rows - 1 && !grid[r+1][c].visited) out.push(grid[r+1][c]);
-  if (c > 0        && !grid[r][c-1].visited) out.push(grid[r][c-1]);
-  return out;
-}
-
-function removeWall(a: Cell, b: Cell) {
-  const dr = b.r - a.r, dc = b.c - a.c;
-  if (dr === -1) { a.walls[0] = false; b.walls[2] = false; }
-  if (dc ===  1) { a.walls[1] = false; b.walls[3] = false; }
-  if (dr ===  1) { a.walls[2] = false; b.walls[0] = false; }
-  if (dc === -1) { a.walls[3] = false; b.walls[1] = false; }
-}
-
-const stackSet = new Set<Cell>();
-
-function draw() {
-  stackSet.clear();
-  stack.forEach(c => stackSet.add(c));
-
-  ctx.fillStyle = BG;
-  ctx.fillRect(0, 0, cols * CELL, rows * CELL);
-
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      const cell = grid[r][c];
-      const x = c * CELL, y = r * CELL;
-
-      if (cell === current) {
-        ctx.fillStyle = CURRENT;
-        ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
-      } else if (stackSet.has(cell)) {
-        ctx.fillStyle = PATH;
-        ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
-      } else if (cell.visited) {
-        ctx.fillStyle = VISITED;
-        ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
-      }
-
-      ctx.strokeStyle = WALL;
-      ctx.lineWidth = 1;
-      if (cell.walls[0]) { ctx.beginPath(); ctx.moveTo(x, y);          ctx.lineTo(x + CELL, y);          ctx.stroke(); }
-      if (cell.walls[1]) { ctx.beginPath(); ctx.moveTo(x + CELL, y);   ctx.lineTo(x + CELL, y + CELL);   ctx.stroke(); }
-      if (cell.walls[2]) { ctx.beginPath(); ctx.moveTo(x + CELL, y + CELL); ctx.lineTo(x, y + CELL);     ctx.stroke(); }
-      if (cell.walls[3]) { ctx.beginPath(); ctx.moveTo(x, y + CELL);   ctx.lineTo(x, y);                 ctx.stroke(); }
-    }
-  }
-}
-
-resize();
-window.addEventListener('resize', resize);
-</script>
 
 <style>
 .layout {
@@ -226,15 +89,10 @@ p {
   margin: 0;
 }
 
-#algo {
-  display: block;
-  margin: 1.75rem 0 1.5rem;
-  border-radius: 3px;
-}
-
 .links {
   display: flex;
   gap: 1.25rem;
+  margin-top: 1.75rem;
 }
 
 .links a {
