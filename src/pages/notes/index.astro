@@ -92,8 +92,8 @@ const DEMOS = [
       `$x^T A x > 0$ for all $x != bold(0)$.`,
       ``,
       `#definition[`,
-      `  $A succ 0 <==>$ all eigenvalues`,
-      `  $lambda_i > 0 <==>$ Cholesky`,
+      `  $A succ 0 bi$ all eigenvalues`,
+      `  $lambda_i > 0 bi$ Cholesky`,
       `  decomposition $A = L L^T$ exists.`,
       `]`,
       ``,
@@ -204,14 +204,54 @@ function currentSrc() {
 }
 
 function highlight(text: string): string {
-  // colour by token type, VS Code dark theme inspired
-  return text
-    .replace(/^(#\w+)/gm, '<span style="color:#4db6c4">$1</span>')
-    .replace(/(\"[^\"]*\")/g,        '<span style="color:#ce9178">$1</span>')
-    .replace(/(\$[^\$\n]+\$)/g,      '<span style="color:#b5cea8">$1</span>')
-    .replace(/\b(true|false)\b/g,    '<span style="color:#569cd6">$1</span>')
-    .replace(/(\/\/[^\n]*)/g,        '<span style="color:#555">$1</span>')
-    .replace(/^(=+\s[^\n]*)/gm,      '<span style="color:#dcdcaa; font-weight:600">$1</span>');
+  const esc = (s: string) =>
+    s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  return text.split('\n').map(line => {
+    // heading lines: one or more = at start
+    if (/^=+\s/.test(line))
+      return `<span style="color:#dcdcaa;font-weight:600">${esc(line)}</span>`;
+
+    let out = '';
+    let i   = 0;
+    while (i < line.length) {
+      const ch = line[i];
+
+      // line comment //
+      if (ch === '/' && line[i+1] === '/') {
+        out += `<span style="color:#555">${esc(line.slice(i))}</span>`;
+        i = line.length;
+
+      // #function or #keyword
+      } else if (ch === '#' && i + 1 < line.length && /\w/.test(line[i+1])) {
+        let j = i + 1;
+        while (j < line.length && /\w/.test(line[j])) j++;
+        out += `<span style="color:#4db6c4">${esc(line.slice(i, j))}</span>`;
+        i = j;
+
+      // "string"
+      } else if (ch === '"') {
+        let j = i + 1;
+        while (j < line.length && line[j] !== '"') j++;
+        if (j < line.length) j++;
+        out += `<span style="color:#ce9178">${esc(line.slice(i, j))}</span>`;
+        i = j;
+
+      // $math$
+      } else if (ch === '$') {
+        let j = i + 1;
+        while (j < line.length && line[j] !== '$') j++;
+        if (j < line.length) j++;
+        out += `<span style="color:#b5cea8">${esc(line.slice(i, j))}</span>`;
+        i = j;
+
+      } else {
+        out += esc(ch);
+        i++;
+      }
+    }
+    return out;
+  }).join('\n');
 }
 
 function render() {
