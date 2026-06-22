@@ -81,7 +81,9 @@ const demosJson = JSON.stringify(demos);
           <span class="tb-name tb-name-dark">notes.pdf</span>
         </div>
         <div class="output-body">
-          <img id="render-img" class="render-img" src="" alt="" style="opacity:0">
+          <div id="render-out" class="render-out">
+            <span class="render-status">loading typst…</span>
+          </div>
         </div>
       </div>
 
@@ -125,32 +127,25 @@ const FADE_MS = 380;
 // ── DOM ───────────────────────────────────────────────────────────────────────
 const codeEl = document.getElementById('code');
 const lineEl = document.getElementById('line-nums');
-const imgEl  = document.getElementById('render-img');
+const outEl  = document.getElementById('render-out');
 
 // ── per-line compile ──────────────────────────────────────────────────────────
-// Compile fires when a new content line completes, not on every character.
-// A "busy" flag prevents concurrent compiles — if one is in flight we skip
-// the intermediate result (the next line completion will trigger a new one).
 let lastCompiledLineCount = -1;
 let compileBusy           = false;
-let lastBlobUrl           = null;
 
 function triggerCompile(lineCount, contentText) {
-  if (lineCount <= lastCompiledLineCount) return;   // nothing new
-  if (typeof window.__typstCompile !== 'function') return;  // WASM not ready
-  if (compileBusy) return;  // previous compile still running — skip, next line will catch up
+  if (lineCount <= lastCompiledLineCount) return;
+  if (typeof window.__typstCompile !== 'function') return;
+  if (compileBusy) return;
 
   lastCompiledLineCount = lineCount;
   compileBusy = true;
   window.__typstCompile(contentText, function(svgStr) {
     compileBusy = false;
-    if (!svgStr) return;
-    const blob = new Blob([svgStr], { type: 'image/svg+xml' });
-    const url  = URL.createObjectURL(blob);
-    if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
-    lastBlobUrl = url;
-    imgEl.src   = url;
-    imgEl.style.opacity = '1';
+    if (svgStr) {
+      outEl.innerHTML = svgStr;
+      outEl.style.opacity = '1';
+    }
   });
 }
 
@@ -232,7 +227,7 @@ function tick() {
     var t = Math.min(clearMs / FADE_MS, 1);
     codeEl.style.opacity = 1 - t;
     lineEl.style.opacity = 1 - t;
-    imgEl.style.opacity  = 1 - t;
+    outEl.style.opacity  = 1 - t;
     if (t < 1) {
       setTimeout(tick, 16);
     } else {
@@ -243,9 +238,8 @@ function tick() {
       compileBusy           = false;
       codeEl.style.opacity = 1;
       lineEl.style.opacity = 1;
-      imgEl.style.opacity  = 0;
-      imgEl.src            = '';
-      if (lastBlobUrl) { URL.revokeObjectURL(lastBlobUrl); lastBlobUrl = null; }
+      outEl.style.opacity  = 1;
+      outEl.innerHTML      = '<span class="render-status">loading typst…</span>';
       codeEl.innerHTML = '<span class="cur">▮</span>';
       lineEl.innerHTML = '<span>1</span>';
       setTimeout(tick, 300);
@@ -285,7 +279,7 @@ tick();
     '',
   ].join('\n');
 
-  var outEl = document.getElementById('render-img');
+  var outEl = document.getElementById('render-out');
 
   try {
     await import('/typst-lite.js');
@@ -324,8 +318,7 @@ tick();
     };
 
   } catch (err) {
-    if (outEl) outEl.insertAdjacentHTML('afterend',
-      '<pre style="font-size:9px;color:#c66;padding:8px">' + err.message + '</pre>');
+    if (outEl) outEl.innerHTML = '<pre style="font-size:9px;color:#c66;padding:8px;white-space:pre-wrap">' + err.message + '</pre>';
   }
 })();
 </script>
@@ -459,12 +452,21 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   padding: 14px 16px;
 }
 
-.render-img {
+.render-out {
   width: 100%;
+  transition: opacity 0.15s ease;
+}
+
+.render-out svg {
+  width: 100%;
+  height: auto;
   display: block;
-  object-fit: contain;
-  object-position: top left;
-  transition: opacity 0.12s ease;
+}
+
+.render-status {
+  font-size: 10px;
+  color: #aaa;
+  font-family: var(--font-mono);
 }
 
 /* ── notes list ── */
