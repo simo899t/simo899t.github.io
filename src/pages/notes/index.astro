@@ -254,16 +254,7 @@ tick();
 
 <script is:inline>
 (async function () {
-  var FONT_BASE = 'https://cdn.jsdelivr.net/gh/typst/typst-assets@v0.13.1/files/fonts/';
-  var FONTS = [
-    'NewCM10-Regular.otf',
-    'NewCM10-Bold.otf',
-    'NewCM10-Italic.otf',
-    'NewCM10-BoldItalic.otf',
-    'NewCMMath-Regular.otf',
-    'NewCMMath-Book.otf',
-    'NewCMMath-Bold.otf',
-  ];
+  // "text" is the keyword that loads all NewCM10 + NewCMMath fonts from typst-assets CDN
 
   var PAGE_SETUP = [
     '#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))',
@@ -288,10 +279,7 @@ tick();
 
     // Preload fonts via typst.use() before first compile
     typst.use(
-      Snippet.preloadFontAssets({
-        assets: FONTS,
-        assetUrlPrefix: FONT_BASE,
-      })
+      Snippet.preloadFontAssets({ assets: ['text'] })
     );
 
     typst.setCompilerInitOptions({
