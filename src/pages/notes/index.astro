@@ -182,23 +182,6 @@ function drainCompile() {
     if (svgStr) {
       outEl.innerHTML     = svgStr;
       outEl.style.opacity = '1';
-      // Grow window to fit SVG — read intrinsic size from viewBox to avoid
-      // circular dependency with flex layout
-      var demoEl = document.querySelector('.demo-window');
-      var svg    = outEl.querySelector('svg');
-      if (demoEl && svg) {
-        var vb = svg.getAttribute('viewBox');  // "0 0 W H" in pt
-        if (vb) {
-          var parts     = vb.split(' ');
-          var vbW       = parseFloat(parts[2]);
-          var vbH       = parseFloat(parts[3]);
-          var cardW     = Math.min(320, outEl.parentElement.clientWidth - 32);
-          var scaledH   = vbH * (cardW / vbW);
-          var needed    = scaledH + 30 + 32; // titlebar + output-body padding
-          var current   = demoEl.clientHeight;
-          if (needed > current) demoEl.style.height = Math.ceil(needed) + 'px';
-        }
-      }
     }
     drainCompile();   // compile again if more content arrived while busy
   });
@@ -293,8 +276,6 @@ function tick() {
       phase   = 'typing';
       compileBusy = false;
       pendingText = null;
-      var demoEl = document.querySelector('.demo-window');
-      if (demoEl) demoEl.style.height = '300px';
       codeEl.style.opacity = 1;
       lineEl.style.opacity = 1;
       outEl.style.opacity  = 1;
@@ -419,8 +400,8 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 .demo-window {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: 300px;
-  min-height: 200px;
+  align-items: stretch;
+  min-height: 300px;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid #2a2a2a;
@@ -514,8 +495,6 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 }
 
 .output-body {
-  flex: 1;
-  overflow-y: auto;
   padding: 16px;
   display: flex;
   justify-content: center;
