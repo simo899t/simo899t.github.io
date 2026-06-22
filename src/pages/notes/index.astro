@@ -143,9 +143,12 @@ const demoEl      = document.querySelector('.demo-window');
 const editorBody  = document.querySelector('.editor-body');
 
 function growIfNeeded() {
-  if (!demoEl || !editorBody) return;
-  var overflow = codeEl.scrollHeight - editorBody.clientHeight;
-  if (overflow > 4) demoEl.style.height = (demoEl.clientHeight + overflow) + 'px';
+  if (!demoEl) return;
+  var text      = DEMOS[di].lines.join('\n').slice(0, charPos);
+  var lineCount = text.split('\n').length;
+  var lineH     = 12 * 1.65;  // font-size × line-height = 19.8px
+  var needed    = lineCount * lineH + 24 + 31; // +padding +titlebar
+  if (needed > demoEl.clientHeight) demoEl.style.height = Math.ceil(needed) + 'px';
 }
 
 // ── continuous compile ────────────────────────────────────────────────────────
