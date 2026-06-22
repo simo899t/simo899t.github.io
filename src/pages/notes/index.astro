@@ -254,10 +254,18 @@ tick();
 
 <script is:inline>
 (async function () {
-  const COMPILER_WASM = 'https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@0.7.0/pkg/typst_ts_web_compiler_bg.wasm';
-  const RENDERER_WASM = 'https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-renderer@0.7.0/pkg/typst_ts_renderer_bg.wasm';
+  var FONT_BASE = 'https://cdn.jsdelivr.net/gh/typst/typst-assets@v0.13.1/files/fonts/';
+  var FONTS = [
+    'NewCM10-Regular.otf',
+    'NewCM10-Bold.otf',
+    'NewCM10-Italic.otf',
+    'NewCM10-BoldItalic.otf',
+    'NewCMMath-Regular.otf',
+    'NewCMMath-Book.otf',
+    'NewCMMath-Bold.otf',
+  ];
 
-  const PAGE_SETUP = [
+  var PAGE_SETUP = [
     '#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))',
     '#set text(size: 9.5pt, font: "New Computer Modern")',
     '#set block(spacing: 0.65em)',
@@ -271,27 +279,48 @@ tick();
     '',
   ].join('\n');
 
-  // importing the bundle sets window.$typst — use that instance (already configured
-  // with buildGlobalCompiler/buildGlobalRenderer internally in the bundle)
-  await import('/typst-lite.js');
-  var typst = window.$typst;
+  var outEl = document.getElementById('render-img');
 
-  // must be called before first svg() so the compiler knows where to get its WASM
-  typst.setCompilerInitOptions({
-    getModule: function() { return fetch(COMPILER_WASM).then(function(r) { return r.arrayBuffer(); }); },
-  });
-  typst.setRendererInitOptions({
-    getModule: function() { return fetch(RENDERER_WASM).then(function(r) { return r.arrayBuffer(); }); },
-  });
+  try {
+    await import('/typst-lite.js');
+    var typst  = window.$typst;
+    var Snippet = window.TypstSnippet;
 
-  window.__typstCompile = async function(contentText, cb) {
-    try {
-      var svg = await typst.svg({ mainContent: PAGE_SETUP + contentText });
-      cb(svg);
-    } catch (e) {
-      // ignore mid-expression compile errors silently
-    }
-  };
+    // Preload fonts via typst.use() before first compile
+    typst.use(
+      Snippet.preloadFontAssets({
+        assets: FONTS,
+        assetUrlPrefix: FONT_BASE,
+      })
+    );
+
+    typst.setCompilerInitOptions({
+      getModule: function() {
+        return fetch('https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@0.7.0/pkg/typst_ts_web_compiler_bg.wasm')
+          .then(function(r) { return r.arrayBuffer(); });
+      },
+    });
+
+    typst.setRendererInitOptions({
+      getModule: function() {
+        return fetch('https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-renderer@0.7.0/pkg/typst_ts_renderer_bg.wasm')
+          .then(function(r) { return r.arrayBuffer(); });
+      },
+    });
+
+    window.__typstCompile = async function(contentText, cb) {
+      try {
+        var svg = await typst.svg({ mainContent: PAGE_SETUP + contentText });
+        cb(svg);
+      } catch (err) {
+        // mid-expression compile errors (incomplete code) are expected
+      }
+    };
+
+  } catch (err) {
+    if (outEl) outEl.insertAdjacentHTML('afterend',
+      '<pre style="font-size:9px;color:#c66;padding:8px">' + err.message + '</pre>');
+  }
 })();
 </script>
 
