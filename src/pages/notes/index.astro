@@ -91,7 +91,7 @@ const demosJson = JSON.stringify(demos);
           <span class="tb-dot yellow"></span>
           <span class="tb-dot green"></span>
           <span class="tb-name tb-name-dark">notes.pdf</span>
-          <button id="lock-btn" class="lock-btn" title="Lock window height">🔒</button>
+          <button id="lock-btn" class="lock-btn" title="Expand preview">↓</button>
         </div>
         <div class="output-body">
           <div id="render-out" class="render-out">
@@ -152,15 +152,16 @@ var lockBtn  = document.getElementById('lock-btn');
 if (lockBtn) {
   lockBtn.addEventListener('click', function() {
     locked = !locked;
-    lockBtn.textContent = locked ? '🔒' : '🔓';
+    lockBtn.textContent = locked ? '↓' : '↑';
+    lockBtn.title = locked ? 'Expand preview' : 'Collapse preview';
     if (locked && demoEl) demoEl.style.height = INIT_H + 'px';
   });
 }
 
-var UNLOCK_H = Math.ceil(30 * LINE_H + 24 + 31); // height for 30 lines
-
 function growIfNeeded() {
   if (!demoEl || locked) return;
+  var total   = DEMOS[di].lines.length;
+  var UNLOCK_H = Math.ceil(total * LINE_H + 24 + 31);
   if (demoEl.clientHeight < UNLOCK_H) demoEl.style.height = UNLOCK_H + 'px';
 }
 
