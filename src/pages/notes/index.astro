@@ -252,39 +252,48 @@ tick();
 })();
 </script>
 
-<script>
-// Loaded and bundled by Vite — imports $typst from @myriaddreamin/typst.ts
-import { $typst } from '@myriaddreamin/typst.ts/dist/esm/contrib/snippet.mjs';
+<script is:inline>
+(async function () {
+  const COMPILER_WASM = 'https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@0.7.0/pkg/typst_ts_web_compiler_bg.wasm';
+  const RENDERER_WASM = 'https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-renderer@0.7.0/pkg/typst_ts_renderer_bg.wasm';
 
-const WASM_CDN = 'https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@0.7.0/pkg/typst_ts_web_compiler_bg.wasm';
+  const PAGE_SETUP = [
+    '#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))',
+    '#set text(size: 9.5pt, font: "New Computer Modern")',
+    '#set block(spacing: 0.65em)',
+    '#align(center)[',
+    '  *Course notes* \\',
+    '  #text(size: 8pt, fill: luma(120))[Simon Holm · SDU · 2025]',
+    ']',
+    '#v(3pt)',
+    '#line(length: 100%, stroke: 0.4pt + luma(160))',
+    '#v(8pt)',
+    '',
+  ].join('\n');
 
-// Page setup injected before every compiled snippet
-const PAGE_SETUP = `#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))
-#set text(size: 9.5pt, font: "New Computer Modern")
-#set block(spacing: 0.65em)
-#align(center)[
-  *Course notes* \\
-  #text(size: 8pt, fill: luma(120))[Simon Holm · SDU · 2025]
-]
-#v(3pt)
-#line(length: 100%, stroke: 0.4pt + luma(160))
-#v(8pt)
-`;
+  // typst-lite.js is the all-in-one-lite bundle — inlines compiler+renderer code,
+  // references WASMs relative to import.meta.url.
+  // We override both WASMs via setCompilerInitOptions / setRendererInitOptions.
+  const m = await import('/typst-lite.js');
+  const typst = new m.TypstSnippet();
 
-$typst.setCompilerInitOptions({
-  getModule: () => fetch(WASM_CDN).then(r => r.arrayBuffer()),
-});
+  typst.setCompilerInitOptions({
+    getModule: () => fetch(COMPILER_WASM).then(function(r) { return r.arrayBuffer(); }),
+  });
 
-// Expose compile function for the inline animation script
-(window as any).__typstCompile = async function(contentText: string, cb: (svg: string) => void) {
-  try {
-    const src = PAGE_SETUP + contentText;
-    const svg = await $typst.svg({ mainContent: src });
-    cb(svg);
-  } catch {
-    // ignore compile errors mid-expression
-  }
-};
+  typst.setRendererInitOptions({
+    getModule: () => fetch(RENDERER_WASM).then(function(r) { return r.arrayBuffer(); }),
+  });
+
+  window.__typstCompile = async function(contentText, cb) {
+    try {
+      const svg = await typst.svg({ mainContent: PAGE_SETUP + contentText });
+      cb(svg);
+    } catch (e) {
+      // ignore mid-expression compile errors
+    }
+  };
+})();
 </script>
 
 <style>
