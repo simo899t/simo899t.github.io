@@ -319,7 +319,7 @@ tick();
         var svg = await typst.svg({ mainContent: PAGE_SETUP + contentText });
         cb(svg);
       } catch (err) {
-        // mid-expression compile errors (incomplete code) are expected
+        cb('');  // must always call cb so compileBusy resets
       }
     };
 
