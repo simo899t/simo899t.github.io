@@ -108,25 +108,47 @@ const demosJson = JSON.stringify(demos);
 <script is:inline define:vars={{ demosJson }}>
 (function () {
 
-// ── demos loaded from public/demo/src/*.typ at build time ─────────────────────
+// ── demos ─────────────────────────────────────────────────────────────────────
 const DEMOS = JSON.parse(demosJson);
 
 // ── state ─────────────────────────────────────────────────────────────────────
-let di       = 0;          // demo index
-let charPos  = 0;          // chars typed so far in current demo
-let phase    = 'typing';   // 'typing' | 'hold' | 'clearing'
-let holdMs   = 0;
-let clearMs  = 0;
-let lastSvgLine = -1;
+let di      = 0;
+let charPos = 0;
+let phase   = 'typing';  // 'typing' | 'hold' | 'clearing'
+let holdMs  = 0;
+let clearMs = 0;
 
-const CHAR_MS  = 36;
-const HOLD_MS  = 3200;
-const FADE_MS  = 380;
+const CHAR_MS = 36;
+const HOLD_MS = 3200;
+const FADE_MS = 380;
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
-const codeEl   = document.getElementById('code');
-const lineEl   = document.getElementById('line-nums');
-const imgEl    = document.getElementById('render-img');
+const codeEl = document.getElementById('code');
+const lineEl = document.getElementById('line-nums');
+const imgEl  = document.getElementById('render-img');
+
+// ── debounced compile ─────────────────────────────────────────────────────────
+// window.__typstCompile is set by the bundled script once WASM is ready.
+// Falls back to the pre-rendered per-line SVGs while loading.
+let compileTimer = null;
+let lastBlobUrl  = null;
+
+function scheduleCompile(contentText) {
+  clearTimeout(compileTimer);
+  compileTimer = setTimeout(function() {
+    if (typeof window.__typstCompile === 'function') {
+      window.__typstCompile(contentText, function(svgStr) {
+        if (!svgStr) return;
+        const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+        const url  = URL.createObjectURL(blob);
+        if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+        lastBlobUrl  = url;
+        imgEl.src    = url;
+        imgEl.style.opacity = '1';
+      });
+    }
+  }, 120);
+}
 
 // ── syntax highlight ──────────────────────────────────────────────────────────
 function hl(text) {
@@ -157,25 +179,23 @@ function hl(text) {
   }).join('\n');
 }
 
-// ── render left pane ──────────────────────────────────────────────────────────
+// ── render ────────────────────────────────────────────────────────────────────
 function renderCode() {
   var full    = DEMOS[di].lines.join('\n');
   var text    = full.slice(0, charPos);
   var typed   = text.split('\n');
   var total   = DEMOS[di].lines.length;
 
-  codeEl.innerHTML  = hl(text) + '<span class="cur">▮</span>';
-  lineEl.innerHTML  = Array.from({length: total}, function(_, i) {
+  codeEl.innerHTML = hl(text) + '<span class="cur">▮</span>';
+  lineEl.innerHTML = Array.from({length: total}, function(_, i) {
     return '<span style="opacity:' + (i < typed.length ? 1 : 0.25) + '">' + (i+1) + '</span>';
   }).join('');
 
-  // update SVG when a new content line completes — swap src on the persistent img
-  var done    = typed.length - 1;
-  var svgIdx  = done - DEMOS[di].preamble;
-  if (done !== lastSvgLine && svgIdx >= 1) {
-    lastSvgLine = done;
-    imgEl.src = '/demo/' + DEMOS[di].slug + '-' + svgIdx + '.svg';
-    imgEl.style.opacity = '1';
+  // extract content lines (skip preamble) and compile
+  var preamble     = DEMOS[di].preamble;
+  var contentLines = typed.slice(preamble + 1); // +1 for blank line after preamble
+  if (contentLines.length > 0) {
+    scheduleCompile(contentLines.join('\n'));
   }
 }
 
@@ -206,22 +226,22 @@ function tick() {
   } else { // clearing
     clearMs += 16;
     var t = Math.min(clearMs / FADE_MS, 1);
-    codeEl.style.opacity  = 1 - t;
-    lineEl.style.opacity  = 1 - t;
-    imgEl.style.opacity   = 1 - t;
+    codeEl.style.opacity = 1 - t;
+    lineEl.style.opacity = 1 - t;
+    imgEl.style.opacity  = 1 - t;
     if (t < 1) {
       setTimeout(tick, 16);
     } else {
-      di           = (di + 1) % DEMOS.length;
-      charPos      = 0;
-      lastSvgLine  = -1;
-      phase        = 'typing';
-      codeEl.style.opacity  = 1;
-      lineEl.style.opacity  = 1;
-      imgEl.style.opacity   = 0;
-      imgEl.src             = '';
-      codeEl.innerHTML  = '<span class="cur">▮</span>';
-      lineEl.innerHTML  = '<span>1</span>';
+      di      = (di + 1) % DEMOS.length;
+      charPos = 0;
+      phase   = 'typing';
+      codeEl.style.opacity = 1;
+      lineEl.style.opacity = 1;
+      imgEl.style.opacity  = 0;
+      imgEl.src            = '';
+      if (lastBlobUrl) { URL.revokeObjectURL(lastBlobUrl); lastBlobUrl = null; }
+      codeEl.innerHTML = '<span class="cur">▮</span>';
+      lineEl.innerHTML = '<span>1</span>';
       setTimeout(tick, 300);
     }
   }
@@ -230,6 +250,41 @@ function tick() {
 tick();
 
 })();
+</script>
+
+<script>
+// Loaded and bundled by Vite — imports $typst from @myriaddreamin/typst.ts
+import { $typst } from '@myriaddreamin/typst.ts/dist/esm/contrib/snippet.mjs';
+
+const WASM_CDN = 'https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@0.7.0/pkg/typst_ts_web_compiler_bg.wasm';
+
+// Page setup injected before every compiled snippet
+const PAGE_SETUP = `#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))
+#set text(size: 9.5pt, font: "New Computer Modern")
+#set block(spacing: 0.65em)
+#align(center)[
+  *Course notes* \\
+  #text(size: 8pt, fill: luma(120))[Simon Holm · SDU · 2025]
+]
+#v(3pt)
+#line(length: 100%, stroke: 0.4pt + luma(160))
+#v(8pt)
+`;
+
+$typst.setCompilerInitOptions({
+  getModule: () => fetch(WASM_CDN).then(r => r.arrayBuffer()),
+});
+
+// Expose compile function for the inline animation script
+(window as any).__typstCompile = async function(contentText: string, cb: (svg: string) => void) {
+  try {
+    const src = PAGE_SETUP + contentText;
+    const svg = await $typst.svg({ mainContent: src });
+    cb(svg);
+  } catch {
+    // ignore compile errors mid-expression
+  }
+};
 </script>
 
 <style>
