@@ -1,24 +1,22 @@
 // PREAMBLE (lines 1-5 shown as #import/#show in the animation, not editable)
-// Edit the content below (line 7 onwards) to change the animation.
+// Edit the content below (after // ── CONTENT) to change the animation.
 // Run: bash public/demo/build.sh  — to regenerate the rendered SVGs.
 // Then push. The animation will reflect your changes automatically.
-
+#let RR = $bb(R)$
+#let mid = "|"
 // ── CONTENT ──────────────────────────────────────────────────
-= Positive Definiteness
+= Matrices
 
-A symmetric $A in RR^(n times n)$ is
-_positive definite_ ($A succ 0$) iff
-$x^T A x > 0$ for all $x != bold(0)$.
+A matrix $A in RR^(m times n)$ maps $RR^n -> RR^m$:
 
-#block(
-  stroke: 0.4pt + luma(120),
-  inset: (x: 8pt, y: 6pt),
-  width: 100%, fill: luma(248),
-)[
-  *Definition.* $A succ 0 arrow.l.r.double$
-  all $lambda_i > 0$ — Cholesky $A = L L^T$.
-]
+$ A = mat(a_11, dots, a_(1n);
+         dots.v, dots.down, dots.v;
+         a_(m 1), dots, a_(m n)) $
 
-*Example.* $mat(2, 1; 1, 3) succ 0$ since
-$lambda_1 = (5 + sqrt(5))/2 > 0$ and
-$lambda_2 = (5 - sqrt(5))/2 > 0$.
+= Determinant
+
+For $A in RR^(2 times 2)$:
+
+$ det(A) = mat(delim: mid, a, b; c, d) = a d - b c $
+
+$A$ is invertible iff $det(A) != 0$.
