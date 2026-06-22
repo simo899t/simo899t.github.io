@@ -151,15 +151,14 @@ declare module 'astro:content' {
 	>;
 
 	type ContentEntryMap = {
-		"notes": {
-"kkt-conditions.md": {
-	id: "kkt-conditions.md";
-  slug: "kkt-conditions";
+		"notes": Record<string, {
+  id: string;
+  slug: string;
   body: string;
   collection: "notes";
-  data: InferEntrySchema<"notes">
-} & { render(): Render[".md"] };
-};
+  data: InferEntrySchema<"notes">;
+  render(): Render[".md"];
+}>;
 
 	};
 

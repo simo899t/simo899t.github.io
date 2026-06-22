@@ -2,7 +2,8 @@
 // Edit the content below (line 7 onwards) to change the animation.
 // Run: bash public/demo/build.sh  — to regenerate the rendered SVGs.
 // Then push. The animation will reflect your changes automatically.
-
+#let apx = $approx$
+#let loss = $cal(L)$
 // ── CONTENT ──────────────────────────────────────────────────
 = Gradient Descent
 
@@ -10,15 +11,18 @@ The update rule for parameters $theta$ with
 loss $cal(L)$:
 
 $ theta_(t+1) = theta_t
-  - eta nabla_theta cal(L)(theta_t) $
+  - alpha nabla_theta (theta_t) $
 
-where $eta > 0$ is the learning rate.
+where $alpha > 0$ is the learning rate.
 
-== Mini-batch SGD
+= Mini-batch SGD
 
-Approximate $nabla_theta cal(L)$ over
+Approximate $nabla_theta loss$ over
 a batch $cal(B) subset cal(D)$:
 
-$ nabla_theta cal(L) approx
-  1 / |cal(B)|
-  sum_(i in cal(B)) nabla_theta ell_i $
+#let batch = $cal(B)$
+#let batchsSize = $abs(batch)$
+
+$ nabla_theta loss apx
+  1 / batchsSize
+  sum_(i in batch) nabla_theta ell_i $

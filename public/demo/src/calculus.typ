@@ -19,7 +19,7 @@ For $h(x) = f(g(x))$:
 
 $ pv(h, x) = pv(f, g) dot pv(g, x) $
 
-== Backpropagation
+= Backpropagation
 
 At layer $l$ with $z^((l)) = W^((l)) a^((l-1))$:
 
