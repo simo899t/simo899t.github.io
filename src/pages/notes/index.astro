@@ -46,7 +46,7 @@ const allNotes = (await getCollection('notes'))
           <span class="pane-title">notes.pdf</span>
         </div>
         <div class="paper-wrap">
-          <div class="paper" id="paper"></div>
+          <img id="paper-svg" class="paper-svg" src="" alt="" />
         </div>
       </div>
     </div>
@@ -70,219 +70,185 @@ const allNotes = (await getCollection('notes'))
 </Layout>
 
 <script>
-// Wait for full page load before touching DOM — guards against edge cases
-// where Astro's module bundling runs the script before layout is inserted.
-function initDemo() {
-  const srcEl   = document.getElementById('typst-src');
-  const lineEl  = document.getElementById('line-nums');
-  const paperEl = document.getElementById('paper');
-  if (!srcEl || !lineEl || !paperEl) return;;
-
-// Each demo: src lines + chunks { atLine, html } that appear as that line finishes typing
+// Source lines match public/demo/src/*.typ exactly.
+// frames: array of { atLine, src } — when completedLines() >= atLine, show that SVG.
 const DEMOS = [
   {
+    slug: 'linear-algebra',
     src: [
-      `#import "../../temp.typ": *`,      // 0
-      `#show: note.with(`,                // 1
-      `  title:  "Linear Algebra",`,      // 2
-      `  course: "DM561",`,               // 3
-      `)`,                                // 4
-      ``,                                 // 5
-      `= Positive Definiteness`,          // 6
-      ``,                                 // 7
-      `A symmetric $A in RR^(n times n)$ is`,  // 8
-      `_positive definite_ ($A succ 0$) iff`,  // 9
-      `$x^T A x > 0$ for all $x != bold(0)$.`, // 10
-      ``,                                 // 11
-      `#definition[`,                     // 12
-      `  $A succ 0 bi$ all eigenvalues`,  // 13
-      `  $lambda_i > 0 bi$ Cholesky`,    // 14
-      `  decomposition $A = L L^T$ exists.`, // 15
-      `]`,                                // 16
-      ``,                                 // 17
-      `*Example.* For`,                   // 18
-      `$A = mat(4, 2; 2, 3)$`,           // 19
-      `we get $det(A) = 8 > 0$ and`,     // 20
-      `$A_11 = 4 > 0$, so $A succ 0$.`,  // 21
+      `#set page(width: 240pt, height: auto,`,
+      `  margin: (x: 14pt, y: 12pt))`,
+      `#set text(size: 9.5pt,`,
+      `  font: "New Computer Modern")`,
+      `#set block(spacing: 0.65em)`,
+      ``,
+      `= Positive Definiteness`,
+      ``,
+      `A symmetric $A in RR^(n times n)$ is`,
+      `_positive definite_ ($A succ 0$) iff`,
+      `$x^T A x > 0$ for all $x != bold(0)$.`,
+      ``,
+      `#block(stroke: 0.4pt + black,`,
+      `  inset: (x: 8pt, y: 6pt), width: 100%,`,
+      `)[`,
+      `  *Definition.* $A succ 0 arrow.l.r.double$`,
+      `  all $lambda_i > 0 arrow.l.r.double$`,
+      `  Cholesky $A = L L^T$ exists.`,
+      `]`,
+      ``,
+      `*Example.* $mat(2, 1; 1, 3) succ 0$ since`,
+      `$lambda_1 = (5 + sqrt(5))/2 > 0$ and`,
+      `$lambda_2 = (5 - sqrt(5))/2 > 0$.`,
     ],
-    chunks: [
-      { atLine: 6,  html: `<h1>Positive Definiteness</h1>` },
-      { atLine: 10, html: `<p>A symmetric <em>A</em> ∈ ℝ<sup><em>n</em>×<em>n</em></sup> is <em>positive definite</em> (<em>A</em> ≻ 0) iff <em>x</em><sup>T</sup><em>Ax</em> &gt; 0 for all <em>x</em> ≠ <strong>0</strong>.</p>` },
-      { atLine: 16, html: `<div class="def-box"><strong>Definition.</strong> <em>A</em> ≻ 0 ⟺ all eigenvalues λ<sub><em>i</em></sub> &gt; 0 ⟺ Cholesky decomposition <em>A</em> = <em>LL</em><sup>T</sup> exists.</div>` },
-      { atLine: 21, html: `<p><strong>Example.</strong> For <em>A</em> = <span style="font-family:serif">[<sup>4 2</sup>/<sub>2 3</sub>]</span> we get det(<em>A</em>) = 8 &gt; 0 and <em>A</em><sub>11</sub> = 4 &gt; 0, so <em>A</em> ≻ 0.</p>` },
+    frames: [
+      { atLine: 6,  n: 1 },
+      { atLine: 10, n: 2 },
+      { atLine: 19, n: 3 },
+      { atLine: 22, n: 4 },
     ],
   },
   {
+    slug: 'gradient-descent',
     src: [
-      `#import "../../temp.typ": *`,      // 0
-      `#show: note.with(`,                // 1
-      `  title:  "Optimisation",`,        // 2
-      `  course: "DM872",`,               // 3
-      `)`,                                // 4
-      ``,                                 // 5
-      `= Gradient Descent`,               // 6
-      ``,                                 // 7
-      `The gradient descent update for`,  // 8
-      `parameters $theta$ with loss $loss$:`, // 9
-      ``,                                 // 10
-      `$ theta_(t+1) = theta_t`,          // 11
-      `  - eta nabla_theta loss(theta_t) $`, // 12
-      ``,                                 // 13
-      `where $eta > 0$ is the learning rate.`, // 14
-      ``,                                 // 15
-      `== Mini-batch SGD`,                // 16
-      ``,                                 // 17
-      `Approximate $nabla_theta loss$ over`, // 18
-      `a batch $cal(B) subset cal(D)$:`,  // 19
-      ``,                                 // 20
-      `$ nabla_theta loss`,               // 21
-      `  approx 1 / abs(cal(B))`,           // 22
-      `  sum_(i in cal(B)) nabla_theta loss_i $`, // 23
+      `#set page(width: 240pt, height: auto,`,
+      `  margin: (x: 14pt, y: 12pt))`,
+      `#set text(size: 9.5pt,`,
+      `  font: "New Computer Modern")`,
+      `#set block(spacing: 0.65em)`,
+      ``,
+      `= Gradient Descent`,
+      ``,
+      `The update rule for parameters $theta$`,
+      `with loss $cal(L)$:`,
+      ``,
+      `$ theta_(t+1) = theta_t`,
+      `  - eta nabla_theta cal(L)(theta_t) $`,
+      ``,
+      `where $eta > 0$ is the learning rate.`,
+      ``,
+      `== Mini-batch SGD`,
+      ``,
+      `Approximate $nabla_theta cal(L)$ over`,
+      `a batch $cal(B) subset cal(D)$:`,
+      ``,
+      `$ nabla_theta cal(L) approx`,
+      `  1 / |cal(B)|`,
+      `  sum_(i in cal(B)) nabla_theta ell_i $`,
     ],
-    chunks: [
-      { atLine: 6,  html: `<h1>Gradient Descent</h1>` },
-      { atLine: 9,  html: `<p>The gradient descent update for parameters θ with loss ℒ:</p>` },
-      { atLine: 12, html: `<div class="math">θ<sub>t+1</sub> = θ<sub>t</sub> − η ∇<sub>θ</sub> ℒ(θ<sub>t</sub>)</div>` },
-      { atLine: 14, html: `<p>where η &gt; 0 is the learning rate.</p>` },
-      { atLine: 16, html: `<h2>Mini-batch SGD</h2>` },
-      { atLine: 19, html: `<p>Approximate ∇<sub>θ</sub> ℒ over a batch ℬ ⊆ 𝒟:</p>` },
-      { atLine: 23, html: `<div class="math">∇<sub>θ</sub> ℒ ≈ (1/|ℬ|) Σ<sub>i∈ℬ</sub> ∇<sub>θ</sub> ℓ<sub>i</sub></div>` },
+    frames: [
+      { atLine: 6,  n: 1 },
+      { atLine: 12, n: 2 },
+      { atLine: 14, n: 3 },
+      { atLine: 20, n: 4 },
     ],
   },
   {
+    slug: 'calculus',
     src: [
-      `#import "../../temp.typ": *`,      // 0
-      `#show: note.with(`,                // 1
-      `  title:  "Calculus",`,            // 2
-      `  course: "MM536",`,               // 3
-      `)`,                                // 4
-      ``,                                 // 5
-      `= Fundamental Theorem`,            // 6
-      ``,                                 // 7
-      `If $f$ is continuous on $[a,b]$ and`, // 8
-      `$F' = f$, then:`,                  // 9
-      ``,                                 // 10
-      `$ integral_a^b  f(x) dx = F(b) - F(a) $`, // 11
-      ``,                                 // 12
-      `= Chain Rule`,                     // 13
-      ``,                                 // 14
-      `For $h(x) = f(g(x))$:`,            // 15
-      ``,                                 // 16
-      `$ dv(h, x) = dv(f, g) dot dv(g, x) $`, // 17
-      ``,                                 // 18
-      `In backprop: $ppv(loss, W)`,       // 19
-      `= ppv(loss, z) dot ppv(z, W)$`,   // 20
-      `applied layer by layer.`,          // 21
+      `#set page(width: 240pt, height: auto,`,
+      `  margin: (x: 14pt, y: 12pt))`,
+      `#set text(size: 9.5pt,`,
+      `  font: "New Computer Modern")`,
+      `#set block(spacing: 0.65em)`,
+      ``,
+      `= Fundamental Theorem`,
+      ``,
+      `If $f$ is continuous on $[a, b]$ and`,
+      `$F' = f$, then:`,
+      ``,
+      `$ integral_a^b f(x) dif x = F(b) - F(a) $`,
+      ``,
+      `= Chain Rule`,
+      ``,
+      `For $h(x) = f(g(x))$:`,
+      ``,
+      `$ (dif h)/(dif x) = (dif f)/(dif g)`,
+      `  dot (dif g)/(dif x) $`,
+      ``,
+      `In backprop: $(partial cal(L))/(partial W)`,
+      `= (partial cal(L))/(partial z)`,
+      `  dot (partial z)/(partial W)$`,
+      `applied layer by layer.`,
     ],
-    chunks: [
-      { atLine: 6,  html: `<h1>Fundamental Theorem</h1>` },
-      { atLine: 9,  html: `<p>If <em>f</em> is continuous on [<em>a</em>, <em>b</em>] and <em>F</em>′ = <em>f</em>, then:</p>` },
-      { atLine: 11, html: `<div class="math">∫<sub><em>a</em></sub><sup><em>b</em></sup> <em>f</em>(<em>x</em>) d<em>x</em> = <em>F</em>(<em>b</em>) − <em>F</em>(<em>a</em>)</div>` },
-      { atLine: 13, html: `<h1>Chain Rule</h1>` },
-      { atLine: 15, html: `<p>For <em>h</em>(<em>x</em>) = <em>f</em>(<em>g</em>(<em>x</em>)):</p>` },
-      { atLine: 17, html: `<div class="math">d<em>h</em>/d<em>x</em> = (d<em>f</em>/d<em>g</em>) · (d<em>g</em>/d<em>x</em>)</div>` },
-      { atLine: 21, html: `<p>In neural nets: ∂ℒ/∂<em>W</em> = (∂ℒ/∂<em>z</em>)(∂<em>z</em>/∂<em>W</em>) applied layer by layer.</p>` },
+    frames: [
+      { atLine: 6,  n: 1 },
+      { atLine: 11, n: 2 },
+      { atLine: 13, n: 3 },
+      { atLine: 20, n: 4 },
     ],
   },
 ];
 
+const srcEl  = document.getElementById('typst-src');
+const lineEl = document.getElementById('line-nums');
+const imgEl  = document.getElementById('paper-svg');
+
 let demoIdx = 0;
 let charPos = 0;
-let phase = 'typing';   // 'typing' | 'hold' | 'clearing'
+let phase = 'typing';
 let holdTick = 0;
 let clearTick = 0;
-let lastRenderedLine = -1;
+let lastFrame = '';
 
-const CHAR_MS   = 48;   // ms per character
-const HOLD_MS   = 2800;
-const CLEAR_MS  = 350;
+const CHAR_MS  = 38;
+const HOLD_MS  = 3000;
+const CLEAR_MS = 350;
 
-function currentSrc() {
-  const full = DEMOS[demoIdx].src.join('\n');
-  return full.slice(0, charPos);
-}
-
-// how many complete lines have been typed so far
 function completedLines() {
-  const full    = DEMOS[demoIdx].src.join('\n');
-  const partial = full.slice(0, charPos);
-  // a line is complete once the newline after it has been typed
+  const partial = DEMOS[demoIdx].src.join('\n').slice(0, charPos);
   return partial.split('\n').length - 1;
 }
 
-function highlight(text) {
-  const esc = (s) =>
-    s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function currentFrame() {
+  const done = completedLines();
+  const frames = DEMOS[demoIdx].frames;
+  let best = null;
+  for (const f of frames) {
+    if (done >= f.atLine) best = f;
+  }
+  return best ? `/demo/${DEMOS[demoIdx].slug}-${best.n}.svg` : '';
+}
 
+function highlight(text) {
+  const esc = (s) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   return text.split('\n').map(line => {
-    // heading lines: one or more = at start
     if (/^=+\s/.test(line))
       return `<span style="color:#dcdcaa;font-weight:600">${esc(line)}</span>`;
-
-    let out = '';
-    let i   = 0;
+    let out = '', i = 0;
     while (i < line.length) {
       const ch = line[i];
-
-      // line comment //
       if (ch === '/' && line[i+1] === '/') {
         out += `<span style="color:#555">${esc(line.slice(i))}</span>`;
         i = line.length;
-
-      // #function or #keyword
-      } else if (ch === '#' && i + 1 < line.length && /\w/.test(line[i+1])) {
-        let j = i + 1;
-        while (j < line.length && /\w/.test(line[j])) j++;
-        out += `<span style="color:#4db6c4">${esc(line.slice(i, j))}</span>`;
-        i = j;
-
-      // "string"
+      } else if (ch === '#' && i+1 < line.length && /\w/.test(line[i+1])) {
+        let j = i+1; while (j < line.length && /\w/.test(line[j])) j++;
+        out += `<span style="color:#4db6c4">${esc(line.slice(i,j))}</span>`; i = j;
       } else if (ch === '"') {
-        let j = i + 1;
-        while (j < line.length && line[j] !== '"') j++;
-        if (j < line.length) j++;
-        out += `<span style="color:#ce9178">${esc(line.slice(i, j))}</span>`;
-        i = j;
-
-      // $math$
+        let j = i+1; while (j < line.length && line[j] !== '"') j++; if (j < line.length) j++;
+        out += `<span style="color:#ce9178">${esc(line.slice(i,j))}</span>`; i = j;
       } else if (ch === '$') {
-        let j = i + 1;
-        while (j < line.length && line[j] !== '$') j++;
-        if (j < line.length) j++;
-        out += `<span style="color:#b5cea8">${esc(line.slice(i, j))}</span>`;
-        i = j;
-
-      } else {
-        out += esc(ch);
-        i++;
-      }
+        let j = i+1; while (j < line.length && line[j] !== '$') j++; if (j < line.length) j++;
+        out += `<span style="color:#b5cea8">${esc(line.slice(i,j))}</span>`; i = j;
+      } else { out += esc(ch); i++; }
     }
     return out;
   }).join('\n');
 }
 
 function render() {
-  const text  = currentSrc();
+  const text = DEMOS[demoIdx].src.join('\n').slice(0, charPos);
   const lines = text.split('\n');
-
-  // source pane
-  srcEl.innerHTML = highlight(text) + '<span class="cursor">▮</span>';
-
-  // line numbers (always show all lines of the demo, grey out future ones)
   const total = DEMOS[demoIdx].src.length;
+
+  srcEl.innerHTML = highlight(text) + '<span class="cursor">▮</span>';
   lineEl.innerHTML = Array.from({ length: total }, (_, i) =>
-    `<span style="opacity:${i < lines.length ? 1 : 0.2}">${i + 1}</span>`
+    `<span style="opacity:${i < lines.length ? 1 : 0.2}">${i+1}</span>`
   ).join('');
 
-  // paper — append chunks as their trigger line completes
-  const done = completedLines();
-  if (done !== lastRenderedLine) {
-    lastRenderedLine = done;
-    const visible = DEMOS[demoIdx].chunks
-      .filter(c => c.atLine <= done)
-      .map(c => c.html)
-      .join('');
-    paperEl.innerHTML = visible;
+  const frame = currentFrame();
+  if (frame && frame !== lastFrame) {
+    lastFrame = frame;
+    imgEl.src = frame;
   }
 }
 
@@ -290,53 +256,40 @@ function step() {
   const fullLen = DEMOS[demoIdx].src.join('\n').length;
 
   if (phase === 'typing') {
-    if (charPos < fullLen) {
-      charPos += 1;
-    } else {
-      phase = 'hold';
-      holdTick = 0;
-    }
+    if (charPos < fullLen) { charPos++; } else { phase = 'hold'; holdTick = 0; }
     render();
     setTimeout(step, CHAR_MS);
 
   } else if (phase === 'hold') {
     holdTick += 16;
-    if (holdTick < HOLD_MS) {
-      setTimeout(step, 16);
-    } else {
-      phase = 'clearing';
-      clearTick = 0;
-      setTimeout(step, 16);
-    }
+    if (holdTick < HOLD_MS) { setTimeout(step, 16); }
+    else { phase = 'clearing'; clearTick = 0; setTimeout(step, 16); }
 
   } else {
     clearTick += 16;
     const t = Math.min(clearTick / CLEAR_MS, 1);
-    paperEl.style.opacity = String(1 - t);
-    srcEl.style.opacity   = String(1 - t);
-    lineEl.style.opacity  = String(1 - t);
+    imgEl.style.opacity  = String(1 - t);
+    srcEl.style.opacity  = String(1 - t);
+    lineEl.style.opacity = String(1 - t);
     if (t < 1) {
       setTimeout(step, 16);
     } else {
-      demoIdx           = (demoIdx + 1) % DEMOS.length;
-      charPos           = 0;
-      lastRenderedLine  = -1;
-      phase             = 'typing';
-      paperEl.innerHTML = '';
-      paperEl.style.opacity = '1';
-      srcEl.style.opacity   = '1';
-      lineEl.style.opacity  = '1';
-      srcEl.innerHTML   = '<span class="cursor">▮</span>';
-      lineEl.innerHTML  = '<span>1</span>';
+      demoIdx  = (demoIdx + 1) % DEMOS.length;
+      charPos  = 0;
+      lastFrame = '';
+      phase    = 'typing';
+      imgEl.src = '';
+      imgEl.style.opacity  = '1';
+      srcEl.style.opacity  = '1';
+      lineEl.style.opacity = '1';
+      srcEl.innerHTML  = '<span class="cursor">▮</span>';
+      lineEl.innerHTML = '<span>1</span>';
       setTimeout(step, 300);
     }
   }
 }
 
-  step();
-} // end initDemo
-
-initDemo();
+step();
 </script>
 
 <style>
@@ -435,89 +388,34 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 
 /* output side */
 .demo-out {
-  background: #e8e5dc;
+  background: #f0ede4;
   display: flex;
   flex-direction: column;
 }
 
 .demo-out .pane-bar {
-  background: #d8d5cc;
-  border-bottom: 1px solid #c8c5bc;
+  background: #dedad0;
+  border-bottom: 1px solid #ccc8be;
 }
 
 .demo-out .pane-title { color: #999; }
 
 .paper-wrap {
   height: 310px;
-  padding: 16px 18px;
   overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.paper-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: top center;
+  padding: 12px;
   box-sizing: border-box;
-}
-
-.paper {
-  font-family: 'Georgia', 'Times New Roman', serif;
-  font-size: 11px;
-  color: #111;
-  line-height: 1.65;
-  transition: opacity 0.25s;
-}
-
-.paper :global(h1) {
-  font-size: 14px;
-  font-weight: bold;
-  margin: 0 0 10px;
-  padding-bottom: 4px;
-  border-bottom: 0.5px solid #bbb;
-  color: #111;
-}
-
-.paper :global(h2) {
-  font-size: 11px;
-  font-weight: bold;
-  margin: 10px 0 4px;
-  color: #111;
-}
-
-.paper :global(p) {
-  margin: 0 0 7px;
-  color: #222;
-  font-size: 10.5px;
-}
-
-.paper :global(.math) {
-  font-style: italic;
-  text-align: center;
-  margin: 8px 0;
-  font-size: 11px;
-  color: #111;
-}
-
-.paper :global(.def-box) {
-  border: 0.5px solid #aaa;
-  padding: 6px 10px;
-  margin: 8px 0;
-  font-size: 10.5px;
-  color: #222;
-  background: #f2efe6;
-}
-
-.paper :global(ul) {
-  margin: 4px 0 7px 14px;
-  padding: 0;
-  font-size: 10.5px;
-  color: #222;
-}
-
-.paper :global(ul li) { margin-bottom: 2px; }
-
-.paper :global(.mat) {
-  font-family: 'Georgia', serif;
-  font-size: 10px;
-  line-height: 1.3;
-  display: inline-block;
-  vertical-align: middle;
-  white-space: pre;
-  letter-spacing: 0.04em;
+  transition: opacity 0.2s;
 }
 
 /* ── rest of page ───────────────────── */
