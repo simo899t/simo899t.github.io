@@ -154,13 +154,16 @@ function triggerCompile(contentText) {
 }
 
 function closePartial(src) {
-  // If inside an unclosed math block, close it and return —
-  // don't check * or _ inside math (they're subscript/multiply there)
   var dollars = (src.match(/\$/g) || []).length;
   if (dollars % 2 !== 0) {
+    // Inside an open math block — close unmatched parens/brackets first
+    var opens  = (src.match(/\(/g) || []).length - (src.match(/\)/g) || []).length;
+    var bracks = (src.match(/\[/g) || []).length - (src.match(/\]/g) || []).length;
+    if (opens  > 0) src += ')'.repeat(opens);
+    if (bracks > 0) src += ']'.repeat(bracks);
     return src + ' $';
   }
-  // Strip completed math blocks, then count text-mode * and _
+  // Outside math — strip completed math blocks, then check text-mode * and _
   var textOnly = src.replace(/\$[^$]*\$/g, '');
   var stars = (textOnly.match(/\*/g) || []).length;
   if (stars % 2 !== 0) src += '*';
