@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head><title>typst test</title></head>
+<body>
+<pre id="log" style="font-size:11px;white-space:pre-wrap"></pre>
+<div id="out"></div>
+<script type="module">
+const log = document.getElementById('log');
+const out  = document.getElementById('out');
+function L(s) { log.textContent += s + '\n'; console.log(s); }
+
+L('importing bundle...');
+try {
+  await import('/typst-lite.js');
+  L('bundle loaded. window.$typst=' + typeof window.$typst + ' TypstSnippet=' + typeof window.TypstSnippet);
+
+  const typst   = window.$typst;
+  const Snippet = window.TypstSnippet;
+
+  L('providers before use: ' + JSON.stringify(typst.providers));
+
+  try {
+    typst.use(
+      Snippet.preloadFontAssets({
+        assets: ['NewCM10-Regular.otf', 'NewCMMath-Regular.otf'],
+        assetUrlPrefix: 'https://cdn.jsdelivr.net/gh/typst/typst-assets@v0.13.1/files/fonts/',
+      })
+    );
+    L('typst.use() OK');
+  } catch(e) { L('typst.use() ERROR: ' + e.message); }
+
+  try {
+    typst.setCompilerInitOptions({
+      getModule: () => fetch('https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@0.7.0/pkg/typst_ts_web_compiler_bg.wasm').then(r => r.arrayBuffer()),
+    });
+    L('setCompilerInitOptions OK');
+  } catch(e) { L('setCompilerInitOptions ERROR: ' + e.message); }
+
+  try {
+    typst.setRendererInitOptions({
+      getModule: () => fetch('https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-renderer@0.7.0/pkg/typst_ts_renderer_bg.wasm').then(r => r.arrayBuffer()),
+    });
+    L('setRendererInitOptions OK');
+  } catch(e) { L('setRendererInitOptions ERROR: ' + e.message); }
+
+  L('calling svg()...');
+  try {
+    const svg = await typst.svg({ mainContent: '= Hello World\n\nThis is a *test*.' });
+    L('svg() SUCCESS, length=' + svg.length);
+    out.innerHTML = svg;
+  } catch(e) {
+    L('svg() ERROR: ' + e.message + '\n' + e.stack);
+  }
+
+} catch(e) {
+  L('IMPORT ERROR: ' + e.message);
+}
+</script>
+</body>
+</html>

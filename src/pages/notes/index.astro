@@ -127,27 +127,31 @@ const codeEl = document.getElementById('code');
 const lineEl = document.getElementById('line-nums');
 const imgEl  = document.getElementById('render-img');
 
-// ── debounced compile ─────────────────────────────────────────────────────────
-// window.__typstCompile is set by the bundled script once WASM is ready.
-// Falls back to the pre-rendered per-line SVGs while loading.
-let compileTimer = null;
-let lastBlobUrl  = null;
+// ── per-line compile ──────────────────────────────────────────────────────────
+// Compile fires when a new content line completes, not on every character.
+// A "busy" flag prevents concurrent compiles — if one is in flight we skip
+// the intermediate result (the next line completion will trigger a new one).
+let lastCompiledLineCount = -1;
+let compileBusy           = false;
+let lastBlobUrl           = null;
 
-function scheduleCompile(contentText) {
-  clearTimeout(compileTimer);
-  compileTimer = setTimeout(function() {
-    if (typeof window.__typstCompile === 'function') {
-      window.__typstCompile(contentText, function(svgStr) {
-        if (!svgStr) return;
-        const blob = new Blob([svgStr], { type: 'image/svg+xml' });
-        const url  = URL.createObjectURL(blob);
-        if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
-        lastBlobUrl  = url;
-        imgEl.src    = url;
-        imgEl.style.opacity = '1';
-      });
-    }
-  }, 120);
+function triggerCompile(lineCount, contentText) {
+  if (lineCount <= lastCompiledLineCount) return;   // nothing new
+  if (typeof window.__typstCompile !== 'function') return;  // WASM not ready
+  if (compileBusy) return;  // previous compile still running — skip, next line will catch up
+
+  lastCompiledLineCount = lineCount;
+  compileBusy = true;
+  window.__typstCompile(contentText, function(svgStr) {
+    compileBusy = false;
+    if (!svgStr) return;
+    const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+    const url  = URL.createObjectURL(blob);
+    if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+    lastBlobUrl = url;
+    imgEl.src   = url;
+    imgEl.style.opacity = '1';
+  });
 }
 
 // ── syntax highlight ──────────────────────────────────────────────────────────
@@ -191,11 +195,11 @@ function renderCode() {
     return '<span style="opacity:' + (i < typed.length ? 1 : 0.25) + '">' + (i+1) + '</span>';
   }).join('');
 
-  // extract content lines (skip preamble) and compile
+  // compile when a new content line is completed
   var preamble     = DEMOS[di].preamble;
-  var contentLines = typed.slice(preamble + 1); // +1 for blank line after preamble
+  var contentLines = typed.slice(preamble + 1); // +1 for blank separator line
   if (contentLines.length > 0) {
-    scheduleCompile(contentLines.join('\n'));
+    triggerCompile(contentLines.length, contentLines.join('\n'));
   }
 }
 
@@ -235,6 +239,8 @@ function tick() {
       di      = (di + 1) % DEMOS.length;
       charPos = 0;
       phase   = 'typing';
+      lastCompiledLineCount = -1;
+      compileBusy           = false;
       codeEl.style.opacity = 1;
       lineEl.style.opacity = 1;
       imgEl.style.opacity  = 0;
