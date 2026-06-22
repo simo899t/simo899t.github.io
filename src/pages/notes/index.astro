@@ -1,12 +1,19 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { resolve } from 'path';
 
-const allNotes = (await getCollection('notes'))
-  .filter(n => !n.data.draft)
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+// Drop PDFs into public/notes-pdf/ — they appear here automatically.
+// Name files like: "DM561 Linear Algebra.pdf" or "AI505-Gradient-Descent.pdf"
+const pdfDir = resolve('public/notes-pdf');
+const pdfs = readdirSync(pdfDir)
+  .filter(f => f.endsWith('.pdf'))
+  .sort()
+  .map(f => ({
+    filename: f,
+    title: f.replace(/\.pdf$/i, '').replace(/[-_]/g, ' '),
+    url: `/notes-pdf/${f}`,
+  }));
 
 // Read the .typ source files — edit those files to change the animation.
 // Lines before "// ── CONTENT" that start with # are hidden source preamble
@@ -100,20 +107,17 @@ const demosJson = JSON.stringify(demos);
 
     </div>
 
-    {allNotes.length > 0 ? (
+    {pdfs.length > 0 ? (
       <div class="note-list">
-        {allNotes.map(n => (
-          <a href={`/notes/${n.slug}`} class="note-row">
-            <span class="note-title">{n.data.title}</span>
-            <span class="note-meta">
-              {n.data.tags.join(' · ')} &nbsp;·&nbsp;
-              {n.data.date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short' })}
-            </span>
+        {pdfs.map(p => (
+          <a href={p.url} target="_blank" rel="noopener" class="note-row">
+            <span class="note-title">{p.title}</span>
+            <span class="note-meta pdf-tag">PDF</span>
           </a>
         ))}
       </div>
     ) : (
-      <p class="empty">more coming soon</p>
+      <p class="empty">notes coming soon</p>
     )}
   </div>
 </Layout>
@@ -568,6 +572,15 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   font-size: 0.68rem;
   color: var(--text-dim);
   white-space: nowrap;
+}
+
+.pdf-tag {
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
 }
 
 .empty {
