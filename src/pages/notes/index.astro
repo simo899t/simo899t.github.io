@@ -59,17 +59,11 @@ const demosJson = JSON.stringify(demos);
 <Layout title="Notes" description="Study notes by Simon Holm.">
   <div class="container page">
     <h1>Notes</h1>
-    <p class="sub">
-      Short write-ups on things I'm figuring out. Written in
-      <a href="https://typst.app" target="_blank">Typst</a> —
-      try the syntax with <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique</a>.
-    </p>
-
     <div class="typst-blurb">
       <p>
-        I write all my lecture notes in <a href="https://typst.app/open-source/" target="_blank">Typst</a>. I have a shared <code>temp.typ</code> every
-        course imports: custom <code>#theorem</code> / <code>#definition</code> boxes, shorthands like <code>apx</code> (≈) or <code>loss</code> (ℒ), calculus operators like <code>#px(f,x)</code> (∂f/∂x).
-        The demo below cycles through real snippets, compiled live in your browser.
+        I write all my lecture notes, exercises and projects using <a href="https://typst.app/open-source/" target="_blank">Typst</a>. I have a shared <code>temp.typ</code> every
+        course imports: this includes custom <code>#theorem</code> / <code>#definition</code> boxes, shorthands like <code>apx</code> (≈), <code>loss</code> (ℒ), or calculus operators like <code>px(f,x)</code> (∂f/∂x).
+        </br></br>The demo below cycles through real snippets, compiled live in your browser.
       </p>
     </div>
 
@@ -161,13 +155,11 @@ if (lockBtn) {
   });
 }
 
+var UNLOCK_H = Math.ceil(30 * LINE_H + 24 + 31); // height for 30 lines
+
 function growIfNeeded() {
   if (!demoEl || locked) return;
-  var lineCount = DEMOS[di].lines.join('\n').slice(0, charPos).split('\n').length;
-  if (lineCount > FITS) {
-    var needed = INIT_H + (lineCount - FITS + 4) * LINE_H;
-    if (needed > demoEl.clientHeight) demoEl.style.height = Math.ceil(needed) + 'px';
-  }
+  if (demoEl.clientHeight < UNLOCK_H) demoEl.style.height = UNLOCK_H + 'px';
 }
 
 // ── continuous compile ────────────────────────────────────────────────────────
