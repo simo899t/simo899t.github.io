@@ -3,6 +3,7 @@
 // Run: bash public/demo/build.sh  — to regenerate the rendered SVGs.
 // Then push. The animation will reflect your changes automatically.
 #let RR = $bb(R)$
+#let apx = $approx$
 #let mid = "|"
 // ── CONTENT ──────────────────────────────────────────────────
 = Matrices
