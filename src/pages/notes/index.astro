@@ -120,8 +120,8 @@ let phase   = 'typing';  // 'typing' | 'hold' | 'clearing'
 let holdMs  = 0;
 let clearMs = 0;
 
-const CHAR_MS = 36;
-const HOLD_MS = 3200;
+const CHAR_MS = 65;
+const HOLD_MS = 5000;
 const FADE_MS = 380;
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
@@ -129,23 +129,43 @@ const codeEl = document.getElementById('code');
 const lineEl = document.getElementById('line-nums');
 const outEl  = document.getElementById('render-out');
 
-// ── per-line compile ──────────────────────────────────────────────────────────
-let lastCompiledLineCount = -1;
-let compileBusy           = false;
+// ── continuous compile ────────────────────────────────────────────────────────
+// Always keep the latest content queued. As soon as a compile finishes, start
+// the next one if content changed — so the preview updates as fast as possible.
+let compileBusy   = false;
+let pendingText   = null;
 
-function triggerCompile(lineCount, contentText) {
-  if (lineCount <= lastCompiledLineCount) return;
+function triggerCompile(contentText) {
+  pendingText = contentText;                                   // always track latest
+  if (compileBusy) return;                                     // will drain on finish
   if (typeof window.__typstCompile !== 'function') return;
-  if (compileBusy) return;
+  drainCompile();
+}
 
-  lastCompiledLineCount = lineCount;
+function closePartial(src) {
+  // Close unclosed delimiters so partial content renders instead of erroring
+  var dollars = (src.match(/\$/g) || []).length;
+  if (dollars % 2 !== 0) src += ' $';
+  var stars = (src.match(/\*/g) || []).length;
+  if (stars % 2 !== 0) src += '*';
+  var underscores = (src.match(/_/g) || []).length;
+  if (underscores % 2 !== 0) src += '_';
+  return src;
+}
+
+function drainCompile() {
+  if (pendingText === null) return;
   compileBusy = true;
-  window.__typstCompile(contentText, function(svgStr) {
+  var src = closePartial(pendingText);
+  pendingText = null;
+  window.__typstCompile(src, function(svgStr) {
     compileBusy = false;
     if (svgStr) {
-      outEl.innerHTML = svgStr;
+      outEl.innerHTML     = svgStr;
       outEl.style.opacity = '1';
+
     }
+    drainCompile();   // compile again if more content arrived while busy
   });
 }
 
@@ -190,11 +210,11 @@ function renderCode() {
     return '<span style="opacity:' + (i < typed.length ? 1 : 0.25) + '">' + (i+1) + '</span>';
   }).join('');
 
-  // compile when a new content line is completed
+  // compile on every character — drainCompile throttles via compileBusy
   var preamble     = DEMOS[di].preamble;
   var contentLines = typed.slice(preamble + 1); // +1 for blank separator line
   if (contentLines.length > 0) {
-    triggerCompile(contentLines.length, contentLines.join('\n'));
+    triggerCompile(contentLines.join('\n'));
   }
 }
 
@@ -234,8 +254,8 @@ function tick() {
       di      = (di + 1) % DEMOS.length;
       charPos = 0;
       phase   = 'typing';
-      lastCompiledLineCount = -1;
-      compileBusy           = false;
+      compileBusy = false;
+      pendingText = null;
       codeEl.style.opacity = 1;
       lineEl.style.opacity = 1;
       outEl.style.opacity  = 1;
@@ -249,6 +269,7 @@ function tick() {
 
 tick();
 
+
 })();
 </script>
 
@@ -257,16 +278,25 @@ tick();
   // "text" is the keyword that loads all NewCM10 + NewCMMath fonts from typst-assets CDN
 
   var PAGE_SETUP = [
-    '#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))',
-    '#set text(size: 9.5pt, font: "New Computer Modern")',
-    '#set block(spacing: 0.65em)',
-    '#align(center)[',
-    '  *Course notes* \\',
-    '  #text(size: 8pt, fill: luma(120))[Simon Holm · SDU · 2025]',
+    '#set page(width: 270pt, height: auto, margin: (x: 18pt, y: 16pt))',
+    '#set text(size: 10pt, font: "New Computer Modern")',
+    '#set par(leading: 0.7em)',
+    '#set block(spacing: 0.8em)',
+    '#set heading(numbering: none)',
+    '#show heading.where(level: 1): it => block(above: 1em, below: 0.4em)[',
+    '  #text(size: 11pt, weight: "bold")[#it.body]',
     ']',
-    '#v(3pt)',
-    '#line(length: 100%, stroke: 0.4pt + luma(160))',
-    '#v(8pt)',
+    '#show heading.where(level: 2): it => block(above: 0.8em, below: 0.3em)[',
+    '  #text(size: 10pt, weight: "bold", style: "italic")[#it.body]',
+    ']',
+    '#grid(',
+    '  columns: (1fr, 1fr),',
+    '  align(left)[#text(weight: "bold", size: 10pt)[Course notes]],',
+    '  align(right)[#text(size: 8pt, fill: luma(140))[Simon Holm · SDU]],',
+    ')',
+    '#v(2pt)',
+    '#line(length: 100%, stroke: 0.5pt + luma(180))',
+    '#v(6pt)',
     '',
   ].join('\n');
 
@@ -342,12 +372,14 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 .demo-window {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: 340px;
+  height: 300px;
+  min-height: 200px;
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid #2a2a2a;
   margin-bottom: 2.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  resize: vertical;
 }
 
 .pane { display: flex; flex-direction: column; min-width: 0; }
@@ -398,12 +430,12 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 .line-nums {
   display: flex;
   flex-direction: column;
-  padding: 10px 8px 10px 6px;
-  min-width: 30px;
+  padding: 12px 8px 12px 8px;
+  min-width: 34px;
   text-align: right;
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.65;
   color: #3a3a3a;
   border-right: 1px solid #1e1e1e;
   user-select: none;
@@ -412,10 +444,10 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 
 .code {
   margin: 0;
-  padding: 10px;
+  padding: 12px 12px;
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  line-height: 1.6;
+  font-size: 12px;
+  line-height: 1.65;
   color: #ccc;
   white-space: pre-wrap;
   word-break: break-all;
@@ -431,18 +463,26 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 
 /* right pane */
 .pane-out {
-  background: #f0ede4;
+  background: #c5c2b8;
 }
 
 .output-body {
   flex: 1;
-  overflow: hidden;
-  padding: 14px 16px;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .render-out {
   width: 100%;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.28);
   transition: opacity 0.15s ease;
+  overflow: hidden;
 }
 
 .render-out svg {
@@ -453,8 +493,10 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 
 .render-status {
   font-size: 10px;
-  color: #aaa;
+  color: #999;
   font-family: var(--font-mono);
+  display: block;
+  padding: 10px;
 }
 
 /* ── notes list ── */
