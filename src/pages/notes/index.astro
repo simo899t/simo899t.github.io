@@ -182,17 +182,23 @@ function drainCompile() {
     if (svgStr) {
       outEl.innerHTML     = svgStr;
       outEl.style.opacity = '1';
-      // grow the window to fit the rendered output, never shrink
-      requestAnimationFrame(function() {
-        var demoEl = document.querySelector('.demo-window');
-        var svg    = outEl.querySelector('svg');
-        if (!demoEl || !svg) return;
-        var svgH    = svg.getBoundingClientRect().height;
-        if (svgH <= 0) return;
-        var needed  = svgH + 30 + 32; // titlebar + output-body padding
-        var current = demoEl.getBoundingClientRect().height;
-        if (needed > current) demoEl.style.height = needed + 'px';
-      });
+      // Grow window to fit SVG — read intrinsic size from viewBox to avoid
+      // circular dependency with flex layout
+      var demoEl = document.querySelector('.demo-window');
+      var svg    = outEl.querySelector('svg');
+      if (demoEl && svg) {
+        var vb = svg.getAttribute('viewBox');  // "0 0 W H" in pt
+        if (vb) {
+          var parts     = vb.split(' ');
+          var vbW       = parseFloat(parts[2]);
+          var vbH       = parseFloat(parts[3]);
+          var cardW     = Math.min(320, outEl.parentElement.clientWidth - 32);
+          var scaledH   = vbH * (cardW / vbW);
+          var needed    = scaledH + 30 + 32; // titlebar + output-body padding
+          var current   = demoEl.clientHeight;
+          if (needed > current) demoEl.style.height = Math.ceil(needed) + 'px';
+        }
+      }
     }
     drainCompile();   // compile again if more content arrived while busy
   });
