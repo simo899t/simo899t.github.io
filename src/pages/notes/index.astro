@@ -183,16 +183,16 @@ function drainCompile() {
       outEl.innerHTML     = svgStr;
       outEl.style.opacity = '1';
       // grow the window to fit the rendered output, never shrink
-      var demoEl = document.querySelector('.demo-window');
-      var svg    = outEl.querySelector('svg');
-      if (demoEl && svg) {
+      requestAnimationFrame(function() {
+        var demoEl = document.querySelector('.demo-window');
+        var svg    = outEl.querySelector('svg');
+        if (!demoEl || !svg) return;
         var svgH    = svg.getBoundingClientRect().height;
-        var titleH  = 30;
-        var padH    = 32;
-        var needed  = svgH + titleH + padH;
+        if (svgH <= 0) return;
+        var needed  = svgH + 30 + 32; // titlebar + output-body padding
         var current = demoEl.getBoundingClientRect().height;
         if (needed > current) demoEl.style.height = needed + 'px';
-      }
+      });
     }
     drainCompile();   // compile again if more content arrived while busy
   });
