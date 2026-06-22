@@ -69,13 +69,15 @@ const allNotes = (await getCollection('notes'))
   </div>
 </Layout>
 
+<script is:inline src="/typst-lite.js"></script>
 <script>
-// src lines match public/demo/src/*.typ exactly (content only, no preamble).
-// SVGs are named /demo/<slug>-<lineN>.svg for every line N.
-// The right pane swaps to the SVG for the current completed line count on every new line.
-// preambleLines: lines typed first (import/show) — not animated against SVGs.
-// After preambleLines are typed, SVG index = completedLines - preambleLines.
-// src lines match what you'd actually write in a real note file.
+// Typst WASM compiler — compiles typed source to SVG on every completed line.
+// PREAMBLE is prepended silently to every compile; the user sees only the typed lines.
+const PREAMBLE = `#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))
+#set text(size: 9.5pt, font: "New Computer Modern")
+#set block(spacing: 0.65em)
+`;
+
 const DEMOS = [
   {
     slug: 'linear-algebra',
@@ -179,10 +181,18 @@ let phase     = 'typing';
 let holdTick  = 0;
 let clearTick = 0;
 let lastLine  = -1;
+let compiling = false;
 
 const CHAR_MS  = 38;
-const HOLD_MS  = 3000;
+const HOLD_MS  = 3500;
 const CLEAR_MS = 400;
+
+// Init typst WASM compiler — load WASM from CDN, fonts from jsdelivr (default)
+window.$typst.setCompilerInitOptions({
+  getModule: () =>
+    fetch('https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@0.7.0/pkg/typst_ts_web_compiler_bg.wasm')
+      .then(r => r.arrayBuffer()),
+});
 
 function completedLines() {
   return DEMOS[demoIdx].src.join('\n').slice(0, charPos).split('\n').length - 1;
@@ -213,6 +223,23 @@ function highlight(text) {
   }).join('\n');
 }
 
+async function compile(content) {
+  if (compiling) return;
+  compiling = true;
+  try {
+    const svg = await window.$typst.svg({ mainContent: PREAMBLE + content });
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
+    const url  = URL.createObjectURL(blob);
+    const old  = imgEl.src;
+    imgEl.src  = url;
+    if (old.startsWith('blob:')) URL.revokeObjectURL(old);
+  } catch (_) {
+    // silently skip invalid intermediate states
+  } finally {
+    compiling = false;
+  }
+}
+
 function render() {
   const text  = DEMOS[demoIdx].src.join('\n').slice(0, charPos);
   const lines = text.split('\n');
@@ -224,13 +251,9 @@ function render() {
   ).join('');
 
   const done = completedLines();
-  const svgIdx = done - DEMOS[demoIdx].preamble;
-  if (done !== lastLine && svgIdx >= 1) {
+  if (done !== lastLine && done > DEMOS[demoIdx].preamble) {
     lastLine = done;
-    imgEl.src = `/demo/${DEMOS[demoIdx].slug}-${svgIdx}.svg`;
-  } else if (svgIdx < 1 && imgEl.src) {
-    // still in preamble — show nothing yet
-    imgEl.removeAttribute('src');
+    compile(text);
   }
 }
 
@@ -260,7 +283,9 @@ function step() {
       charPos  = 0;
       lastLine = -1;
       phase    = 'typing';
-      imgEl.src = '';
+      const old = imgEl.src;
+      if (old.startsWith('blob:')) URL.revokeObjectURL(old);
+      imgEl.removeAttribute('src');
       imgEl.style.opacity  = '1';
       srcEl.style.opacity  = '1';
       lineEl.style.opacity = '1';
