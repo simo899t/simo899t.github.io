@@ -1,13 +1,9 @@
-// Header baked into every frame via preamble — matches temp.typ note output
-#align(center)[
-  *MM536 — Analysis* \
-  #text(size: 8pt, fill: luma(120))[Simon Holm · SDU · 2025]
-]
-#v(3pt)
-#line(length: 100%, stroke: 0.4pt + luma(160))
-#v(8pt)
+// PREAMBLE (lines 1-5 shown as #import/#show in the animation, not editable)
+// Edit the content below (line 7 onwards) to change the animation.
+// Run: bash public/demo/build.sh  — to regenerate the rendered SVGs.
+// Then push. The animation will reflect your changes automatically.
 
-// Content starts here (lines below are animated)
+// ── CONTENT ──────────────────────────────────────────────────
 = Fundamental Theorem
 
 If $f$ is continuous on $[a, b]$ and
@@ -19,8 +15,10 @@ $ integral_a^b f(x) dif x = F(b) - F(a) $
 
 For $h(x) = f(g(x))$:
 
-$ (dif h) / (dif x) = (dif f) / (dif g) dot (dif g) / (dif x) $
+$ (dif h) / (dif x) = (dif f) / (dif g)
+  dot (dif g) / (dif x) $
 
-In backprop: $(partial cal(L)) / (partial W) =
-(partial cal(L)) / (partial z) dot
-(partial z) / (partial W)$ applied layer by layer.
+In backprop: $(partial cal(L)) / (partial W)
+= (partial cal(L)) / (partial z)
+  dot (partial z) / (partial W)$
+applied layer by layer.

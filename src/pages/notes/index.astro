@@ -1,54 +1,90 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 const allNotes = (await getCollection('notes'))
   .filter(n => !n.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
+// Read the .typ source files — edit those files to change the animation.
+// Lines 1-6 are the comment block; content starts at line 7.
+const SKIP = 6;
+
+function loadDemo(slug: string, title: string, course: string) {
+  const raw = readFileSync(resolve('public/demo/src', slug + '.typ'), 'utf8');
+  const content = raw.split('\n').slice(SKIP);
+  // Strip trailing empty lines
+  while (content.length && content[content.length - 1].trim() === '') content.pop();
+  const preamble = [
+    '#import "../../temp.typ": *',
+    '#show: note.with(',
+    `  title:  "${title}",`,
+    `  course: "${course}",`,
+    ')',
+  ];
+  return { slug, preamble: preamble.length, lines: [...preamble, '', ...content] };
+}
+
+const demos = [
+  loadDemo('linear-algebra',   'Linear Algebra',   'DM561'),
+  loadDemo('gradient-descent', 'Gradient Descent', 'AI505'),
+  loadDemo('calculus',         'Calculus',         'MM536'),
+];
+
+const demosJson = JSON.stringify(demos);
 ---
 
 <Layout title="Notes" description="Study notes by Simon Holm.">
   <div class="container page">
     <h1>Notes</h1>
     <p class="sub">
-      Short write-ups on things I'm figuring out.
-      Written in <a href="https://typst.app" target="_blank">Typst</a> —
+      Short write-ups on things I'm figuring out. Written in
+      <a href="https://typst.app" target="_blank">Typst</a> —
       try the syntax with <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique</a>.
     </p>
 
     <div class="typst-blurb">
       <p>
         I write all my lecture notes in <a href="https://typst.app/open-source/" target="_blank">Typst</a> —
-        a modern typesetting system that compiles as you type, with real math, clean PDFs, and
-        no LaTeX boilerplate. I have a shared <code>temp.typ</code> that every course imports:
-        custom <code>#theorem</code> / <code>#definition</code> boxes, matrix shorthands like <code>succ</code> and <code>mat</code>,
-        calculus operators like <code>#dv(f,x)</code> and <code>#ppv(f,x)</code>, and a bunch of
-        symbol aliases so KR proofs don't look like line noise.
-        The demo below cycles through a few real snippets.
+        real math, clean PDFs, no LaTeX boilerplate. I have a shared <code>temp.typ</code> every
+        course imports: custom <code>#theorem</code> / <code>#definition</code> boxes,
+        matrix shorthands like <code>succ</code>, calculus operators like <code>#dv(f,x)</code>.
+        The demo below cycles through real snippets, compiled live in your browser.
       </p>
     </div>
 
-    <div class="typst-demo">
-      <div class="demo-src">
-        <div class="pane-bar">
-          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
-          <span class="pane-title">notes.typ</span>
+    <!-- two-pane demo window -->
+    <div class="demo-window">
+
+      <!-- left: editor -->
+      <div class="pane pane-src">
+        <div class="titlebar">
+          <span class="tb-dot red"></span>
+          <span class="tb-dot yellow"></span>
+          <span class="tb-dot green"></span>
+          <span class="tb-name">notes.typ</span>
         </div>
-        <div class="editor">
-          <div class="line-nums" id="line-nums"></div>
-          <pre id="typst-src"></pre>
-        </div>
-      </div>
-      <div class="demo-out">
-        <div class="pane-bar">
-          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
-          <span class="pane-title">notes.pdf</span>
-        </div>
-        <div class="paper-wrap">
-          <img id="paper-svg" class="paper-svg" src="" alt="" />
+        <div class="editor-body">
+          <div id="line-nums" class="line-nums"></div>
+          <pre id="code" class="code"></pre>
         </div>
       </div>
+
+      <!-- right: rendered output -->
+      <div class="pane pane-out">
+        <div class="titlebar titlebar-light">
+          <span class="tb-dot red"></span>
+          <span class="tb-dot yellow"></span>
+          <span class="tb-dot green"></span>
+          <span class="tb-name tb-name-dark">notes.pdf</span>
+        </div>
+        <div class="output-body">
+          <div id="render-out" class="render-out"></div>
+        </div>
+      </div>
+
     </div>
 
     {allNotes.length > 0 ? (
@@ -69,234 +105,131 @@ const allNotes = (await getCollection('notes'))
   </div>
 </Layout>
 
-<script is:inline src="/typst-lite.js"></script>
-<script>
-// Typst WASM compiler — compiles typed source to SVG on every completed line.
-// PREAMBLE is prepended silently to every compile; the user sees only the typed lines.
-const PREAMBLE = `#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))
-#set text(size: 9.5pt, font: "New Computer Modern")
-#set block(spacing: 0.65em)
-`;
+<script is:inline define:vars={{ demosJson }}>
+(function () {
 
-const DEMOS = [
-  {
-    slug: 'linear-algebra',
-    preamble: 5,   // #import + #show: note.with(...) block
-    src: [
-      `#import "../../temp.typ": *`,
-      `#show: note.with(`,
-      `  title:  "Linear Algebra",`,
-      `  course: "DM561",`,
-      `)`,
-      ``,
-      `= Positive Definiteness`,
-      ``,
-      `A symmetric $A in RR^(n times n)$ is`,
-      `_positive definite_ ($A succ 0$) iff`,
-      `$x^T A x > 0$ for all $x != bold(0)$.`,
-      ``,
-      `#block(`,
-      `  stroke: 0.4pt + luma(120),`,
-      `  inset: (x: 8pt, y: 6pt),`,
-      `  width: 100%, fill: luma(248),`,
-      `)[`,
-      `  *Definition.* $A succ 0 arrow.l.r.double$`,
-      `  all $lambda_i > 0$ — Cholesky $A = L L^T$.`,
-      `]`,
-      ``,
-      `*Example.* $mat(2, 1; 1, 3) succ 0$ since`,
-      `$lambda_1 = (5 + sqrt(5))/2 > 0$ and`,
-      `$lambda_2 = (5 - sqrt(5))/2 > 0$.`,
-    ],
-  },
-  {
-    slug: 'gradient-descent',
-    preamble: 5,
-    src: [
-      `#import "../../temp.typ": *`,
-      `#show: note.with(`,
-      `  title:  "Gradient Descent",`,
-      `  course: "AI505",`,
-      `)`,
-      ``,
-      `= Gradient Descent`,
-      ``,
-      `The update rule for parameters $theta$ with`,
-      `loss $cal(L)$:`,
-      ``,
-      `$ theta_(t+1) = theta_t`,
-      `  - eta nabla_theta cal(L)(theta_t) $`,
-      ``,
-      `where $eta > 0$ is the learning rate.`,
-      ``,
-      `== Mini-batch SGD`,
-      ``,
-      `Approximate $nabla_theta cal(L)$ over`,
-      `a batch $cal(B) subset cal(D)$:`,
-      ``,
-      `$ nabla_theta cal(L) approx`,
-      `  1 / |cal(B)|`,
-      `  sum_(i in cal(B)) nabla_theta ell_i $`,
-    ],
-  },
-  {
-    slug: 'calculus',
-    preamble: 5,
-    src: [
-      `#import "../../temp.typ": *`,
-      `#show: note.with(`,
-      `  title:  "Calculus",`,
-      `  course: "MM536",`,
-      `)`,
-      ``,
-      `= Fundamental Theorem`,
-      ``,
-      `If $f$ is continuous on $[a, b]$ and`,
-      `$F' = f$, then:`,
-      ``,
-      `$ integral_a^b f(x) dif x = F(b) - F(a) $`,
-      ``,
-      `= Chain Rule`,
-      ``,
-      `For $h(x) = f(g(x))$:`,
-      ``,
-      `$ (dif h) / (dif x) = (dif f) / (dif g)`,
-      `  dot (dif g) / (dif x) $`,
-      ``,
-      `In backprop: $(partial cal(L)) / (partial W)`,
-      `= (partial cal(L)) / (partial z)`,
-      `  dot (partial z) / (partial W)$`,
-      `applied layer by layer.`,
-    ],
-  },
-];
+// ── demos loaded from public/demo/src/*.typ at build time ─────────────────────
+const DEMOS = JSON.parse(demosJson);
 
-const srcEl  = document.getElementById('typst-src');
-const lineEl = document.getElementById('line-nums');
-const imgEl  = document.getElementById('paper-svg');
+// ── state ─────────────────────────────────────────────────────────────────────
+let di       = 0;          // demo index
+let charPos  = 0;          // chars typed so far in current demo
+let phase    = 'typing';   // 'typing' | 'hold' | 'clearing'
+let holdMs   = 0;
+let clearMs  = 0;
+let lastSvgLine = -1;
 
-let demoIdx   = 0;
-let charPos   = 0;
-let phase     = 'typing';
-let holdTick  = 0;
-let clearTick = 0;
-let lastLine  = -1;
-let compiling = false;
+const CHAR_MS  = 36;
+const HOLD_MS  = 3200;
+const FADE_MS  = 380;
 
-const CHAR_MS  = 38;
-const HOLD_MS  = 3500;
-const CLEAR_MS = 400;
+// ── DOM ───────────────────────────────────────────────────────────────────────
+const codeEl   = document.getElementById('code');
+const lineEl   = document.getElementById('line-nums');
+const outEl    = document.getElementById('render-out');
 
-// Init typst WASM compiler — load WASM from CDN, fonts from jsdelivr (default)
-window.$typst.setCompilerInitOptions({
-  getModule: () =>
-    fetch('https://cdn.jsdelivr.net/npm/@myriaddreamin/typst-ts-web-compiler@0.7.0/pkg/typst_ts_web_compiler_bg.wasm')
-      .then(r => r.arrayBuffer()),
-});
-
-function completedLines() {
-  return DEMOS[demoIdx].src.join('\n').slice(0, charPos).split('\n').length - 1;
-}
-
-function highlight(text) {
-  const esc = (s) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  return text.split('\n').map(line => {
+// ── syntax highlight ──────────────────────────────────────────────────────────
+function hl(text) {
+  var esc = function(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  };
+  return text.split('\n').map(function(line) {
     if (/^=+\s/.test(line))
-      return `<span style="color:#dcdcaa;font-weight:600">${esc(line)}</span>`;
-    let out = '', i = 0;
+      return '<span style="color:#dcdcaa;font-weight:600">' + esc(line) + '</span>';
+    var out = '', i = 0;
     while (i < line.length) {
-      const ch = line[i];
+      var ch = line[i];
       if (ch === '/' && line[i+1] === '/') {
-        out += `<span style="color:#555">${esc(line.slice(i))}</span>`; i = line.length;
+        out += '<span style="color:#555">' + esc(line.slice(i)) + '</span>';
+        i = line.length;
       } else if (ch === '#' && i+1 < line.length && /\w/.test(line[i+1])) {
-        let j = i+1; while (j < line.length && /\w/.test(line[j])) j++;
-        out += `<span style="color:#4db6c4">${esc(line.slice(i,j))}</span>`; i = j;
+        var j = i+1; while (j < line.length && /\w/.test(line[j])) j++;
+        out += '<span style="color:#4db6c4">' + esc(line.slice(i,j)) + '</span>'; i = j;
       } else if (ch === '"') {
-        let j = i+1; while (j < line.length && line[j] !== '"') j++; if (j < line.length) j++;
-        out += `<span style="color:#ce9178">${esc(line.slice(i,j))}</span>`; i = j;
+        var j = i+1; while (j < line.length && line[j] !== '"') j++; if (j < line.length) j++;
+        out += '<span style="color:#ce9178">' + esc(line.slice(i,j)) + '</span>'; i = j;
       } else if (ch === '$') {
-        let j = i+1; while (j < line.length && line[j] !== '$') j++; if (j < line.length) j++;
-        out += `<span style="color:#b5cea8">${esc(line.slice(i,j))}</span>`; i = j;
+        var j = i+1; while (j < line.length && line[j] !== '$') j++; if (j < line.length) j++;
+        out += '<span style="color:#b5cea8">' + esc(line.slice(i,j)) + '</span>'; i = j;
       } else { out += esc(ch); i++; }
     }
     return out;
   }).join('\n');
 }
 
-async function compile(content) {
-  if (compiling) return;
-  compiling = true;
-  try {
-    const svg = await window.$typst.svg({ mainContent: PREAMBLE + content });
-    const blob = new Blob([svg], { type: 'image/svg+xml' });
-    const url  = URL.createObjectURL(blob);
-    const old  = imgEl.src;
-    imgEl.src  = url;
-    if (old.startsWith('blob:')) URL.revokeObjectURL(old);
-  } catch (_) {
-    // silently skip invalid intermediate states
-  } finally {
-    compiling = false;
+// ── render left pane ──────────────────────────────────────────────────────────
+function renderCode() {
+  var full    = DEMOS[di].lines.join('\n');
+  var text    = full.slice(0, charPos);
+  var typed   = text.split('\n');
+  var total   = DEMOS[di].lines.length;
+
+  codeEl.innerHTML  = hl(text) + '<span class="cur">▮</span>';
+  lineEl.innerHTML  = Array.from({length: total}, function(_, i) {
+    return '<span style="opacity:' + (i < typed.length ? 1 : 0.25) + '">' + (i+1) + '</span>';
+  }).join('');
+
+  // update SVG when a new content line completes
+  var done    = typed.length - 1;
+  var svgIdx  = done - DEMOS[di].preamble;
+  if (done !== lastSvgLine && svgIdx >= 1) {
+    lastSvgLine = done;
+    var src = '/demo/' + DEMOS[di].slug + '-' + svgIdx + '.svg';
+    outEl.innerHTML = '<img src="' + src + '" style="width:100%;display:block;">';
   }
 }
 
-function render() {
-  const text  = DEMOS[demoIdx].src.join('\n').slice(0, charPos);
-  const lines = text.split('\n');
-  const total = DEMOS[demoIdx].src.length;
-
-  srcEl.innerHTML  = highlight(text) + '<span class="cursor">▮</span>';
-  lineEl.innerHTML = Array.from({ length: total }, (_, i) =>
-    `<span style="opacity:${i < lines.length ? 1 : 0.3}">${i+1}</span>`
-  ).join('');
-
-  const done = completedLines();
-  if (done !== lastLine && done > DEMOS[demoIdx].preamble) {
-    lastLine = done;
-    compile(text);
-  }
-}
-
-function step() {
-  const fullLen = DEMOS[demoIdx].src.join('\n').length;
+// ── animation loop ────────────────────────────────────────────────────────────
+function tick() {
+  var full = DEMOS[di].lines.join('\n');
 
   if (phase === 'typing') {
-    if (charPos < fullLen) { charPos++; } else { phase = 'hold'; holdTick = 0; }
-    render();
-    setTimeout(step, CHAR_MS);
+    if (charPos < full.length) {
+      charPos++;
+    } else {
+      phase  = 'hold';
+      holdMs = 0;
+    }
+    renderCode();
+    setTimeout(tick, CHAR_MS);
 
   } else if (phase === 'hold') {
-    holdTick += 16;
-    if (holdTick < HOLD_MS) setTimeout(step, 16);
-    else { phase = 'clearing'; clearTick = 0; setTimeout(step, 16); }
-
-  } else {
-    clearTick += 16;
-    const t = Math.min(clearTick / CLEAR_MS, 1);
-    imgEl.style.opacity  = String(1 - t);
-    srcEl.style.opacity  = String(1 - t);
-    lineEl.style.opacity = String(1 - t);
-    if (t < 1) {
-      setTimeout(step, 16);
+    holdMs += 16;
+    if (holdMs < HOLD_MS) {
+      setTimeout(tick, 16);
     } else {
-      demoIdx  = (demoIdx + 1) % DEMOS.length;
-      charPos  = 0;
-      lastLine = -1;
-      phase    = 'typing';
-      const old = imgEl.src;
-      if (old.startsWith('blob:')) URL.revokeObjectURL(old);
-      imgEl.removeAttribute('src');
-      imgEl.style.opacity  = '1';
-      srcEl.style.opacity  = '1';
-      lineEl.style.opacity = '1';
-      srcEl.innerHTML  = '<span class="cursor">▮</span>';
-      lineEl.innerHTML = '<span>1</span>';
-      setTimeout(step, 300);
+      phase   = 'clearing';
+      clearMs = 0;
+      setTimeout(tick, 16);
+    }
+
+  } else { // clearing
+    clearMs += 16;
+    var t = Math.min(clearMs / FADE_MS, 1);
+    codeEl.style.opacity  = 1 - t;
+    lineEl.style.opacity  = 1 - t;
+    outEl.style.opacity   = 1 - t;
+    if (t < 1) {
+      setTimeout(tick, 16);
+    } else {
+      di           = (di + 1) % DEMOS.length;
+      charPos      = 0;
+      lastSvgLine  = -1;
+      phase        = 'typing';
+      codeEl.style.opacity  = 1;
+      lineEl.style.opacity  = 1;
+      outEl.style.opacity   = 1;
+      codeEl.innerHTML  = '<span class="cur">▮</span>';
+      lineEl.innerHTML  = '<span>1</span>';
+      outEl.innerHTML   = '';
+      setTimeout(tick, 300);
     }
   }
 }
 
-step();
+tick();
+
+})();
 </script>
 
 <style>
@@ -305,138 +238,18 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 .sub {
   font-size: 0.85rem;
   color: var(--text-dim);
+  margin-bottom: 1rem;
+}
+
+.typst-blurb {
   margin-bottom: 1.5rem;
 }
-
-/* ── Typst demo ─────────────────────── */
-.typst-demo {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  overflow: hidden;
-  margin-bottom: 2.25rem;
-  font-size: 0;   /* kill inline-block gaps */
-}
-
-.pane-bar {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 7px 10px;
-  background: #1a1a1a;
-  border-bottom: 1px solid #262626;
-}
-
-.dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-.dot.red    { background: #ff5f57; }
-.dot.yellow { background: #febc2e; }
-.dot.green  { background: #28c840; }
-
-.pane-title {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: #555;
-  margin-left: 6px;
-}
-
-/* source side */
-.demo-src {
-  border-right: 1px solid #222;
-  background: #111;
-}
-
-.editor {
-  display: flex;
-  height: 310px;
-  overflow: hidden;
-}
-
-.line-nums {
-  display: flex;
-  flex-direction: column;
-  padding: 10px 8px 10px 0;
-  min-width: 28px;
-  text-align: right;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1.6;
-  color: #3a3a3a;
-  background: #111;
-  border-right: 1px solid #1e1e1e;
-  user-select: none;
-  flex-shrink: 0;
-}
-
-#typst-src {
-  margin: 0;
-  padding: 10px 10px 10px 10px;
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  line-height: 1.6;
-  color: #ccc;
-  white-space: pre-wrap;
-  word-break: break-all;
-  background: #111;
-  flex: 1;
-  border: none;
-  outline: none;
-}
-
-.cursor {
-  color: #4db6c4;
-  animation: blink 1s step-end infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
-
-/* output side */
-.demo-out {
-  background: #f0ede4;
-  display: flex;
-  flex-direction: column;
-}
-
-.demo-out .pane-bar {
-  background: #dedad0;
-  border-bottom: 1px solid #ccc8be;
-}
-
-.demo-out .pane-title { color: #999; }
-
-.paper-wrap {
-  height: 310px;
-  overflow: hidden;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.paper-svg {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: top center;
-  padding: 12px;
-  box-sizing: border-box;
-  transition: opacity 0.2s;
-}
-
-/* ── rest of page ───────────────────── */
-.typst-blurb {
-  margin-bottom: 1.25rem;
-}
-
 .typst-blurb p {
   font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.7;
   margin: 0;
 }
-
 .typst-blurb code {
   font-family: var(--font-mono);
   font-size: 0.78rem;
@@ -446,6 +259,122 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   border-radius: 3px;
 }
 
+/* ── demo window ── */
+.demo-window {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 340px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #2a2a2a;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+.pane { display: flex; flex-direction: column; min-width: 0; }
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #1c1c1c;
+  border-bottom: 1px solid #2a2a2a;
+  flex-shrink: 0;
+}
+.titlebar-light {
+  background: #d0cdc4;
+  border-bottom: 1px solid #b8b5ac;
+}
+
+.tb-dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tb-dot.red    { background: #ff5f57; }
+.tb-dot.yellow { background: #febc2e; }
+.tb-dot.green  { background: #28c840; }
+
+.tb-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: #555;
+  margin-left: 4px;
+}
+.tb-name-dark { color: #888; }
+
+/* left pane */
+.pane-src {
+  background: #111;
+  border-right: 1px solid #222;
+}
+
+.editor-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.line-nums {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 8px 10px 6px;
+  min-width: 30px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: #3a3a3a;
+  border-right: 1px solid #1e1e1e;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.code {
+  margin: 0;
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  line-height: 1.6;
+  color: #ccc;
+  white-space: pre-wrap;
+  word-break: break-all;
+  flex: 1;
+  overflow: hidden;
+}
+
+.cur {
+  color: #4db6c4;
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* right pane */
+.pane-out {
+  background: #f0ede4;
+}
+
+.output-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 14px 16px;
+}
+
+.render-out {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.render-out img {
+  width: 100%;
+  object-fit: contain;
+  object-position: top left;
+  display: block;
+}
+
+/* ── notes list ── */
 .note-list {
   display: flex;
   flex-direction: column;
@@ -459,13 +388,10 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   gap: 1rem;
   padding: 0.8rem 0;
   border-bottom: 1px solid var(--border);
-  opacity: 1 !important;
 }
-
 .note-row:hover .note-title { color: var(--accent); }
 
 .note-title { font-size: 0.875rem; color: var(--text); }
-
 .note-meta {
   font-family: var(--font-mono);
   font-size: 0.68rem;
