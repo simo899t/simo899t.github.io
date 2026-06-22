@@ -47,10 +47,8 @@ const demosJson = JSON.stringify(demos);
 
     <div class="typst-blurb">
       <p>
-        I write all my lecture notes in <a href="https://typst.app/open-source/" target="_blank">Typst</a> —
-        real math, clean PDFs, no LaTeX boilerplate. I have a shared <code>temp.typ</code> every
-        course imports: custom <code>#theorem</code> / <code>#definition</code> boxes,
-        matrix shorthands like <code>succ</code>, calculus operators like <code>#dv(f,x)</code>.
+        I write all my lecture notes in <a href="https://typst.app/open-source/" target="_blank">Typst</a>. I have a shared <code>temp.typ</code> every
+        course imports: custom <code>#theorem</code> / <code>#definition</code> boxes, shorthands like <code>apx</code> (≈) or <code>loss</code> (ℒ), calculus operators like <code>#px(f,x)</code> (∂f/∂x).
         The demo below cycles through real snippets, compiled live in your browser.
       </p>
     </div>
@@ -143,12 +141,17 @@ function triggerCompile(contentText) {
 }
 
 function closePartial(src) {
-  // Close unclosed delimiters so partial content renders instead of erroring
+  // If inside an unclosed math block, close it and return —
+  // don't check * or _ inside math (they're subscript/multiply there)
   var dollars = (src.match(/\$/g) || []).length;
-  if (dollars % 2 !== 0) src += ' $';
-  var stars = (src.match(/\*/g) || []).length;
+  if (dollars % 2 !== 0) {
+    return src + ' $';
+  }
+  // Strip completed math blocks, then count text-mode * and _
+  var textOnly = src.replace(/\$[^$]*\$/g, '');
+  var stars = (textOnly.match(/\*/g) || []).length;
   if (stars % 2 !== 0) src += '*';
-  var underscores = (src.match(/_/g) || []).length;
+  var underscores = (textOnly.match(/_/g) || []).length;
   if (underscores % 2 !== 0) src += '_';
   return src;
 }
