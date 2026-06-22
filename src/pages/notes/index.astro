@@ -248,8 +248,8 @@ function renderCode() {
   var total   = DEMOS[di].lines.length;
 
   codeEl.innerHTML = hl(text) + '<span class="cur">▮</span>';
-  lineEl.innerHTML = Array.from({length: total}, function(_, i) {
-    return '<span style="opacity:' + (i < typed.length ? 1 : 0.25) + '">' + (i+1) + '</span>';
+  lineEl.innerHTML = Array.from({length: typed.length}, function(_, i) {
+    return '<span>' + (i+1) + '</span>';
   }).join('');
 
   // compile on every character — drainCompile throttles via compileBusy
