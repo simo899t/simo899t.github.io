@@ -1,7 +1,13 @@
-#set page(width: 240pt, height: auto, margin: (x: 14pt, y: 12pt))
-#set text(size: 9.5pt, font: "New Computer Modern")
-#set block(spacing: 0.65em)
+// Header baked into every frame via preamble — matches temp.typ note output
+#align(center)[
+  *MM536 — Analysis* \
+  #text(size: 8pt, fill: luma(120))[Simon Holm · SDU · 2025]
+]
+#v(3pt)
+#line(length: 100%, stroke: 0.4pt + luma(160))
+#v(8pt)
 
+// Content starts here (lines below are animated)
 = Fundamental Theorem
 
 If $f$ is continuous on $[a, b]$ and
