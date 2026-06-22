@@ -271,26 +271,25 @@ tick();
     '',
   ].join('\n');
 
-  // typst-lite.js is the all-in-one-lite bundle — inlines compiler+renderer code,
-  // references WASMs relative to import.meta.url.
-  // We override both WASMs via setCompilerInitOptions / setRendererInitOptions.
-  const m = await import('/typst-lite.js');
-  const typst = new m.TypstSnippet();
+  // importing the bundle sets window.$typst — use that instance (already configured
+  // with buildGlobalCompiler/buildGlobalRenderer internally in the bundle)
+  await import('/typst-lite.js');
+  var typst = window.$typst;
 
+  // must be called before first svg() so the compiler knows where to get its WASM
   typst.setCompilerInitOptions({
-    getModule: () => fetch(COMPILER_WASM).then(function(r) { return r.arrayBuffer(); }),
+    getModule: function() { return fetch(COMPILER_WASM).then(function(r) { return r.arrayBuffer(); }); },
   });
-
   typst.setRendererInitOptions({
-    getModule: () => fetch(RENDERER_WASM).then(function(r) { return r.arrayBuffer(); }),
+    getModule: function() { return fetch(RENDERER_WASM).then(function(r) { return r.arrayBuffer(); }); },
   });
 
   window.__typstCompile = async function(contentText, cb) {
     try {
-      const svg = await typst.svg({ mainContent: PAGE_SETUP + contentText });
+      var svg = await typst.svg({ mainContent: PAGE_SETUP + contentText });
       cb(svg);
     } catch (e) {
-      // ignore mid-expression compile errors
+      // ignore mid-expression compile errors silently
     }
   };
 })();
