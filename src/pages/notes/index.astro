@@ -147,7 +147,8 @@ function growIfNeeded() {
   var text      = DEMOS[di].lines.join('\n').slice(0, charPos);
   var lineCount = text.split('\n').length;
   var lineH     = 12 * 1.65;  // font-size × line-height = 19.8px
-  var needed    = lineCount * lineH + 24 + 31; // +padding +titlebar
+  var buffer    = lineH * 4;  // grow 4 lines before overflow
+  var needed    = lineCount * lineH + 24 + 31 + buffer;
   if (needed > demoEl.clientHeight) demoEl.style.height = Math.ceil(needed) + 'px';
 }
 
