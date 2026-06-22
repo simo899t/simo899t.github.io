@@ -160,8 +160,7 @@ if (lockBtn) {
 
 function growIfNeeded() {
   if (!demoEl || locked) return;
-  var total   = DEMOS[di].lines.length;
-  var UNLOCK_H = Math.ceil(total * LINE_H + 24 + 31);
+  var UNLOCK_H = Math.ceil(30 * LINE_H + 24 + 31);
   if (demoEl.clientHeight < UNLOCK_H) demoEl.style.height = UNLOCK_H + 'px';
 }
 
