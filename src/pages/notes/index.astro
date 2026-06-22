@@ -143,12 +143,18 @@ const demoEl      = document.querySelector('.demo-window');
 const editorBody  = document.querySelector('.editor-body');
 
 function growIfNeeded() {
-  if (!demoEl) return;
-  var text      = DEMOS[di].lines.join('\n').slice(0, charPos);
-  var lineCount = text.split('\n').length;
-  var lineH     = 12 * 1.65;  // font-size × line-height = 19.8px
-  var buffer    = lineH * 4;  // grow 4 lines before overflow
-  var needed    = lineCount * lineH + 24 + 31 + buffer;
+  if (!demoEl || !editorBody) return;
+  var text       = DEMOS[di].lines.join('\n').slice(0, charPos);
+  var lineH      = 12 * 1.65;  // 19.8px per visual line
+  var charW      = 7.2;         // ~0.6 × 12px monospace
+  var codeW      = editorBody.clientWidth - 40; // subtract line-nums gutter
+  var charsPerRow = Math.max(1, Math.floor(codeW / charW));
+  // count visual (wrapped) lines
+  var visualLines = text.split('\n').reduce(function(sum, line) {
+    return sum + Math.max(1, Math.ceil((line.length || 1) / charsPerRow));
+  }, 0);
+  var buffer  = lineH * 3;
+  var needed  = visualLines * lineH + 24 + 31 + buffer;
   if (needed > demoEl.clientHeight) demoEl.style.height = Math.ceil(needed) + 'px';
 }
 
@@ -289,6 +295,7 @@ function tick() {
       phase   = 'typing';
       compileBusy = false;
       pendingText = null;
+      if (demoEl) demoEl.style.height = '300px';
       codeEl.style.opacity = 1;
       lineEl.style.opacity = 1;
       outEl.style.opacity  = 1;
