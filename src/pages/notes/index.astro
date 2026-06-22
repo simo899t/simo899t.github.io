@@ -97,6 +97,7 @@ const demosJson = JSON.stringify(demos);
           <span class="tb-dot yellow"></span>
           <span class="tb-dot green"></span>
           <span class="tb-name tb-name-dark">notes.pdf</span>
+          <button id="lock-btn" class="lock-btn" title="Lock window height">🔒</button>
         </div>
         <div class="output-body">
           <div id="render-out" class="render-out">
@@ -146,15 +147,25 @@ const outEl       = document.getElementById('render-out');
 const demoEl      = document.querySelector('.demo-window');
 const editorBody  = document.querySelector('.editor-body');
 
-var LINE_H   = 12 * 1.65;           // 19.8px per line
-var INIT_H   = 300;                 // starting window height
-var FITS     = Math.floor((INIT_H - 31 - 24) / LINE_H); // lines that fit at 300px
+var LINE_H   = 12 * 1.65;
+var INIT_H   = 300;
+var FITS     = Math.floor((INIT_H - 31 - 24) / LINE_H);
+var locked   = true;
+
+var lockBtn  = document.getElementById('lock-btn');
+if (lockBtn) {
+  lockBtn.addEventListener('click', function() {
+    locked = !locked;
+    lockBtn.textContent = locked ? '🔒' : '🔓';
+    if (locked && demoEl) demoEl.style.height = INIT_H + 'px';
+  });
+}
 
 function growIfNeeded() {
-  if (!demoEl) return;
+  if (!demoEl || locked) return;
   var lineCount = DEMOS[di].lines.join('\n').slice(0, charPos).split('\n').length;
   if (lineCount > FITS) {
-    var needed = INIT_H + (lineCount - FITS + 4) * LINE_H; // +4 line lookahead
+    var needed = INIT_H + (lineCount - FITS + 4) * LINE_H;
     if (needed > demoEl.clientHeight) demoEl.style.height = Math.ceil(needed) + 'px';
   }
 }
@@ -464,6 +475,19 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   margin-left: 4px;
 }
 .tb-name-dark { color: #888; }
+
+.lock-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 2px;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.lock-btn:hover { opacity: 1; }
 
 /* left pane */
 .pane-src {
