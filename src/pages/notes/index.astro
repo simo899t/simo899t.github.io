@@ -136,9 +136,17 @@ const HOLD_MS = 5000;
 const FADE_MS = 380;
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
-const codeEl = document.getElementById('code');
-const lineEl = document.getElementById('line-nums');
-const outEl  = document.getElementById('render-out');
+const codeEl      = document.getElementById('code');
+const lineEl      = document.getElementById('line-nums');
+const outEl       = document.getElementById('render-out');
+const demoEl      = document.querySelector('.demo-window');
+const editorBody  = document.querySelector('.editor-body');
+
+function growIfNeeded() {
+  if (!demoEl || !editorBody) return;
+  var overflow = codeEl.scrollHeight - editorBody.clientHeight;
+  if (overflow > 4) demoEl.style.height = (demoEl.clientHeight + overflow) + 'px';
+}
 
 // ── continuous compile ────────────────────────────────────────────────────────
 // Always keep the latest content queued. As soon as a compile finishes, start
@@ -250,6 +258,7 @@ function tick() {
       holdMs = 0;
     }
     renderCode();
+    growIfNeeded();
     setTimeout(tick, CHAR_MS);
 
   } else if (phase === 'hold') {
