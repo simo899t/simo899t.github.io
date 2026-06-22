@@ -182,7 +182,17 @@ function drainCompile() {
     if (svgStr) {
       outEl.innerHTML     = svgStr;
       outEl.style.opacity = '1';
-
+      // grow the window to fit the rendered output, never shrink
+      var demoEl = document.querySelector('.demo-window');
+      var svg    = outEl.querySelector('svg');
+      if (demoEl && svg) {
+        var svgH    = svg.getBoundingClientRect().height;
+        var titleH  = 30;
+        var padH    = 32;
+        var needed  = svgH + titleH + padH;
+        var current = demoEl.getBoundingClientRect().height;
+        if (needed > current) demoEl.style.height = needed + 'px';
+      }
     }
     drainCompile();   // compile again if more content arrived while busy
   });
@@ -277,6 +287,8 @@ function tick() {
       phase   = 'typing';
       compileBusy = false;
       pendingText = null;
+      var demoEl = document.querySelector('.demo-window');
+      if (demoEl) demoEl.style.height = '300px';
       codeEl.style.opacity = 1;
       lineEl.style.opacity = 1;
       outEl.style.opacity  = 1;
