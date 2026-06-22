@@ -4,21 +4,26 @@
 // Then push. The animation will reflect your changes automatically.
 
 // ── CONTENT ──────────────────────────────────────────────────
-= Fundamental Theorem
-
-If $f$ is continuous on $[a, b]$ and
-$F' = f$, then:
-
-$ integral_a^b f(x) dif x = F(b) - F(a) $
-
 = Chain Rule
 
-For $h(x) = f(g(x))$:
+For $h(x) = f(g(x))$, the derivative is:
 
-$ (dif h) / (dif x) = (dif f) / (dif g)
-  dot (dif g) / (dif x) $
+$ (d h) / (d x) = (d f) / (d g) dot (d g) / (d x) $
 
-In backprop: $(partial cal(L)) / (partial W)
-= (partial cal(L)) / (partial z)
-  dot (partial z) / (partial W)$
-applied layer by layer.
+== Backpropagation
+
+At layer $l$ with pre-activation $z^((l)) = W^((l)) a^((l-1))$:
+
+$ (partial cal(L)) / (partial W^((l)))
+  = (partial cal(L)) / (partial z^((l)))
+  dot (partial z^((l))) / (partial W^((l))) $
+
+== Gradient of Loss
+
+For $cal(L) = 1/n sum_(i=1)^n ell(hat(y)_i, y_i)$:
+
+$ nabla_W cal(L) = 1/n sum_(i=1)^n
+  delta^((l)) (a^((l-1)))^T $
+
+where $delta^((l)) = (partial cal(L))/(partial z^((l)))$
+is the *error signal* at layer $l$.
