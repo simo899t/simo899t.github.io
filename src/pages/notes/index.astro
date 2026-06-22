@@ -9,22 +9,35 @@ const allNotes = (await getCollection('notes'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
 // Read the .typ source files — edit those files to change the animation.
-// Lines 1-6 are the comment block; content starts at line 7.
-const SKIP = 6;
+// Lines before "// ── CONTENT" that start with # are hidden source preamble
+// (compiled but not animated). Lines after the marker are animated.
 
 function loadDemo(slug: string, title: string, course: string) {
   const raw = readFileSync(resolve('public/demo/src', slug + '.typ'), 'utf8');
-  const content = raw.split('\n').slice(SKIP);
-  // Strip trailing empty lines
+  const allLines = raw.split('\n');
+  const markerIdx = allLines.findIndex(l => l.startsWith('// ── CONTENT'));
+  const beforeMarker = markerIdx >= 0 ? allLines.slice(0, markerIdx) : [];
+  const afterMarker  = markerIdx >= 0 ? allLines.slice(markerIdx + 1) : allLines;
+
+  // #-prefixed lines before the marker → hidden preamble sent to compiler only
+  const hiddenDefs = beforeMarker.filter(l => l.trimStart().startsWith('#'));
+
+  const content = [...afterMarker];
   while (content.length && content[content.length - 1].trim() === '') content.pop();
-  const preamble = [
+
+  const animPreamble = [
     '#import "../../temp.typ": *',
     '#show: note.with(',
     `  title:  "${title}",`,
     `  course: "${course}",`,
     ')',
   ];
-  return { slug, preamble: preamble.length, lines: [...preamble, '', ...content] };
+  return {
+    slug,
+    preamble: animPreamble.length,
+    hiddenDefs,
+    lines: [...animPreamble, '', ...content],
+  };
 }
 
 const demos = [
@@ -217,7 +230,9 @@ function renderCode() {
   var preamble     = DEMOS[di].preamble;
   var contentLines = typed.slice(preamble + 1); // +1 for blank separator line
   if (contentLines.length > 0) {
-    triggerCompile(contentLines.join('\n'));
+    var hidden = (DEMOS[di].hiddenDefs || []).join('\n');
+    var src = hidden ? hidden + '\n' + contentLines.join('\n') : contentLines.join('\n');
+    triggerCompile(src);
   }
 }
 
@@ -283,6 +298,13 @@ tick();
   var PAGE_SETUP = [
     '#set page(width: 270pt, height: auto, margin: (x: 18pt, y: 16pt))',
     '#set text(size: 10pt, font: "New Computer Modern")',
+    '// shorthands mirroring temp.typ',
+    '#let loss = $cal(L)$',
+    '#let apx = $approx$',
+    '#let RR = $bb(R)$',
+    '#let px(f, x) = $(partial #f) / (partial #x)$',
+    '#let pv(f, x) = $(d #f) / (d #x)$',
+    '#let dx = $upright(d)x$',
     '#set par(leading: 0.7em)',
     '#set block(spacing: 0.8em)',
     '#set heading(numbering: none)',
