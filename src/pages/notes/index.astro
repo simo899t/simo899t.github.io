@@ -81,7 +81,7 @@ const demosJson = JSON.stringify(demos);
           <span class="tb-name tb-name-dark">notes.pdf</span>
         </div>
         <div class="output-body">
-          <div id="render-out" class="render-out"></div>
+          <img id="render-img" class="render-img" src="" alt="" style="opacity:0">
         </div>
       </div>
 
@@ -126,7 +126,7 @@ const FADE_MS  = 380;
 // ── DOM ───────────────────────────────────────────────────────────────────────
 const codeEl   = document.getElementById('code');
 const lineEl   = document.getElementById('line-nums');
-const outEl    = document.getElementById('render-out');
+const imgEl    = document.getElementById('render-img');
 
 // ── syntax highlight ──────────────────────────────────────────────────────────
 function hl(text) {
@@ -169,13 +169,13 @@ function renderCode() {
     return '<span style="opacity:' + (i < typed.length ? 1 : 0.25) + '">' + (i+1) + '</span>';
   }).join('');
 
-  // update SVG when a new content line completes
+  // update SVG when a new content line completes — swap src on the persistent img
   var done    = typed.length - 1;
   var svgIdx  = done - DEMOS[di].preamble;
   if (done !== lastSvgLine && svgIdx >= 1) {
     lastSvgLine = done;
-    var src = '/demo/' + DEMOS[di].slug + '-' + svgIdx + '.svg';
-    outEl.innerHTML = '<img src="' + src + '" style="width:100%;display:block;">';
+    imgEl.src = '/demo/' + DEMOS[di].slug + '-' + svgIdx + '.svg';
+    imgEl.style.opacity = '1';
   }
 }
 
@@ -208,7 +208,7 @@ function tick() {
     var t = Math.min(clearMs / FADE_MS, 1);
     codeEl.style.opacity  = 1 - t;
     lineEl.style.opacity  = 1 - t;
-    outEl.style.opacity   = 1 - t;
+    imgEl.style.opacity   = 1 - t;
     if (t < 1) {
       setTimeout(tick, 16);
     } else {
@@ -218,10 +218,10 @@ function tick() {
       phase        = 'typing';
       codeEl.style.opacity  = 1;
       lineEl.style.opacity  = 1;
-      outEl.style.opacity   = 1;
+      imgEl.style.opacity   = 0;
+      imgEl.src             = '';
       codeEl.innerHTML  = '<span class="cur">▮</span>';
       lineEl.innerHTML  = '<span>1</span>';
-      outEl.innerHTML   = '';
       setTimeout(tick, 300);
     }
   }
@@ -361,17 +361,12 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   padding: 14px 16px;
 }
 
-.render-out {
+.render-img {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.render-out img {
-  width: 100%;
+  display: block;
   object-fit: contain;
   object-position: top left;
-  display: block;
+  transition: opacity 0.12s ease;
 }
 
 /* ── notes list ── */
