@@ -33,7 +33,7 @@ function loadDemo(slug: string, title: string, course: string) {
   while (content.length && content[content.length - 1].trim() === '') content.pop();
 
   const animPreamble = [
-    '#import "../../temp.typ": *',
+    '#import "@local/sdu-notes:0.1.0": *',
     '#show: note.with(',
     `  title:  "${title}",`,
     `  course: "${course}",`,
