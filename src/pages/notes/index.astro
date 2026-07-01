@@ -62,7 +62,7 @@ const demosJson = JSON.stringify(demos);
     <div class="typst-blurb">
       <p>
         I write all my lecture notes, exercises and projects using <a href="https://typst.app/open-source/" target="_blank">Typst</a>. I created my own package, <a href="https://github.com/simo899t/sdu-notes" target="_blank">sdu-notes</a>, for easy page setup, document templates, styled blocks like <code>#theorem</code> / <code>#definition</code>, and math shorthands like <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). Feel free to clone and use it - note that it is updated regularly and may contain breaking changes.
-        </br></br>The demo below cycles through real snippets, compiled live in your browser.
+        </br></br>The demo below cycles through real snippets, compiled live in your browser (it might need to load for ≈ 5 seconds). 
       </p>
     </div>
 
@@ -517,8 +517,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   font-size: 12px;
   line-height: 1.65;
   color: #ccc;
-  white-space: pre-wrap;
-  word-break: break-all;
+  white-space: pre;
   flex: 1;
   overflow: hidden;
 }
