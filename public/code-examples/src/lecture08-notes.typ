@@ -1,3 +1,4 @@
+
 = Relative clauses
 The logic of $cal(A)(R C)$ of $"all _" + underline("relative") "clauses")$
 
@@ -29,8 +30,7 @@ A term is either
 *Terms*
 - i
    + if $t$ is a single noun, then
-   - $ip(t) #[is simply] ip(t)_#[noun]$, which comes from the data in $model$
-   + 
+   + $ip(t) #[is simply] ip(t)_#[noun]$, which comes from the data in $model$
 - ii
    + if $t$ is $term(r,t')$, then 
    + $ ip(t) = {m in M: forall n in ip(t') quad (m,n) in ip(r) } $
