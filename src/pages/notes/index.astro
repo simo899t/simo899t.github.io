@@ -789,7 +789,7 @@ tick();
     var title  = (meta && meta.title)  || 'Course Notes';
     var course = (meta && meta.course) || '';
     return [
-      '#set page(width: 500pt, height: auto, margin: (x: 30pt, top: 38pt, bottom: 20pt))',
+      '#set page(width: 500pt, height: 350pt, margin: (x: 30pt, top: 38pt, bottom: 20pt))',
       '#set text(size: 12pt, font: "New Computer Modern")',
       '#let loss = $cal(L)$',
       '#let apx = $approx$',
@@ -1059,14 +1059,12 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  height: 340px;
   border-radius: 8px;
   overflow: clip;
   border: 1px solid #2a2a2a;
   margin-top: 16px;
   margin-bottom: 2.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-  resize: vertical;
   width: calc(100vw - 4rem);
   position: relative;
   left: 50%;
@@ -1170,13 +1168,14 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 }
 
 .output-body {
-  flex: 1;
+  aspect-ratio: 500 / 350;
   overflow-y: auto;
   scrollbar-gutter: stable both-edges;
   padding: 16px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  box-sizing: border-box;
 }
 
 .render-out {
