@@ -155,15 +155,17 @@
   "SDU note": {
     "prefix": "note",
     "body": [
-      "#import \"${1:../../temp.typ}\": *",
+      "#import \"@local/sdust:0.1.0\": *",
       "#show: note.with(",
-      "  title:         \"${2:Lecture Notes}\",",
-      "  course:        \"${3:DM000 — Course Name}\",",
-      "  author:        \"${4:Simon Holm}\",",
-      "  date:          \"${5:date}\",",
+      "  title:         \"${1:Lecture Notes}\",",
+      "  course:        \"${2:DM000 — Course Name}\",",
+      "  author:        \"${3:Simon Holm}\",",
+      "  date:          \"${4:date}\",",
       "  outline:       true,",
       "  outline-depth: 2,",
       ")",
+      "",
+      "= ${5:First Section}",
       "$0"
     ],
     "description": "SDU lecture note document template"
@@ -171,15 +173,17 @@
   "SDU exercise": {
     "prefix": "exercise",
     "body": [
-      "#import \"${1:../../temp.typ}\": *",
+      "#import \"@local/sdust:0.1.0\": *",
       "#show: exercise.with(",
-      "  title:         \"${2:Exercises 1}\",",
-      "  course:        \"${3:DM000 — Course Name}\",",
-      "  author:        \"${4:Simon Holm}\",",
-      "  date:          \"${5:date}\",",
+      "  title:         \"${1:Exercises 1}\",",
+      "  course:        \"${2:DM000 — Course Name}\",",
+      "  author:        \"${3:Simon Holm}\",",
+      "  date:          \"${4:date}\",",
       "  outline:       true,",
       "  outline-depth: 2,",
       ")",
+      "",
+      "= ${5:Exercise 1}",
       "$0"
     ],
     "description": "SDU exercise document template"
@@ -187,18 +191,20 @@
   "SDU project": {
     "prefix": "project",
     "body": [
-      "#import \"${1:../../temp.typ}\": *",
+      "#import \"@local/sdust:0.1.0\": *",
       "#show: project.with(",
-      "  title:         \"${2:Project Title}\",",
-      "  course:        \"${3:DM000 — Course Name}\",",
-      "  author:        \"${4:Simon Holm}\",",
-      "  date:          \"${5:date}\",",
-      "  group:         \"${6:Group no.}\",",
-      "  supervisor:    \"${7:Prof. Firstname Lastname}\",",
+      "  title:         \"${1:Project Title}\",",
+      "  course:        \"${2:DM000 — Course Name}\",",
+      "  author:        \"${3:Simon Holm}\",",
+      "  date:          \"${4:date}\",",
+      "  group:         \"${5:Group no.}\",",
+      "  supervisor:    \"${6:Prof. Firstname Lastname}\",",
       "  university:    \"University of Southern Denmark\",",
       "  outline:       true,",
       "  outline-depth: 2,",
       ")",
+      "",
+      "= ${7:Introduction}",
       "$0"
     ],
     "description": "SDU project document template"
@@ -212,22 +218,12 @@
       "$0"
     ],
     "description": "Fenced Python code block"
-  },
+  }
+  ,
   "Output/terminal code block": {
   "prefix": "outcode",
     "body": [
       "```output",
-      "${1:code}",
-      "```",
-      "$0"
-    ],
-    "description": "Fenced terminal style code block"
-  }
-  ,
-  "Haskell code block": {
-  "prefix": "hscode",
-    "body": [
-      "```hs",
       "${1:code}",
       "```",
       "$0"
