@@ -15,6 +15,84 @@ const pdfs = readdirSync(pdfDir)
     url: `/notes-pdf/${f}`,
   }));
 
+function highlightTypst(raw: string): string {
+  const e = (s: string) => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const lines = raw.split('\n');
+  return lines.map(line => {
+    // comments
+    if (line.trimStart().startsWith('//')) {
+      return `<span class="ch-comment">${e(line)}</span>`;
+    }
+    let out = '';
+    let i = 0;
+    while (i < line.length) {
+      // inline math $...$
+      if (line[i] === '$') {
+        const end = line.indexOf('$', i + 1);
+        if (end !== -1) {
+          out += `<span class="ch-math">${e(line.slice(i, end + 1))}</span>`;
+          i = end + 1;
+          continue;
+        }
+      }
+      // #keyword
+      if (line[i] === '#') {
+        const m = line.slice(i).match(/^#[a-zA-Z_][a-zA-Z0-9_-]*/);
+        if (m) {
+          out += `<span class="ch-kw">${e(m[0])}</span>`;
+          i += m[0].length;
+          continue;
+        }
+      }
+      // *bold*
+      if (line[i] === '*') {
+        const end = line.indexOf('*', i + 1);
+        if (end !== -1) {
+          out += `<span class="ch-bold">${e(line.slice(i, end + 1))}</span>`;
+          i = end + 1;
+          continue;
+        }
+      }
+      // strings
+      if (line[i] === '"') {
+        const end = line.indexOf('"', i + 1);
+        if (end !== -1) {
+          out += `<span class="ch-str">${e(line.slice(i, end + 1))}</span>`;
+          i = end + 1;
+          continue;
+        }
+      }
+      out += e(line[i]);
+      i++;
+    }
+    return out;
+  }).join('\n');
+}
+
+// Code examples — drop .typ + matching .png into public/code-examples/src/ and they appear automatically.
+const ceDir = resolve('public/code-examples/src');
+const codeExamples = readdirSync(ceDir)
+  .filter(f => f.endsWith('.typ'))
+  .sort()
+  .map(f => {
+    const slug = f.replace(/\.typ$/, '');
+    const imgFile = slug + '.png';
+    const hasImg = readdirSync(ceDir).includes(imgFile);
+    const raw = readFileSync(resolve(ceDir, f), 'utf8')
+      .split('\n')
+      .filter(line => !/^\s*#import\s+"@local\/sdust/.test(line))
+      .join('\n')
+      .replace(/^\n+/, '')
+      .trimEnd();
+    return {
+      slug,
+      label: slug.replace(/[-_]/g, ' '),
+      code: raw,
+      highlighted: highlightTypst(raw),
+      img: hasImg ? `/code-examples/src/${imgFile}` : null,
+    };
+  });
+
 // Read the .typ source files — edit those files to change the animation.
 // Lines before "// ── CONTENT" that start with # are hidden source preamble
 // (compiled but not animated). Lines after the marker are animated.
@@ -33,7 +111,7 @@ function loadDemo(slug: string, title: string, course: string) {
   while (content.length && content[content.length - 1].trim() === '') content.pop();
 
   const animPreamble = [
-    '#import "@local/sdu-notes:0.1.0": *',
+    '#import "@local/sdust:0.1.0": *',
     '#show: note.with(',
     `  title:  "${title}",`,
     `  course: "${course}",`,
@@ -41,6 +119,8 @@ function loadDemo(slug: string, title: string, course: string) {
   ];
   return {
     slug,
+    title,
+    course,
     preamble: animPreamble.length,
     hiddenDefs,
     lines: [...animPreamble, '', ...content],
@@ -58,68 +138,123 @@ const demosJson = JSON.stringify(demos);
 
 <Layout title="Notes" description="Study notes by Simon Holm.">
   <div class="container page">
-    <h1>Notes</h1>
     <div class="typst-blurb">
+      <h1>How I write my notes</h1>
       <p>
-        I write all my lecture notes, exercises and projects using <a href="https://typst.app/open-source/" target="_blank">Typst</a>. I created my own package, <a href="https://github.com/simo899t/sdu-notes" target="_blank">sdu-notes</a>, for easy page setup, document templates, styled blocks like <code>#theorem</code> / <code>#definition</code>, and math shorthands like <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). Feel free to clone and use it - note that it is updated regularly and may contain breaking changes.
-        </br></br>The demo below cycles through real snippets, compiled live in your browser (it might need to load for ≈ 5 seconds). 
+        All lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using <a href="https://github.com/simo899t/sdu-notes" target="_blank">sdust</a>, a package I developed to streamline academic document authoring. It provides document templates, structured environments such as <code>#theorem</code> and <code>#definition</code>, and mathematical shorthands including <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). The package is open to use, though it is actively maintained and may introduce breaking changes.
       </p>
+
+      <h2 class="blurb-heading">What is Typst?</h2>
+      <p>
+        <a href="https://typst.app/open-source/" target="_blank">Typst</a> is a modern typesetting language and a significant improvement over LaTeX. Typst is used to produce high-quality PDFs and is particularly well suited for mathematics and the natural sciences.  Where other typesetting languages like LaTeX is decades old and notoriously difficult to debug, Typst offers a clean and readable syntax, near-instant compilation, and clear error messages. Typst is open source and built in Rust.
+      </p>
+
+      <p class="see-how-label">See how it works with real examples 😃:</p>
     </div>
 
-    <!-- two-pane demo window -->
-    <div class="demo-window">
+    <div class="demo-tabs">
+      <button class="demo-tab active" data-tab="live-demo">Live Demo</button>
+      <button class="demo-tab" data-tab="code-examples">Code Examples</button>
+      <button class="demo-tab" data-tab="assignment-examples">Assignment Examples</button>
+    </div>
 
-      <!-- left: editor -->
-      <div class="pane pane-src">
-        <div class="titlebar">
-          <span class="tb-dot red"></span>
-          <span class="tb-dot yellow"></span>
-          <span class="tb-dot green"></span>
-          <span class="tb-name">notes.typ</span>
-        </div>
-        <div class="editor-body">
-          <div id="line-nums" class="line-nums"></div>
-          <pre id="code" class="code"></pre>
-        </div>
-      </div>
+    <div class="tab-panels">
 
-      <!-- right: rendered output -->
-      <div class="pane pane-out">
-        <div class="titlebar titlebar-light">
-          <span class="tb-dot red"></span>
-          <span class="tb-dot yellow"></span>
-          <span class="tb-dot green"></span>
-          <span class="tb-name tb-name-dark">notes.pdf</span>
-          <button id="lock-btn" class="lock-btn" title="Expand preview">↓</button>
-        </div>
-        <div class="output-body">
-          <div id="render-out" class="render-out">
-            <span class="render-status">loading typst…</span>
+      <!-- Live Demo -->
+      <div class="tab-panel active" id="panel-live-demo">
+        <div class="demo-window">
+          <div class="pane pane-src">
+            <div class="titlebar">
+              <span class="tb-dot red"></span>
+              <span class="tb-dot yellow"></span>
+              <span class="tb-dot green"></span>
+              <span class="tb-name">notes.typ</span>
+            </div>
+            <div class="editor-body">
+              <div class="editor-inner">
+                <div id="line-nums" class="line-nums"></div>
+                <pre id="code" class="code"></pre>
+              </div>
+            </div>
+          </div>
+          <div class="pane pane-out">
+            <div class="titlebar titlebar-light">
+              <span class="tb-dot red"></span>
+              <span class="tb-dot yellow"></span>
+              <span class="tb-dot green"></span>
+              <span class="tb-name tb-name-dark">notes.pdf</span>
+              <button id="lock-btn" class="lock-btn" title="Expand preview">↓</button>
+            </div>
+            <div class="output-body">
+              <div id="render-out" class="render-out">
+                <span class="render-status">loading typst…</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-    </div>
+      <!-- Code Examples -->
+      <div class="tab-panel" id="panel-code-examples">
+        <div class="code-examples-list">
+          {codeExamples.map(ex => (
+            <div class="code-example">
+              <div class="ce-editor">
+                <div class="ce-titlebar">
+                  <span class="tb-dot red"></span>
+                  <span class="tb-dot yellow"></span>
+                  <span class="tb-dot green"></span>
+                  <span class="ce-filename">{ex.slug}.typ</span>
+                </div>
+                <pre class="ce-code" set:html={ex.highlighted}></pre>
+              </div>
+              <div class="ce-preview">
+                {ex.img
+                  ? <img src={ex.img} alt={ex.label} />
+                  : <span class="render-status">no preview</span>
+                }
+              </div>
+            </div>
+          ))}
+          </div>
 
-    <p class="examples-label">Examples written in Typst from my own university courses</p>
-
-    {pdfs.length > 0 ? (
-      <div class="note-list">
-        {pdfs.map(p => (
-          <a href={p.url} target="_blank" rel="noopener" class="note-row">
-            <span class="note-title">{p.title}</span>
-            <span class="note-meta pdf-tag">PDF</span>
-          </a>
-        ))}
+        </div>
       </div>
-    ) : (
-      <p class="empty">notes coming soon</p>
-    )}
+
+      <!-- Assignment Examples -->
+      <div class="tab-panel" id="panel-assignment-examples">
+        {pdfs.length > 0 ? (
+          <div class="note-list">
+            {pdfs.map(p => (
+              <a href={p.url} target="_blank" rel="noopener" class="note-row">
+                <span class="note-title">{p.title}</span>
+                <span class="note-meta pdf-tag">PDF</span>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p class="empty">coming soon</p>
+        )}
+      </div>
+
+    </div>
   </div>
 </Layout>
 
 <script is:inline define:vars={{ demosJson }}>
 (function () {
+
+// ── tabs ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.demo-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    document.querySelectorAll('.demo-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+  });
+});
+
 
 // ── demos ─────────────────────────────────────────────────────────────────────
 const DEMOS = JSON.parse(demosJson);
@@ -131,9 +266,9 @@ let phase   = 'typing';  // 'typing' | 'hold' | 'clearing'
 let holdMs  = 0;
 let clearMs = 0;
 
-const CHAR_MS = 65;
+const CHAR_MS = 140;
 const HOLD_MS = 5000;
-const FADE_MS = 380;
+const FADE_MS = 600;
 
 // ── DOM ───────────────────────────────────────────────────────────────────────
 const codeEl      = document.getElementById('code');
@@ -142,25 +277,29 @@ const outEl       = document.getElementById('render-out');
 const demoEl      = document.querySelector('.demo-window');
 const editorBody  = document.querySelector('.editor-body');
 
-var LINE_H   = 12 * 1.65;
-var INIT_H   = 300;
-var FITS     = Math.floor((INIT_H - 31 - 24) / LINE_H);
-var locked   = true;
+var autoScroll           = true;
+var autoScrollTimer      = null;
+var programmaticScroll   = false;
 
-var lockBtn  = document.getElementById('lock-btn');
-if (lockBtn) {
-  lockBtn.addEventListener('click', function() {
-    locked = !locked;
-    lockBtn.textContent = locked ? '↓' : '↑';
-    lockBtn.title = locked ? 'Expand preview' : 'Collapse preview';
-    if (locked && demoEl) demoEl.style.height = INIT_H + 'px';
-  });
+if (editorBody) {
+  editorBody.addEventListener('scroll', function() {
+    if (programmaticScroll) return;
+    autoScroll = false;
+    clearTimeout(autoScrollTimer);
+    autoScrollTimer = setTimeout(function() { autoScroll = true; }, 10000);
+  }, { passive: true });
 }
 
-function growIfNeeded() {
-  if (!demoEl || locked) return;
-  var UNLOCK_H = Math.ceil(30 * LINE_H + 24 + 31);
-  if (demoEl.clientHeight < UNLOCK_H) demoEl.style.height = UNLOCK_H + 'px';
+function scrollToBottom() {
+  if (!autoScroll || !editorBody) return;
+  // double rAF ensures DOM has reflowed before measuring scrollHeight
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      programmaticScroll = true;
+      editorBody.scrollTop = editorBody.scrollHeight;
+      setTimeout(function() { programmaticScroll = false; }, 150);
+    });
+  });
 }
 
 // ── continuous compile ────────────────────────────────────────────────────────
@@ -226,7 +365,7 @@ function hl(text) {
         i = line.length;
       } else if (ch === '#' && i+1 < line.length && /\w/.test(line[i+1])) {
         var j = i+1; while (j < line.length && /\w/.test(line[j])) j++;
-        out += '<span style="color:#4db6c4">' + esc(line.slice(i,j)) + '</span>'; i = j;
+        out += '<span style="color:#c0703a">' + esc(line.slice(i,j)) + '</span>'; i = j;
       } else if (ch === '"') {
         var j = i+1; while (j < line.length && line[j] !== '"') j++; if (j < line.length) j++;
         out += '<span style="color:#ce9178">' + esc(line.slice(i,j)) + '</span>'; i = j;
@@ -241,40 +380,48 @@ function hl(text) {
 
 // ── render ────────────────────────────────────────────────────────────────────
 function renderCode() {
-  var full    = DEMOS[di].lines.join('\n');
-  var text    = full.slice(0, charPos);
-  var typed   = text.split('\n');
-  var total   = DEMOS[di].lines.length;
+  var demo          = DEMOS[di];
+  var preambleLines = demo.lines.slice(0, demo.preamble + 1); // +1 for blank separator
+  var contentLines  = demo.lines.slice(demo.preamble + 1);
+  var contentFull   = contentLines.join('\n');
+  var contentTyped  = contentFull.slice(0, charPos);
 
-  codeEl.innerHTML = hl(text) + '<span class="cur">▮</span>';
-  lineEl.innerHTML = Array.from({length: typed.length}, function(_, i) {
+  var displayText   = preambleLines.join('\n') + '\n' + contentTyped;
+  var allLines      = displayText.split('\n');
+
+  // preamble rendered dim, content rendered normally
+  var preambleHtml = '<span style="opacity:0.35">' + hl(preambleLines.join('\n')) + '</span>\n';
+  codeEl.innerHTML = preambleHtml + hl(contentTyped) + '<span class="cur">▮</span>';
+  lineEl.innerHTML = Array.from({length: allLines.length}, function(_, i) {
     return '<span>' + (i+1) + '</span>';
   }).join('');
 
-  // compile on every character — drainCompile throttles via compileBusy
-  var preamble     = DEMOS[di].preamble;
-  var contentLines = typed.slice(preamble + 1); // +1 for blank separator line
-  if (contentLines.length > 0) {
-    var hidden = (DEMOS[di].hiddenDefs || []).join('\n');
-    var src = hidden ? hidden + '\n' + contentLines.join('\n') : contentLines.join('\n');
+  if (contentTyped.length > 0) {
+    var hidden = (demo.hiddenDefs || []).join('\n');
+    var src = hidden ? hidden + '\n' + contentTyped : contentTyped;
     triggerCompile(src);
   }
 }
 
 // ── animation loop ────────────────────────────────────────────────────────────
 function tick() {
-  var full = DEMOS[di].lines.join('\n');
+  var contentLines = DEMOS[di].lines.slice(DEMOS[di].preamble + 1);
+  var full = contentLines.join('\n');
 
   if (phase === 'typing') {
     if (charPos < full.length) {
       charPos++;
+      // rush past consecutive blank lines instantly
+      while (charPos < full.length && full[charPos - 1] === '\n' && full[charPos] === '\n') {
+        charPos++;
+      }
     } else {
       phase  = 'hold';
       holdMs = 0;
     }
     renderCode();
-    growIfNeeded();
-    setTimeout(tick, CHAR_MS);
+    scrollToBottom();
+    setTimeout(tick, charPos < full.length && full[charPos] === ' ' ? 10 : CHAR_MS);
 
   } else if (phase === 'hold') {
     holdMs += 16;
@@ -300,7 +447,10 @@ function tick() {
       phase   = 'typing';
       compileBusy = false;
       pendingText = null;
-      if (demoEl) demoEl.style.height = '300px';
+      autoScroll  = true;
+      window.__demoMeta = DEMOS[di];
+      clearTimeout(autoScrollTimer);
+      if (editorBody) editorBody.scrollTop = 0;
       codeEl.style.opacity = 1;
       lineEl.style.opacity = 1;
       outEl.style.opacity  = 1;
@@ -312,6 +462,9 @@ function tick() {
   }
 }
 
+// expose current demo meta for the compile script
+window.__demoMeta = DEMOS[di];
+
 tick();
 
 
@@ -322,36 +475,46 @@ tick();
 (async function () {
   // "text" is the keyword that loads all NewCM10 + NewCMMath fonts from typst-assets CDN
 
-  var PAGE_SETUP = [
-    '#set page(width: 270pt, height: auto, margin: (x: 18pt, y: 16pt))',
-    '#set text(size: 10pt, font: "New Computer Modern")',
-    '// shorthands mirroring temp.typ',
-    '#let loss = $cal(L)$',
-    '#let apx = $approx$',
-    '#let RR = $bb(R)$',
-    '#let mid = "|"',
-    '#let px(f, x) = $(partial #f) / (partial #x)$',
-    '#let pv(f, x) = $(d #f) / (d #x)$',
-    '#let dx = $upright(d)x$',
-    '#set par(leading: 0.7em)',
-    '#set block(spacing: 0.8em)',
-    '#set heading(numbering: none)',
-    '#show heading.where(level: 1): it => block(above: 1em, below: 0.4em)[',
-    '  #text(size: 11pt, weight: "bold")[#it.body]',
-    ']',
-    '#show heading.where(level: 2): it => block(above: 0.8em, below: 0.3em)[',
-    '  #text(size: 10pt, weight: "bold", style: "italic")[#it.body]',
-    ']',
-    '#align(center)[',
-    '  #text(size: 13pt, weight: "bold")[Course Notes] \\',
-    '  #v(2pt)',
-    '  #text(size: 8pt, fill: luma(120))[Simon Holm #h(6pt) · #h(6pt) SDU #h(6pt) · #h(6pt) 2025]',
-    ']',
-    '#v(4pt)',
-    '#line(length: 100%, stroke: 0.6pt + luma(160))',
-    '#v(8pt)',
-    '',
-  ].join('\n');
+  function buildPageSetup(meta) {
+    var title  = (meta && meta.title)  || 'Course Notes';
+    var course = (meta && meta.course) || '';
+    return [
+      '#set page(width: 310pt, height: auto, margin: (x: 20pt, top: 30pt, bottom: 14pt))',
+      '#set text(size: 9pt, font: "New Computer Modern")',
+      '#let loss = $cal(L)$',
+      '#let apx = $approx$',
+      '#let RR = $bb(R)$',
+      '#let mid = "|"',
+      '#let px(f, x) = $(partial #f) / (partial #x)$',
+      '#let pv(f, x) = $(d #f) / (d #x)$',
+      '#let dx = $upright(d)x$',
+      '#set par(leading: 0.65em)',
+      '#set block(spacing: 0.75em)',
+      '#set math.equation(numbering: none)',
+      '#set heading(numbering: "1.1")',
+      '#show heading.where(level: 1): it => block(above: 1em, below: 0.35em)[',
+      '  #text(size: 10.5pt, weight: "bold")[#counter(heading).display() #it.body]',
+      ']',
+      '#show heading.where(level: 2): it => block(above: 0.75em, below: 0.25em)[',
+      '  #text(size: 9.5pt, weight: "bold")[#counter(heading).display() #it.body]',
+      ']',
+      '#align(center, stack(spacing: 0pt,',
+      '  line(length: 100%, stroke: 2.5pt + rgb("#2c5aa0")),',
+      '  v(0.7em),',
+      '  text(size: 6pt, fill: rgb("#2c5aa0"), tracking: 2pt, weight: "bold")[LECTURE NOTES],',
+      '  v(1.2em),',
+      '  text(size: 16pt, weight: "bold")[' + title + '],',
+      '  v(0.7em),',
+      '  line(length: 28%, stroke: 0.5pt + rgb("#bbbbbb")),',
+      '  v(0.5em),',
+      '  text(size: 9pt, fill: rgb("#444444"))[' + course + '],',
+      '  v(0.8em),',
+      '))',
+      '#line(length: 100%, stroke: 0.4pt + rgb("#dddddd"))',
+      '#v(8pt)',
+      '',
+    ].join('\n');
+  }
 
   var outEl = document.getElementById('render-out');
 
@@ -359,6 +522,20 @@ tick();
     await import('/typst-lite.js');
     var typst  = window.$typst;
     var Snippet = window.TypstSnippet;
+
+    // Preload logo for use in Typst headers
+    var logoBytes = null;
+    try {
+      var resp = await fetch('/sdu-logo.png');
+      logoBytes = new Uint8Array(await resp.arrayBuffer());
+    } catch (e) { logoBytes = null; }
+
+    // Map sdust package so @local/sdust:0.1.0 resolves in the browser compiler
+    try {
+      var sdustResp = await fetch('/sdust-lib.typ');
+      var sdustBytes = new Uint8Array(await sdustResp.arrayBuffer());
+      typst.mapShadow('/packages/local/sdust/0.1.0/lib.typ', sdustBytes);
+    } catch (e) { /* non-fatal */ }
 
     // Preload fonts via typst.use() before first compile
     typst.use(
@@ -381,7 +558,9 @@ tick();
 
     window.__typstCompile = async function(contentText, cb) {
       try {
-        var svg = await typst.svg({ mainContent: PAGE_SETUP + contentText });
+        var setup = buildPageSetup(window.__demoMeta);
+        if (logoBytes) typst.mapShadow('/sdu-logo.png', logoBytes);
+        var svg = await typst.svg({ mainContent: setup + contentText });
         cb(svg);
       } catch (err) {
         cb('');  // must always call cb so compileBusy resets
@@ -410,7 +589,11 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.7;
-  margin: 0;
+  margin: 0 0 0.75rem;
+}
+.blurb-heading {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 .typst-blurb code {
   font-family: var(--font-mono);
@@ -421,22 +604,132 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   border-radius: 3px;
 }
 
+/* ── demo tabs ── */
+.tab-panels { margin-top: 0; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+.code-examples-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 0;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
+}
+
+.code-example {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* editor side */
+.ce-editor { display: flex; flex-direction: column; background: #141414; min-width: 0; }
+.ce-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: #1e1e1e;
+  border-bottom: 1px solid #2a2a2a;
+}
+.ce-filename { font-size: 0.72rem; color: #555; margin-left: 6px; font-family: var(--font-mono); }
+.ce-code {
+  margin: 0;
+  padding: 18px 20px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: #bbb;
+  white-space: pre-wrap;
+  line-height: 1.75;
+  flex: 1;
+}
+.ce-kw { color: #c0703a; }
+
+/* code example syntax highlighting */
+:global(.ch-kw)      { color: #c0703a; }
+:global(.ch-math)    { color: #7ec8a0; }
+:global(.ch-bold)    { color: #e0c97a; font-weight: bold; }
+:global(.ch-str)     { color: #9ecbff; }
+:global(.ch-comment) { color: #555; font-style: italic; }
+
+/* preview side */
+.ce-preview {
+  background: #fff;
+  border-left: 1px solid #2a2a2a;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px;
+  min-height: 80px;
+  min-width: 0;
+  overflow: hidden;
+}
+.ce-preview img { width: 100%; height: auto; display: block; object-fit: contain; }
+.ce-preview svg { width: 100%; height: auto; display: block; }
+
+.see-how-label {
+  font-size: 0.8rem;
+  color: #555;
+  margin: 12px 0 6px;
+}
+
+.demo-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.demo-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #555;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 10px 22px;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+}
+
+.demo-tab:hover {
+  color: #bbb;
+  border-bottom-color: #444;
+}
+
+.demo-tab.active {
+  color: #e0e0e0;
+  border-bottom-color: #e0e0e0;
+}
+
 /* ── demo window ── */
 .demo-window {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  height: 300px;
+  height: 320px;
   border-radius: 8px;
-  overflow: hidden;
-  transition: height 0.3s ease;
+  overflow: clip;
   border: 1px solid #2a2a2a;
   margin-bottom: 2.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
   resize: vertical;
 }
 
-.pane { display: flex; flex-direction: column; min-width: 0; }
+.pane { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
 
 .titlebar {
   display: flex;
@@ -490,36 +783,47 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 }
 
 .editor-body {
-  display: flex;
   flex: 1;
-  overflow: hidden;
+  min-height: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a #111;
+}
+
+.editor-inner {
+  display: flex;
+  min-height: 100%;
 }
 
 .line-nums {
   display: flex;
   flex-direction: column;
-  padding: 12px 8px 12px 8px;
-  min-width: 34px;
+  padding: 10px 8px;
+  min-width: 30px;
   text-align: right;
   font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.65;
+  font-size: 11px;
+  line-height: 1.6;
   color: #3a3a3a;
   border-right: 1px solid #1e1e1e;
   user-select: none;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .code {
   margin: 0;
-  padding: 12px 12px;
+  padding: 10px 12px;
   font-family: var(--font-mono);
-  font-size: 12px;
-  line-height: 1.65;
+  font-size: 11px;
+  line-height: 1.6;
   color: #ccc;
-  white-space: pre;
-  flex: 1;
-  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-all;
+  align-self: flex-start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cur {
@@ -536,15 +840,15 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 .output-body {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 4px;
   display: flex;
   justify-content: center;
   align-items: flex-start;
 }
 
 .render-out {
-  width: 100%;
-  max-width: 320px;
+  width: fit-content;
+  max-width: 100%;
   background: #fff;
   border-radius: 2px;
   box-shadow: 0 2px 16px rgba(0,0,0,0.28);
