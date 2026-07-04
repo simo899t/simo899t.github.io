@@ -164,8 +164,6 @@
       "  outline:       true,",
       "  outline-depth: 2,",
       ")",
-      "",
-      "= ${6:First Section}",
       "$0"
     ],
     "description": "SDU lecture note document template"
@@ -182,8 +180,6 @@
       "  outline:       true,",
       "  outline-depth: 2,",
       ")",
-      "",
-      "= ${6:Exercise 1}",
       "$0"
     ],
     "description": "SDU exercise document template"
@@ -203,8 +199,6 @@
       "  outline:       true,",
       "  outline-depth: 2,",
       ")",
-      "",
-      "= ${8:Introduction}",
       "$0"
     ],
     "description": "SDU project document template"
@@ -218,12 +212,22 @@
       "$0"
     ],
     "description": "Fenced Python code block"
-  }
-  ,
+  },
   "Output/terminal code block": {
   "prefix": "outcode",
     "body": [
       "```output",
+      "${1:code}",
+      "```",
+      "$0"
+    ],
+    "description": "Fenced terminal style code block"
+  }
+  ,
+  "Haskell code block": {
+  "prefix": "hscode",
+    "body": [
+      "```hs",
       "${1:code}",
       "```",
       "$0"

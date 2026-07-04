@@ -1,8 +1,10 @@
+#import "@local/sdust:0.1.0": *
+
 = Exercise $1^*$
 Consider the Boolean objective function:
 $ f(x) = x_1 and (x_2 or not x_3) and (not x_1 or not x_2) $
 
-Formulate the problem as an integer linear program. Can any Boolean satisfiability problem be formulated as an integer linear program? Solve the problem with `scipy`.
+Formulate the problem as an integer linear program. Can any Boolean satisfiability problem be formulated as an integer linear program?
 
 == Solution
 
@@ -13,7 +15,7 @@ st A x =b \ x in ZZ^n $
 
 Consider  $max{c^top x | A x = b, x in ZZ^n}.$ Sometimes the solution of the linear relaxation is already integral. Can you find a sufficient condition for the matrix $A$ for that to happen?
 
-==
+== Solution
 
 $ max_x c^top x \
 st A x =b \ x in RR^n $
