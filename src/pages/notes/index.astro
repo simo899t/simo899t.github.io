@@ -224,7 +224,6 @@ const demosJson = JSON.stringify(demos);
               <span class="tb-dot yellow"></span>
               <span class="tb-dot green"></span>
               <span class="tb-name tb-name-dark">notes.pdf</span>
-              <button id="lock-btn" class="lock-btn" title="Expand preview">↓</button>
             </div>
             <div class="output-body">
               <div id="render-out" class="render-out">
@@ -1108,20 +1107,6 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   margin-left: 6px;
 }
 .tb-name-dark { color: #555; }
-
-.lock-btn {
-  margin-left: auto;
-  background: none;
-  border: 1px solid rgba(0,0,0,0.18);
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  padding: 1px 5px;
-  line-height: 1.4;
-  opacity: 0.55;
-  transition: opacity 0.15s, border-color 0.15s;
-}
-.lock-btn:hover { opacity: 1; border-color: rgba(0,0,0,0.35); }
 
 /* left pane */
 .pane-src {
