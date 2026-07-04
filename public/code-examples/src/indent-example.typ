@@ -44,5 +44,3 @@
 + By induction, $sum_(i=1)^n i = (n(n+1))/2$ holds for all $n >= 0$. #QED
 ]
 
-
-

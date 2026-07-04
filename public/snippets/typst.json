@@ -78,11 +78,6 @@
     ],
     "description": "White/neutral proof block, ends with QED (sdust)"
   },
-  "Directed/tree graph (h-graph)": {
-    "prefix": "dirgraph",
-    "body": "#dirgraph(\"${1:A.C; B-A;}\")$0",
-    "description": "Tree/graph rendered with h-graph's dirgraph (polar-render)"
-  },
   "Tree (tidy-tree)": {
     "prefix": "tree",
     "body": [
@@ -90,17 +85,17 @@
       "  tree(",
       "    shape: \"${4:rectangle}\",",
       "    reverse: ${5:false},",
-      "    spacing: (${6:40pt}, ${6:40pt}),",
+      "    spacing: (${6:40pt}, ${7:40pt}),",
       "  )[",
       "    - ${1:root}",
       "      - ${2:child 1}",
       "      - ${3:child 2}",
       "  ],",
       "  caption: [${7:Caption text}],",
-      ") <${8:label}>",
+      ") <${9:label}>",
       "$0"
     ],
-    "description": "Nested list rendered as a tree diagram via sdust's #tree (tidy-tree), wrapped in a figure with caption"
+    "description": "tree (tidy-tree) template"
   },
   "Proof tree (curryst)": {
     "prefix": "ptree",
@@ -115,7 +110,7 @@
       ") <${5:label}>",
       "$0"
     ],
-    "description": "Proof tree using curryst's rule/prooftree, wrapped in a figure with caption"
+    "description": "Proof tree template"
   },
   "Pseudocode algorithm": {
     "prefix": "pseudo",
@@ -123,37 +118,38 @@
       "#pseudo[",
       "  *Algorithm* ${1:Name}",
       "  - *Goal:* ${2:what the algorithm computes}",
-      "  - *Input:* \\$${3:x_1, dots, x_n}\\$",
+      "  - *Input:* \\$${3:x}\\$",
       "  + *for* \\$${4:i = 1, dots, n}\\$ *do*",
-      "    + ${5:loop body}",
-      "  + *while* \\$${6:condition}\\$ *do*",
-      "    + ${7:loop body}",
-      "  + *return* ${8:result}",
+      "    + ${5:\"body\"}",
+      "  + *while* \\$${6:}\\$ *do*",
+      "    + ${7:\"body\"}",
+      "  + *return* ${8:}",
       "]",
       "$0"
     ],
-    "description": "Pseudocode algorithm with Goal, Input, for-loop, and while-loop (lovelace via sdust's #pseudo)"
+    "description": "Pseudocode algorithm template"
   },
   "Induction proof": {
     "prefix": "induct",
     "body": [
       "#pseudo[",
-      "*Proof by ${1:induction}*",
-      "- We want to prove that ${2:claim}",
+      "*Proof by induction*",
+      "- ${2:I want to prove that...}",
       "+ *\\$underline(\"Base case\")\\$*",
-      "  + ${3:base case content}",
+      "  + ${3:content}",
       "+ *\\$underline(\"Inductive hypothesis\")\\$*",
       "  + Assume that ${4:hypothesis}",
       "+ *\\$underline(\"Inductive step\")\\$*",
-      "  + ${5:step content}",
+      "  + ${5:content}",
       "]",
       "$0"
     ],
-    "description": "Induction proof template (base case / IH / inductive step)"
+    "description": "Induction proof template"
   },
   "SDU template import": {
     "prefix": "sdust",
-    "body": "#import \"@local/sdust:0.1.0\": *",
+    "body": ["#import \"@local/sdust:0.1.0\": *",
+             "$0"],
     "description": "Import the SDU temp.typ template"
   },
   "SDU note": {
@@ -175,7 +171,7 @@
     "description": "SDU lecture note document template"
   },
   "SDU exercise": {
-    "prefix": "exer",
+    "prefix": "exercise",
     "body": [
       "#import \"${1:../../temp.typ}\": *",
       "#show: exercise.with(",
@@ -193,7 +189,7 @@
     "description": "SDU exercise document template"
   },
   "SDU project": {
-    "prefix": "proj",
+    "prefix": "project",
     "body": [
       "#import \"${1:../../temp.typ}\": *",
       "#show: project.with(",
@@ -212,5 +208,26 @@
       "$0"
     ],
     "description": "SDU project document template"
+  },
+  "Python code block": {
+    "prefix": "pycode",
+    "body": [
+      "```py",
+      "${1:code}",
+      "```",
+      "$0"
+    ],
+    "description": "Fenced Python code block"
+  }
+  ,
+  "Output/terminal code block": {
+  "prefix": "outcode",
+    "body": [
+      "```output",
+      "${1:code}",
+      "```",
+      "$0"
+    ],
+    "description": "Fenced terminal style code block"
   }
 }

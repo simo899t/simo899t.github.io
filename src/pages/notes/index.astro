@@ -93,17 +93,38 @@ const codeExamples = readdirSync(ceDir)
     };
   });
 
+// Resolve VSCode snippet placeholders (${1:foo}, $0, \$) into plain display text,
+// the same way the editor shows them right after expansion.
+function resolveSnippetBody(body: string): string {
+  return body
+    .replace(/\$\{\d+:([^}]*)\}/g, '$1')
+    .replace(/\$\{\d+\}/g, '')
+    .replace(/\$0/g, '')
+    .replace(/\\\$/g, '$');
+}
+
 // VSCode snippets — copy your typst.json into public/snippets/typst.json to show them here.
+// Only these snippets get an animated card; edit this list to change the selection.
+const SNIPPET_WHITELIST = ['Definition', 'Tree (tidy-tree)', 'SDU template import', 'Induction proof', 'Pseudocode algorithm', 'SDU note'];
+
 const snippetsPath = resolve('public/snippets/typst.json');
-let snippets: { name: string; prefix: string; body: string; description: string }[] = [];
+let snippets: { name: string; prefix: string; body: string; expanded: string; description: string; json: string }[] = [];
 try {
   const raw = JSON.parse(readFileSync(snippetsPath, 'utf8'));
-  snippets = Object.entries(raw).map(([name, def]: [string, any]) => ({
-    name,
-    prefix: def.prefix,
-    body: Array.isArray(def.body) ? def.body.join('\n') : def.body,
-    description: def.description || '',
-  }));
+  snippets = Object.entries(raw)
+    .filter(([name]) => SNIPPET_WHITELIST.includes(name))
+    .sort((a, b) => SNIPPET_WHITELIST.indexOf(a[0]) - SNIPPET_WHITELIST.indexOf(b[0]))
+    .map(([name, def]: [string, any]) => {
+      const body = Array.isArray(def.body) ? def.body.join('\n') : def.body;
+      return {
+        name,
+        prefix: def.prefix,
+        body,
+        expanded: resolveSnippetBody(body),
+        description: def.description || '',
+        json: JSON.stringify({ [name]: def }, null, 2).replace(/^\{\n/, '').replace(/\n\}$/, ''),
+      };
+    });
 } catch (e) { snippets = []; }
 
 // Read the .typ source files — edit those files to change the animation.
@@ -253,16 +274,50 @@ const demosJson = JSON.stringify(demos);
 
       <!-- Snippets -->
       <div class="tab-panel" id="panel-snippets">
+        <p class="snippets-intro">Snippets are small shortcuts in my editor — type a prefix like <code>def</code>, pick it from the autocomplete dropdown, and it expands into a ready-made block.</p>
         {snippets.length > 0 ? (
           <div class="snippet-list">
-            {snippets.map(s => (
+            {snippets.map((s, i) => (
               <div class="snippet-row">
-                <div class="snippet-head">
-                  <span class="snippet-name">{s.name}</span>
-                  <span class="snippet-prefix">{s.prefix}</span>
+                <div class="snippet-pair">
+                  <div class="snippet-editor">
+                    <div class="ce-titlebar">
+                      <span class="tb-dot red"></span>
+                      <span class="tb-dot yellow"></span>
+                      <span class="tb-dot green"></span>
+                      <span class="ce-filename">typst.json</span>
+                    </div>
+                    <div class="snippet-code-wrap fixed-size">
+                      <div class="snippet-inner">
+                        <div class="line-nums">
+                          {s.json.split('\n').map((_, li) => <span>{li + 1}</span>)}
+                        </div>
+                        <pre class="snippet-static">{s.json}</pre>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="snippet-editor">
+                    <div class="ce-titlebar">
+                      <span class="tb-dot red"></span>
+                      <span class="tb-dot yellow"></span>
+                      <span class="tb-dot green"></span>
+                      <span class="ce-filename">notes.typ</span>
+                    </div>
+                    <div class="snippet-code-wrap fixed-size">
+                      <div class="snippet-inner">
+                        <div class="line-nums snippet-anim-linenums"></div>
+                        <pre
+                          class="snippet-anim"
+                          data-prefix={s.prefix}
+                          data-body={s.body}
+                          data-expanded={s.expanded}
+                          data-description={s.description}
+                        ></pre>
+                      </div>
+                      <div class="snippet-dropdown"></div>
+                    </div>
+                  </div>
                 </div>
-                {s.description && <p class="snippet-desc">{s.description}</p>}
-                <pre class="snippet-body">{s.body}</pre>
               </div>
             ))}
           </div>
@@ -279,6 +334,8 @@ const demosJson = JSON.stringify(demos);
 (function () {
 
 // ── tabs ──────────────────────────────────────────────────────────────────────
+let snippetAnimsStarted = false;
+
 document.querySelectorAll('.demo-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     const tab = btn.dataset.tab;
@@ -286,8 +343,213 @@ document.querySelectorAll('.demo-tab').forEach(btn => {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('panel-' + tab).classList.add('active');
+    if (tab === 'snippets' && !snippetAnimsStarted) {
+      snippetAnimsStarted = true;
+      initSnippetAnimations();
+    }
   });
 });
+
+// ── snippet dropdown animations ────────────────────────────────────────────────
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function highlightTypstClient(raw) {
+  const lines = raw.split('\n');
+  return lines.map(line => {
+    if (line.trimStart().startsWith('//')) {
+      return '<span class="ch-comment">' + escapeHtml(line) + '</span>';
+    }
+    let out = '';
+    let i = 0;
+    while (i < line.length) {
+      if (line[i] === '$') {
+        const end = line.indexOf('$', i + 1);
+        if (end !== -1) {
+          out += '<span class="ch-math">' + escapeHtml(line.slice(i, end + 1)) + '</span>';
+          i = end + 1;
+          continue;
+        }
+      }
+      if (line[i] === '#') {
+        const m = line.slice(i).match(/^#[a-zA-Z_][a-zA-Z0-9_-]*/);
+        if (m) {
+          out += '<span class="ch-kw">' + escapeHtml(m[0]) + '</span>';
+          i += m[0].length;
+          continue;
+        }
+      }
+      if (line[i] === '*') {
+        const end = line.indexOf('*', i + 1);
+        if (end !== -1) {
+          out += '<span class="ch-bold">' + escapeHtml(line.slice(i, end + 1)) + '</span>';
+          i = end + 1;
+          continue;
+        }
+      }
+      if (line[i] === '"') {
+        const end = line.indexOf('"', i + 1);
+        if (end !== -1) {
+          out += '<span class="ch-str">' + escapeHtml(line.slice(i, end + 1)) + '</span>';
+          i = end + 1;
+          continue;
+        }
+      }
+      out += escapeHtml(line[i]);
+      i++;
+    }
+    return out;
+  }).join('\n');
+}
+
+function parseSnippetFields(raw) {
+  const segments = [];
+  const re = /\$\{(\d+):([^}]*)\}|\$\{(\d+)\}|\$(\d+)|\\\$/g;
+  let last = 0;
+  let m;
+  while ((m = re.exec(raw))) {
+    if (m.index > last) segments.push({ type: 'text', value: raw.slice(last, m.index) });
+    if (m[0] === '\\$') {
+      segments.push({ type: 'text', value: '$' });
+    } else if (m[1] !== undefined) {
+      segments.push({ type: 'field', index: parseInt(m[1], 10), value: m[2] });
+    } else {
+      const idx = parseInt(m[3] !== undefined ? m[3] : m[4], 10);
+      segments.push({ type: 'field', index: idx, value: '' });
+    }
+    last = re.lastIndex;
+  }
+  if (last < raw.length) segments.push({ type: 'text', value: raw.slice(last) });
+  return segments;
+}
+
+function fieldOrder(segments) {
+  const seen = new Set();
+  segments.forEach(s => { if (s.type === 'field' && s.index !== 0) seen.add(s.index); });
+  return Array.from(seen).sort((a, b) => a - b);
+}
+
+function renderSnippetStep(segments, activeIndex) {
+  return segments.map(seg => {
+    if (seg.type === 'text') return highlightTypstClient(seg.value);
+    const cls = seg.index === activeIndex ? 'ts-field ts-active' : 'ts-field';
+    return '<span class="' + cls + '">' + escapeHtml(seg.value) + '</span>';
+  }).join('');
+}
+
+function initSnippetAnimations() {
+  const cards = document.querySelectorAll('.snippet-anim');
+  cards.forEach((animEl, idx) => {
+    const prefix     = animEl.dataset.prefix || '';
+    const body       = animEl.dataset.body || '';
+    const description = animEl.dataset.description || '';
+    const codeWrapEl = animEl.closest('.snippet-code-wrap');
+    const ddEl = codeWrapEl.querySelector('.snippet-dropdown');
+    const lineNumsEl = codeWrapEl.querySelector('.snippet-anim-linenums');
+
+    const altSuffixes = ['ion', 'ive'];
+    const alts = altSuffixes.map(suf => prefix + suf);
+
+    ddEl.innerHTML = `
+      <div class="dd-row active">
+        <span class="dd-icon"></span>
+        <span class="dd-prefix"><b>${prefix}</b></span>
+        <span class="dd-desc">${description}</span>
+      </div>
+      ${alts.map(a => `
+        <div class="dd-row">
+          <span class="dd-icon abc">abc</span>
+          <span class="dd-prefix"><b>${prefix}</b>${a.slice(prefix.length)}</span>
+        </div>
+      `).join('')}
+    `;
+
+    const segments = parseSnippetFields(body);
+    const order = fieldOrder(segments);
+
+    const TYPE_MS = 320;
+    const DROPDOWN_HOLD_MS = 2600;
+    const FLASH_MS = 260;
+    const FIELD_HOLD_MS = 1400;
+    const EXPANDED_HOLD_MS = 3200;
+    const CLEAR_HOLD_MS = 900;
+
+    let charPos = 0;
+    let fieldStep = 0;
+    let timer = null;
+
+    function updateLineNums(text) {
+      const lineCount = text.split('\n').length;
+      lineNumsEl.innerHTML = Array.from({ length: lineCount }, (_, n) => `<span>${n + 1}</span>`).join('');
+    }
+
+    function setPlainText(text) {
+      animEl.innerHTML = escapeHtml(text);
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      cursor.textContent = '\xa0';
+      animEl.appendChild(cursor);
+      updateLineNums(text);
+    }
+
+    function typeStep() {
+      charPos++;
+      setPlainText(prefix.slice(0, charPos));
+      if (charPos < prefix.length) {
+        timer = setTimeout(typeStep, TYPE_MS);
+      } else {
+        ddEl.classList.add('visible');
+        timer = setTimeout(selectActive, DROPDOWN_HOLD_MS);
+      }
+    }
+
+    function selectActive() {
+      const activeRow = ddEl.querySelector('.dd-row.active');
+      if (activeRow) activeRow.classList.add('flash');
+      timer = setTimeout(showFieldStep, FLASH_MS);
+    }
+
+    function showFieldStep() {
+      ddEl.classList.remove('visible');
+      const activeIndex = order[fieldStep];
+      animEl.innerHTML = renderSnippetStep(segments, activeIndex);
+      const fullText = segments.map(s => s.value).join('');
+      updateLineNums(fullText);
+      fieldStep++;
+      if (fieldStep < order.length) {
+        timer = setTimeout(showFieldStep, FIELD_HOLD_MS);
+      } else {
+        timer = setTimeout(showFinal, FIELD_HOLD_MS);
+      }
+    }
+
+    function showFinal() {
+      let cursorInserted = false;
+      const html = segments.map(seg => {
+        if (seg.type === 'field' && seg.index === 0) {
+          cursorInserted = true;
+          return '<span class="cursor">\xa0</span>';
+        }
+        if (seg.type === 'text') return highlightTypstClient(seg.value);
+        return escapeHtml(seg.value);
+      }).join('') + (cursorInserted ? '' : '<span class="cursor">\xa0</span>');
+      animEl.innerHTML = html;
+      updateLineNums(segments.map(s => s.value).join(''));
+      timer = setTimeout(clearAndRestart, EXPANDED_HOLD_MS);
+    }
+
+    function clearAndRestart() {
+      animEl.textContent = '';
+      charPos = 0;
+      fieldStep = 0;
+      timer = setTimeout(typeStep, CLEAR_HOLD_MS);
+    }
+
+    // stagger start so cards don't all animate in lockstep
+    setTimeout(typeStep, idx * 220);
+  });
+}
 
 
 // ── demos ─────────────────────────────────────────────────────────────────────
@@ -513,8 +775,8 @@ tick();
     var title  = (meta && meta.title)  || 'Course Notes';
     var course = (meta && meta.course) || '';
     return [
-      '#set page(width: 310pt, height: auto, margin: (x: 20pt, top: 30pt, bottom: 14pt))',
-      '#set text(size: 9pt, font: "New Computer Modern")',
+      '#set page(width: 560pt, height: auto, margin: (x: 32pt, top: 42pt, bottom: 22pt))',
+      '#set text(size: 12pt, font: "New Computer Modern")',
       '#let loss = $cal(L)$',
       '#let apx = $approx$',
       '#let RR = $bb(R)$',
@@ -754,13 +1016,19 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  height: 320px;
+  height: 420px;
   border-radius: 8px;
   overflow: clip;
   border: 1px solid #2a2a2a;
   margin-bottom: 2.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
   resize: vertical;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 100vw;
+  box-sizing: border-box;
 }
 
 .pane { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
@@ -850,7 +1118,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   margin: 0;
   padding: 10px 12px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
   color: #ccc;
   white-space: pre-wrap;
@@ -860,7 +1128,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   box-sizing: border-box;
 }
 
-.cur {
+:global(.cur) {
   color: #4db6c4;
   animation: blink 1s step-end infinite;
 }
@@ -896,7 +1164,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   display: block;
 }
 
-.render-status {
+:global(.render-status) {
   font-size: 10px;
   color: #999;
   font-family: var(--font-mono);
@@ -911,18 +1179,39 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   border-top: 1px solid var(--border);
 }
 
+.snippets-intro {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin: 1rem 0 2rem;
+}
+.snippets-intro code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+  background: rgba(192, 112, 58, 0.1);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
 .snippet-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 24px;
   padding: 16px 0;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  padding-left: 2rem;
+  padding-right: 2rem;
+  box-sizing: border-box;
 }
 
 .snippet-row {
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  padding: 12px 16px;
-  background: #141414;
+  border: none;
+  padding: 0;
+  background: none;
 }
 
 .snippet-head {
@@ -961,6 +1250,156 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   white-space: pre-wrap;
   line-height: 1.6;
   margin: 0;
+}
+
+.snippet-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.snippet-editor {
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #141414;
+}
+
+.snippet-code-wrap {
+  position: relative;
+}
+
+.snippet-code-wrap.fixed-size {
+  height: 500px;
+  overflow: hidden;
+}
+
+.snippet-inner {
+  display: flex;
+  min-height: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.snippet-inner .line-nums {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  min-width: 30px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 22px;
+  color: #3a3a3a;
+  border-right: 1px solid #1e1e1e;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.snippet-static {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: #bbb;
+  white-space: pre-wrap;
+  line-height: 22px;
+  margin: 0;
+  padding: 12px 16px;
+  flex: 1;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 21px,
+    rgba(255, 255, 255, 0.045) 21px,
+    rgba(255, 255, 255, 0.045) 22px
+  );
+  background-position: 0 12px;
+}
+
+.snippet-anim {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: #ddd;
+  white-space: pre-wrap;
+  line-height: 22px;
+  margin: 0;
+  padding: 12px 16px;
+  flex: 1;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 21px,
+    rgba(255, 255, 255, 0.045) 21px,
+    rgba(255, 255, 255, 0.045) 22px
+  );
+  background-position: 0 12px;
+}
+
+:global(.snippet-anim .cursor) {
+  display: inline-block;
+  width: 1px;
+  background: #ddd;
+  margin-left: 1px;
+  animation: blink 1s step-start infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.snippet-dropdown {
+  position: absolute;
+  left: 14px;
+  top: 34px;
+  z-index: 5;
+  display: none;
+  min-width: 320px;
+  background: #1c1c1c;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+.snippet-dropdown.visible { display: block; }
+
+:global(.dd-row) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  white-space: nowrap;
+}
+:global(.dd-row.active) { background: #2a3f4d; }
+:global(.dd-row.active.flash) { background: #355062; }
+
+:global(.dd-icon) {
+  flex-shrink: 0;
+  width: 14px;
+  height: 16px;
+  display: inline-block;
+  border: 1.3px solid #9fb3c8;
+  border-radius: 2px;
+  background: transparent;
+}
+:global(.dd-row.active .dd-icon) { border-color: #6fb3e0; }
+
+:global(.dd-icon.abc) {
+  width: auto;
+  height: auto;
+  font-size: 0.65rem;
+  color: #7d8590;
+  letter-spacing: 0.5px;
+}
+
+:global(.dd-prefix) { color: #d4d4d4; font-weight: 400; }
+:global(.dd-prefix b) { color: #fff; font-weight: 700; }
+:global(.dd-row.active .dd-prefix) { color: #6fb3e0; }
+:global(.dd-row.active .dd-prefix b) { color: #6fb3e0; }
+:global(.dd-desc) { color: #8b939c; margin-left: auto; padding-left: 16px; }
+
+:global(.ts-field) {
+  background: rgba(255, 255, 255, 0.12);
+}
+:global(.ts-field.ts-active) {
+  background: rgba(70, 140, 200, 0.5);
 }
 
 .note-row {
