@@ -3,9 +3,9 @@
 // Run: bash public/demo/build.sh  — to regenerate the rendered SVGs.
 // Then push. The animation will reflect your changes automatically.
 #let loss = $cal(L)$
-#let px(f, x) = $(partial #f) / (partial #x)$
-#let pv(f, x) = $(d #f) / (d #x)$
-#let dx = $upright(d)x$
+#let px = $(partial)/(partial x)$
+#let pv(f, x) = $(partial #f)/(partial #x)$
+#let dx = $space upright(d)x$
 // ── CONTENT ──────────────────────────────────────────────────
 = Fundamental Theorem
 

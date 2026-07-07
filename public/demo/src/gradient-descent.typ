@@ -8,7 +8,7 @@
 = Gradient Descent
 
 The update rule for parameters $theta$ with
-loss $cal(L)$:
+loss $loss$:
 
 $ theta_(t+1) = theta_t
   - alpha nabla_theta (theta_t) $

@@ -171,6 +171,9 @@ const demos = [
   loadDemo('linear-algebra',   'Linear Algebra',   'DM561'),
   loadDemo('gradient-descent', 'Gradient Descent', 'AI505'),
   loadDemo('calculus',         'Calculus',         'MM536'),
+  loadDemo('probability',      'Probability',      'MM537'),
+  loadDemo('matrix-basics',    'Matrix Basics',    'DM512'),
+  loadDemo('newton-method',    "Newton's Method",  'AI506'),
 ];
 
 const demosJson = JSON.stringify(demos);
@@ -181,7 +184,18 @@ const demosJson = JSON.stringify(demos);
     <div class="typst-blurb">
       <h1>How I write my notes</h1>
       <p>
-        All lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using <a href="https://github.com/simo899t/sdu-notes" target="_blank">sdust</a>, a package I developed to streamline academic document authoring. It provides document templates, structured environments such as <code>#theorem</code> and <code>#definition</code>, and mathematical shorthands including <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). The package is open to use, though it is actively maintained and may introduce breaking changes.
+        All lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a pair of packages I built to streamline academic document authoring — see <strong>My Packages</strong> below for details.
+      </p>
+
+      <h2 class="blurb-heading">My Packages</h2>
+      <p>
+        <a href="https://github.com/simo899t/sdust" target="_blank"><code>sdust</code></a> provides the reusable, institution-agnostic layer: document templates (<code>note</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, <code>exam</code>), theorem-style blocks like <code>#theorem</code> and <code>#definition</code>, and helpers for graphs, trees, and pseudocode. It's generic by design — no bundled branding — so it can be published to <a href="https://typst.app/universe/" target="_blank">Typst Universe</a> for anyone to use.
+      </p>
+      <p>
+        <a href="https://github.com/simo899t/tempst" target="_blank"><code>tempst</code></a> sits on top of sdust and holds everything subjective to me: SDU/IMADA branding defaults for the cover-page templates, plus personal math shorthands like <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). This is the package my own notes actually import.
+      </p>
+      <p>
+        Both packages are actively maintained and may introduce breaking changes.
       </p>
 
       <h2 class="blurb-heading">What is Typst?</h2>
@@ -231,6 +245,11 @@ const demosJson = JSON.stringify(demos);
               </div>
             </div>
           </div>
+        </div>
+        <div class="demo-picker" id="demo-picker">
+          {demos.map((d, i) => (
+            <button class="demo-picker-dot" data-demo-index={i} title={d.title}>{i + 1}</button>
+          ))}
         </div>
       </div>
 
@@ -651,10 +670,32 @@ function drainCompile() {
     if (svgStr) {
       outEl.innerHTML     = svgStr;
       outEl.style.opacity = '1';
+      fitOutputToBox();
     }
     drainCompile();   // compile again if more content arrived while busy
   });
 }
+
+// Scale the compiled SVG so it always fits fully inside the output box —
+// no clipping, no scrollbar, regardless of how tall the rendered note gets.
+function fitOutputToBox() {
+  var svg = outEl.querySelector('svg');
+  var box = outEl.parentElement;
+  if (!svg || !box) return;
+  var bw = box.clientWidth  - 32; // minus .output-body padding (16px each side)
+  var bh = box.clientHeight - 32;
+  var vb = svg.viewBox && svg.viewBox.baseVal;
+  var sw = (vb && vb.width)  || (svg.width  && svg.width.baseVal  && svg.width.baseVal.value)  || svg.getBoundingClientRect().width;
+  var sh = (vb && vb.height) || (svg.height && svg.height.baseVal && svg.height.baseVal.value) || svg.getBoundingClientRect().height;
+  if (!sw || !sh || !bw || !bh) return;
+  var ZOOM = 1.12;
+  var scale = Math.min(bw / sw, bh / sh) * ZOOM;
+  outEl.style.width     = sw + 'px';
+  outEl.style.height    = sh + 'px';
+  outEl.style.transform = 'scale(' + scale + ')';
+}
+
+window.addEventListener('resize', fitOutputToBox);
 
 // ── syntax highlight ──────────────────────────────────────────────────────────
 function hl(text) {
@@ -688,13 +729,51 @@ function hl(text) {
   }).join('\n');
 }
 
+// ── snippet-expand simulation ──────────────────────────────────────────────────
+// When the typer reaches one of these constructs, it types the short snippet
+// prefix (as if the real VSCode snippet were used), then expands instantly —
+// mirroring how the Snippets tab demonstrates the same prefixes.
+var SNIPPET_TRIGGERS = [
+  { match: '#definition(', typed: 'def' },
+  { match: '#theorem(',    typed: 'theorem' },
+  { match: '#example(',    typed: 'example' },
+  { match: '#proof(',      typed: 'proof' },
+  { match: '```py',        typed: 'pycode' },
+  { match: '```output',    typed: 'outcode' },
+];
+
+function detectSnippetTrigger(full, pos) {
+  for (var i = 0; i < SNIPPET_TRIGGERS.length; i++) {
+    var t = SNIPPET_TRIGGERS[i];
+    if (full.startsWith(t.match, pos)) {
+      var end;
+      if (t.match.indexOf('```') === 0) {
+        var fenceClose = full.indexOf('```', pos + 3);
+        if (fenceClose === -1) continue;
+        end = fenceClose + 3;
+      } else {
+        var closeIdx = full.indexOf('\n]', pos);
+        if (closeIdx === -1) continue;
+        end = closeIdx + 2;
+      }
+      return { typed: t.typed, end: end };
+    }
+  }
+  return null;
+}
+
+var snippetExpandPrefix = null;
+var snippetExpandChar   = 0;
+var snippetExpandEnd    = 0;
+
 // ── render ────────────────────────────────────────────────────────────────────
 function renderCode() {
   var demo          = DEMOS[di];
   var preambleLines = demo.lines.slice(0, demo.preamble + 1); // +1 for blank separator
   var contentLines  = demo.lines.slice(demo.preamble + 1);
   var contentFull   = contentLines.join('\n');
-  var contentTyped  = contentFull.slice(0, charPos);
+  var contentTyped  = contentFull.slice(0, charPos) +
+    (snippetExpandPrefix ? snippetExpandPrefix.slice(0, snippetExpandChar) : '');
 
   var displayText   = preambleLines.join('\n') + '\n' + contentTyped;
   var allLines      = displayText.split('\n');
@@ -706,7 +785,7 @@ function renderCode() {
     return '<span>' + (i+1) + '</span>';
   }).join('');
 
-  if (contentTyped.length > 0) {
+  if (contentTyped.length > 0 && !snippetExpandPrefix) {
     var hidden = (demo.hiddenDefs || []).join('\n');
     var src = hidden ? hidden + '\n' + contentTyped : contentTyped;
     triggerCompile(src);
@@ -719,7 +798,38 @@ function tick() {
   var full = contentLines.join('\n');
 
   if (phase === 'typing') {
+    if (snippetExpandPrefix) {
+      snippetExpandChar++;
+      renderCode();
+      scrollToBottom();
+      if (snippetExpandChar < snippetExpandPrefix.length) {
+        setTimeout(tick, 70);
+      } else {
+        var end = snippetExpandEnd;
+        setTimeout(function() {
+          charPos = end;
+          snippetExpandPrefix = null;
+          snippetExpandChar   = 0;
+          renderCode();
+          scrollToBottom();
+          setTimeout(tick, CHAR_MS);
+        }, 260);
+      }
+      return;
+    }
+
     if (charPos < full.length) {
+      var atLineStart = charPos === 0 || full[charPos - 1] === '\n';
+      var trigger = atLineStart ? detectSnippetTrigger(full, charPos) : null;
+      if (trigger) {
+        snippetExpandPrefix = trigger.typed;
+        snippetExpandChar   = 0;
+        snippetExpandEnd    = trigger.end;
+        renderCode();
+        scrollToBottom();
+        setTimeout(tick, 70);
+        return;
+      }
       charPos++;
       // rush past consecutive blank lines instantly
       while (charPos < full.length && full[charPos - 1] === '\n' && full[charPos] === '\n') {
@@ -752,28 +862,50 @@ function tick() {
     if (t < 1) {
       setTimeout(tick, 16);
     } else {
-      di      = (di + 1) % DEMOS.length;
-      charPos = 0;
-      phase   = 'typing';
-      compileBusy = false;
-      pendingText = null;
-      autoScroll  = true;
-      window.__demoMeta = DEMOS[di];
-      clearTimeout(autoScrollTimer);
-      if (editorBody) editorBody.scrollTop = 0;
-      codeEl.style.opacity = 1;
-      lineEl.style.opacity = 1;
-      outEl.style.opacity  = 1;
-      outEl.innerHTML      = '<span class="render-status">loading typst…</span>';
-      codeEl.innerHTML = '<span class="cur">▮</span>';
-      lineEl.innerHTML = '<span>1</span>';
-      setTimeout(tick, 300);
+      goToDemo((di + 1) % DEMOS.length);
     }
   }
 }
 
+function updatePickerActive() {
+  document.querySelectorAll('.demo-picker-dot').forEach(function(btn, i) {
+    btn.classList.toggle('active', i === di);
+  });
+}
+
+function goToDemo(index) {
+  di      = index;
+  charPos = 0;
+  phase   = 'typing';
+  holdMs  = 0;
+  clearMs = 0;
+  snippetExpandPrefix = null;
+  snippetExpandChar   = 0;
+  compileBusy = false;
+  pendingText = null;
+  autoScroll  = true;
+  window.__demoMeta = DEMOS[di];
+  clearTimeout(autoScrollTimer);
+  if (editorBody) editorBody.scrollTop = 0;
+  codeEl.style.opacity = 1;
+  lineEl.style.opacity = 1;
+  outEl.style.opacity  = 1;
+  outEl.innerHTML      = '<span class="render-status">loading typst…</span>';
+  codeEl.innerHTML = '<span class="cur">▮</span>';
+  lineEl.innerHTML = '<span>1</span>';
+  updatePickerActive();
+  setTimeout(tick, 300);
+}
+
+document.querySelectorAll('.demo-picker-dot').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    goToDemo(parseInt(btn.dataset.demoIndex, 10));
+  });
+});
+
 // expose current demo meta for the compile script
 window.__demoMeta = DEMOS[di];
+updatePickerActive();
 
 tick();
 
@@ -968,7 +1100,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   text-align: right;
   font-family: var(--font-mono);
   font-size: 12px;
-  line-height: 1.75;
+  line-height: 24px;
   color: #3a3a3a;
   border-right: 1px solid #1e1e1e;
   user-select: none;
@@ -982,7 +1114,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   font-size: 0.9rem;
   color: #bbb;
   white-space: pre-wrap;
-  line-height: 1.75;
+  line-height: 24px;
   flex: 1;
 }
 .ce-kw { color: #c0703a; }
@@ -1058,6 +1190,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 .demo-window {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr;
   align-items: stretch;
   border-radius: 8px;
   overflow: clip;
@@ -1066,13 +1199,47 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   margin-bottom: 2.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
   width: calc(100vw - 4rem);
+  aspect-ratio: 1000 / 350;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
   box-sizing: border-box;
 }
 
-.pane { display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+
+.demo-picker {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: -1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.demo-picker-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #2a2a2a;
+  background: #1c1c1c;
+  color: #666;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.demo-picker-dot:hover {
+  border-color: #4db6c4;
+  color: #ccc;
+}
+
+.demo-picker-dot.active {
+  background: #4db6c4;
+  border-color: #4db6c4;
+  color: #0a0a0a;
+  font-weight: 600;
+}
 
 .titlebar {
   display: flex;
@@ -1134,7 +1301,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   text-align: right;
   font-family: var(--font-mono);
   font-size: 11px;
-  line-height: 1.6;
+  line-height: 20px;
   color: #3a3a3a;
   border-right: 1px solid #1e1e1e;
   user-select: none;
@@ -1147,7 +1314,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   padding: 10px 12px;
   font-family: var(--font-mono);
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 20px;
   color: #ccc;
   white-space: pre-wrap;
   word-break: break-all;
@@ -1168,29 +1335,27 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 }
 
 .output-body {
-  aspect-ratio: 500 / 350;
-  overflow-y: auto;
-  scrollbar-gutter: stable both-edges;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
   padding: 16px;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   box-sizing: border-box;
 }
 
 .render-out {
-  width: fit-content;
-  max-width: 100%;
+  flex-shrink: 0;
   background: #fff;
   transition: opacity 0.15s ease;
   overflow: hidden;
-  transform: scale(1.12);
-  transform-origin: top center;
+  transform-origin: center center;
 }
 
 .render-out svg {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
 }
 
