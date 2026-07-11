@@ -133,6 +133,25 @@ try {
     });
 } catch (e) { snippets = []; }
 
+// Snippet bodies used to drive the "typed as a real snippet, then fields
+// filled in" animation in the Live Demo tab. Keyed by prefix so the client
+// script can look up the placeholder template for whatever trigger it hits
+// (e.g. "#definition(" → the "def" snippet body) and animate real content
+// into its fields instead of just pasting the whole block in one jump.
+const DEMO_SNIPPET_PREFIXES = ['def', 'theorem', 'example', 'proof', 'induct', 'sum', 'integral', 'product', 'code', 'frac'];
+let demoSnippetDefs: Record<string, { prefix: string; body: string; description: string }> = {};
+try {
+  const raw = JSON.parse(readFileSync(snippetsPath, 'utf8'));
+  for (const def of Object.values(raw) as any[]) {
+    if (DEMO_SNIPPET_PREFIXES.includes(def.prefix)) {
+      const body = Array.isArray(def.body) ? def.body.join('\n') : def.body;
+      demoSnippetDefs[def.prefix] = { prefix: def.prefix, body, description: def.description || '' };
+    }
+  }
+} catch (e) { demoSnippetDefs = {}; }
+
+const demoSnippetDefsJson = JSON.stringify(demoSnippetDefs);
+
 // Read the .typ source files — edit those files to change the animation.
 // Lines before "// ── CONTENT" that start with # are hidden source preamble
 // (compiled but not animated). Lines after the marker are animated.
@@ -168,15 +187,41 @@ function loadDemo(slug: string, title: string, course: string) {
 }
 
 const demos = [
-  loadDemo('linear-algebra',   'Linear Algebra',   'DM561'),
-  loadDemo('gradient-descent', 'Gradient Descent', 'AI505'),
-  loadDemo('calculus',         'Calculus',         'MM536'),
-  loadDemo('probability',      'Probability',      'MM537'),
-  loadDemo('matrix-basics',    'Matrix Basics',    'DM512'),
-  loadDemo('newton-method',    "Newton's Method",  'AI506'),
+  loadDemo('calculus',         'Taylor Series',             'MM531'),
+  loadDemo('binary-search',    'Binary Search & Big-O',     'DM578'),
+  loadDemo('induction',        'Proof by Induction',        'DM549'),
+  loadDemo('linear-algebra',   'Gauss Elimination',         'DM561'),
+  loadDemo('np-reduction',     '3-SAT to Independent Set',  'DM572'),
+  loadDemo('newton-method',    "Newton's Method",           'MM538'),
 ];
 
 const demosJson = JSON.stringify(demos);
+
+const packages = [
+  {
+    name: 'sdust',
+    repo: 'https://github.com/simo899t/sdust',
+    tag: 'SDU themed package',
+    desc: `A package for writing Typst documents faster: document templates (<code>note</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, <code>exam</code>), theorem-style blocks like <code>#theorem</code> and <code>#definition</code>, and helpers for graphs, trees, and pseudocode.`,
+    importCode: '#import "@local/sdust:0.1.0": *\n#show: note.with(\n  title:  "Lecture Notes",\n  course: "DM000 — Course Name",\n)',
+  },
+  {
+    name: 'tempst',
+    repo: 'https://github.com/simo899t/tempst',
+    tag: 'personal shortcut package',
+    desc: `Builds directly on <code>sdust</code> and adds the math shorthands I use day to day, like <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). This is the package my own notes import.`,
+    importCode: '#import "@local/tempst:0.1.0": *\n#show: note.with(\n  title:  "Lecture Notes",\n  course: "DM000 — Course Name",\n)',
+  },
+].map(p => ({ ...p, importHighlighted: highlightTypst(p.importCode) }));
+
+const usefulPackages = [
+  { name: 'codly',        repo: 'https://typst.app/universe/package/codly',        desc: 'Nicer code blocks — line numbers, highlighting, and language labels. Used live in the demo above.' },
+  { name: 'lovelace',     repo: 'https://typst.app/universe/package/lovelace',     desc: 'Pseudocode blocks with proper line numbering and indentation. Also used live in the demo above.' },
+  { name: 'cetz',         repo: 'https://typst.app/universe/package/cetz',         desc: 'A general-purpose drawing/plotting library for diagrams, plots, and geometry.' },
+  { name: 'fletcher',     repo: 'https://typst.app/universe/package/fletcher',     desc: 'Node-and-arrow diagrams (graphs, flowcharts, commutative diagrams), built on cetz.' },
+  { name: 'physica',      repo: 'https://typst.app/universe/package/physica',      desc: 'Shorthands for physics notation — vectors, derivatives, bra-ket, and more.' },
+  { name: 'mitex',        repo: 'https://typst.app/universe/package/mitex',        desc: 'Renders raw LaTeX math syntax directly in Typst — handy for pasting in existing LaTeX.' },
+];
 ---
 
 <Layout title="Notes" description="Study notes by Simon Holm.">
@@ -184,7 +229,7 @@ const demosJson = JSON.stringify(demos);
     <div class="typst-blurb">
       <h1>How I write my notes</h1>
       <p>
-        All lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a pair of packages I built to streamline academic document authoring — see the <strong>My Packages</strong> tab below for details.
+        All my lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a pair of packages I built myself to make documents easier to build — see the <strong>Packages</strong> tab below for details.
       </p>
 
       <h2 class="blurb-heading">What is Typst?</h2>
@@ -200,7 +245,7 @@ const demosJson = JSON.stringify(demos);
       <button class="demo-tab" data-tab="code-examples">Code Examples</button>
       <button class="demo-tab" data-tab="assignment-examples">Assignment Examples</button>
       <button class="demo-tab" data-tab="snippets">Snippets</button>
-      <button class="demo-tab" data-tab="my-packages">My Packages</button>
+      <button class="demo-tab" data-tab="my-packages">Packages</button>
     </div>
 
     <div class="tab-panels">
@@ -220,6 +265,7 @@ const demosJson = JSON.stringify(demos);
                 <div id="line-nums" class="line-nums"></div>
                 <pre id="code" class="code"></pre>
               </div>
+              <div class="demo-snippet-dropdown" id="demo-dropdown"></div>
             </div>
           </div>
           <div class="pane pane-out">
@@ -346,37 +392,53 @@ const demosJson = JSON.stringify(demos);
       <!-- My Packages -->
       <div class="tab-panel" id="panel-my-packages">
         <p class="snippets-intro">
-          Everything above is built on two Typst packages I maintain — a
-          reusable public layer, and a personal layer on top of it.
+          Everything on this page is built with two Typst packages I maintain myself, a
+          custom SDU themed package, and a personal shortcut package. Either one is free to use, and shown below.
         </p>
         <div class="package-list">
-          <div class="package-card">
-            <div class="package-head">
-              <a href="https://github.com/simo899t/sdust" target="_blank" class="package-name">sdust</a>
-              <span class="package-tag">public · Typst Universe</span>
+          {packages.map(p => (
+            <div class="package-card">
+              <div class="package-head">
+                <a href={p.repo} target="_blank" class="package-name">{p.name}</a>
+                <span class="package-tag">{p.tag}</span>
+              </div>
+              <p class="package-desc" set:html={p.desc} />
+              <div class="ce-editor package-import">
+                <div class="ce-titlebar">
+                  <span class="tb-dot red"></span>
+                  <span class="tb-dot yellow"></span>
+                  <span class="tb-dot green"></span>
+                  <span class="ce-filename">notes.typ</span>
+                </div>
+                <div class="ce-code-wrap">
+                  <div class="line-nums ce-line-nums">
+                    {p.importCode.split('\n').map((_, li) => <span>{li + 1}</span>)}
+                  </div>
+                  <pre class="ce-code" set:html={p.importHighlighted}></pre>
+                </div>
+              </div>
             </div>
-            <p class="package-desc">
-              The reusable, institution-agnostic layer: document templates (<code>note</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, <code>exam</code>), theorem-style blocks like <code>#theorem</code> and <code>#definition</code>, and helpers for graphs, trees, and pseudocode. It's generic by design — no bundled branding — so it can be published to <a href="https://typst.app/universe/" target="_blank">Typst Universe</a> for anyone to use.
-            </p>
-          </div>
-          <div class="package-card">
-            <div class="package-head">
-              <a href="https://github.com/simo899t/tempst" target="_blank" class="package-name">tempst</a>
-              <span class="package-tag">personal</span>
-            </div>
-            <p class="package-desc">
-              Sits on top of sdust and holds everything subjective to me: SDU/IMADA branding defaults for the cover-page templates, plus personal math shorthands like <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). This is the package my own notes actually import.
-            </p>
-          </div>
+          ))}
         </div>
         <p class="snippets-intro">Both packages are actively maintained and may introduce breaking changes.</p>
+
+        <h2 class="blurb-heading">Other useful packages</h2>
+        <p class="snippets-intro">A few other Typst packages worth knowing about, from the wider ecosystem — browse more on <a href="https://typst.app/universe" target="_blank">Typst Universe</a>.</p>
+        <div class="useful-package-list">
+          {usefulPackages.map(p => (
+            <a class="useful-package-card" href={p.repo} target="_blank">
+              <span class="useful-package-name">{p.name}</span>
+              <span class="useful-package-desc">{p.desc}</span>
+            </a>
+          ))}
+        </div>
       </div>
 
     </div>
   </div>
 </Layout>
 
-<script is:inline define:vars={{ demosJson }}>
+<script is:inline define:vars={{ demosJson, demoSnippetDefsJson }}>
 (function () {
 
 // ── tabs ──────────────────────────────────────────────────────────────────────
@@ -413,6 +475,18 @@ function highlightTypstClient(raw) {
     let out = '';
     let i = 0;
     while (i < line.length) {
+      // \uE000/\uE001 sentinels mark a word "selected" (like
+      // double-clicking it in a real editor) right before emphasis markers
+      // wrap it — used by the */_ reveal steps below, never present in
+      // real Typst source.
+      if (line[i] === '\uE000') {
+        const selEnd = line.indexOf('\uE001', i + 1);
+        if (selEnd !== -1) {
+          out += '<span class="word-sel">' + escapeHtml(line.slice(i + 1, selEnd)) + '</span>';
+          i = selEnd + 1;
+          continue;
+        }
+      }
       if (line[i] === '$') {
         const end = line.indexOf('$', i + 1);
         if (end !== -1) {
@@ -695,23 +769,37 @@ function drainCompile() {
   });
 }
 
-// Scale the compiled SVG so it always fits fully inside the output box —
-// no clipping, no scrollbar, regardless of how tall the rendered note gets.
+// Fit the compiled SVG to the box's width, at a fixed zoom. The svg's
+// width never changes as content is typed (it's the page width, fixed by
+// buildPageSetup) — only its height grows — so this scale is already
+// stable across an entire typing run. The window's own height is set
+// separately, once, by presizeWindow() before typing starts; we must NOT
+// touch it here on every frame, or the box visibly grows while typing.
 function fitOutputToBox() {
   var svg = outEl.querySelector('svg');
-  var box = outEl.parentElement;
+  var box = outEl.parentElement; // .output-body
   if (!svg || !box) return;
-  var bw = box.clientWidth  - 32; // minus .output-body padding (16px each side)
-  var bh = box.clientHeight - 32;
+  var bw = box.clientWidth - 32; // minus .output-body padding (16px each side)
   var vb = svg.viewBox && svg.viewBox.baseVal;
   var sw = (vb && vb.width)  || (svg.width  && svg.width.baseVal  && svg.width.baseVal.value)  || svg.getBoundingClientRect().width;
   var sh = (vb && vb.height) || (svg.height && svg.height.baseVal && svg.height.baseVal.value) || svg.getBoundingClientRect().height;
-  if (!sw || !sh || !bw || !bh) return;
-  var ZOOM = 1.12;
-  var scale = Math.min(bw / sw, bh / sh) * ZOOM;
+  if (!sw || !sh || !bw) return;
+  var scale = (bw / sw) * ZOOM_FIXED;
   outEl.style.width     = sw + 'px';
   outEl.style.height    = sh + 'px';
   outEl.style.transform = 'scale(' + scale + ')';
+}
+var ZOOM_FIXED = 1.12;
+
+// Compile a demo's FULL final content once (invisibly) to measure its
+// rendered size, so the window can be set to its final height *before*
+// the typing animation starts — instead of resizing on every keystroke.
+// The demo window's size is fixed once via CSS (.demo-window's
+// aspect-ratio) and never changed by JS again — no per-demo resizing, so
+// switching demos never makes the box grow or shrink. This function is
+// kept as a no-op call site so goToDemo()'s flow doesn't need to change.
+function presizeWindow(demo, cb) {
+  cb();
 }
 
 window.addEventListener('resize', fitOutputToBox);
@@ -750,105 +838,863 @@ function hl(text) {
 
 // ── snippet-expand simulation ──────────────────────────────────────────────────
 // When the typer reaches one of these constructs, it types the short snippet
-// prefix (as if the real VSCode snippet were used), then expands instantly —
-// mirroring how the Snippets tab demonstrates the same prefixes.
+// prefix (as if the real VSCode snippet were used), shows the autocomplete
+// dropdown and selects it (like the Snippets tab), then reveals the snippet's
+// placeholder fields and "tabs" through them, typing the real title/body/code
+// that already exists in the source over each placeholder — instead of just
+// pasting the whole finished block in one jump.
+var DEMO_SNIPPETS = JSON.parse(demoSnippetDefsJson);
+
+// Card blocks (#definition/#theorem/#example/#proof) use their real VSCode
+// snippet bodies fetched from typst.json (see DEMO_SNIPPETS below). Code
+// fences and #pseudo don't need that — any language fence or pseudo block
+// gets a small synthetic single-field snippet built on the fly, so this
+// works generically instead of being hardcoded to Python.
 var SNIPPET_TRIGGERS = [
-  { match: '#definition(', typed: 'def' },
-  { match: '#theorem(',    typed: 'theorem' },
-  { match: '#example(',    typed: 'example' },
-  { match: '#proof(',      typed: 'proof' },
-  { match: '```py',        typed: 'pycode' },
-  { match: '```output',    typed: 'outcode' },
+  { match: '#definition(', prefix: 'def' },
+  { match: '#theorem(',    prefix: 'theorem' },
+  { match: '#example(',    prefix: 'example' },
+  { match: '#proof(',      prefix: 'proof' },
 ];
 
+// #name(title: "TITLE")[\n  BODY\n]  →  { end, fields: [TITLE, BODY] }
+function parseBracketBlock(full, pos) {
+  var m = /^#\w+\(title:\s*"([^"]*)"\)\[\n([\s\S]*?)\n\]/.exec(full.slice(pos));
+  if (!m) return null;
+  return { end: pos + m[0].length, fields: [m[1], m[2]] };
+}
+
+// ```lang\nCODE\n```  →  { end, fields: [CODE] }
+function parseFenceBlock(full, pos, matchStr) {
+  var afterOpen = full.indexOf('\n', pos + matchStr.length);
+  if (afterOpen === -1) return null;
+  // The closing ``` may itself be indented (e.g. nested inside
+  // #example[...]), so match optional leading whitespace, not just "\n```".
+  var closeMatch = /\n[ \t]*```/.exec(full.slice(afterOpen));
+  if (!closeMatch) return null;
+  var closeIdx = afterOpen + closeMatch.index;
+  return { end: closeIdx + closeMatch[0].length, fields: [full.slice(afterOpen + 1, closeIdx)] };
+}
+
+// #pseudo[\n  STEPS\n]  →  { end, fields: [STEPS] }
+function parsePseudoBlock(full, pos) {
+  var m = /^#pseudo\[\n([\s\S]*?)\n\]/.exec(full.slice(pos));
+  if (!m) return null;
+  return { end: pos + m[0].length, fields: [m[1]] };
+}
+
+// Build a regex straight from a real multi-field VSCode snippet body (e.g.
+// the "Induction proof" snippet, which has 4 fields, not just title+body)
+// so real content matching that exact scaffold can be matched and its
+// field values extracted generically — no per-snippet parser needed.
+// Newlines in the scaffold become "any newline + any indentation", since
+// real content is usually indented differently than the raw snippet body.
+function buildScaffoldRegex(body) {
+  // VSCode snippet bodies escape literal "$" as "\$" (to avoid colliding
+  // with tabstop syntax) — that backslash is stripped by the editor on
+  // expansion and never appears in real typed content, so strip it here
+  // too before building the match pattern (otherwise the regex demands a
+  // literal backslash that will never actually be in the document).
+  body = body.replace(/\\\$/g, '$');
+  var fieldRe = /\$\{(\d+):[^}]*\}|\$\{(\d+)\}|\$(\d+)/g;
+  var fieldNums = [];
+  var patternSrc = '';
+  var last = 0;
+  var m;
+  function escSeg(s) {
+    return s.split(/\n[ \t]*/).map(function(part) {
+      return part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('\\n[ \\t]*');
+  }
+  var lastFieldOpen = false;
+  while ((m = fieldRe.exec(body))) {
+    var literalBefore = body.slice(last, m.index);
+    patternSrc += escSeg(literalBefore);
+    if (literalBefore.length > 0) lastFieldOpen = false;
+    var num = m[1] !== undefined ? m[1] : (m[2] !== undefined ? m[2] : m[3]);
+    if (num !== '0') {
+      fieldNums.push(parseInt(num, 10));
+      patternSrc += '([\\s\\S]*?)';
+      lastFieldOpen = true; // true unless more literal text follows it below
+    }
+    // $0 itself isn't a captured field and doesn't reset lastFieldOpen —
+    // only literal text appearing after the last real field should.
+    last = fieldRe.lastIndex;
+  }
+  var tail = body.slice(last);
+  if (tail.length > 0) lastFieldOpen = false;
+  patternSrc += escSeg(tail);
+  // The snippet body's tail (e.g. "\n]\n$0") expects more document content
+  // to follow — but the block may be the very last thing in the file, with
+  // no trailing newline at all. Make that final connector optional so the
+  // match doesn't fail purely for being at the end of the document.
+  patternSrc = patternSrc.replace(/\\n\[ \\t\]\*$/, '(?:\\n[ \\t]*)?');
+  // If the last field has NO literal text after it at all (e.g. "sum_(a)^(b)
+  // ${3:c}$0" — nothing follows but the empty $0), a plain non-greedy
+  // group matches zero characters, since nothing forces it to consume
+  // more. That silently drops the entire argument. Bound it instead to
+  // stop at a sensible math boundary: a top-level "=", a line break, or
+  // the end of the string.
+  if (lastFieldOpen) {
+    patternSrc = patternSrc.replace(/\(\[\\s\\S\]\*\?\)$/, '([\\s\\S]*?)(?=\\s*=(?!=)|\\\\|$)');
+  }
+  return { regex: new RegExp('^' + patternSrc), fieldNums: fieldNums };
+}
+
+function parseByRealSnippet(full, pos, def) {
+  var built = buildScaffoldRegex(def.body);
+  var m = built.regex.exec(full.slice(pos));
+  if (!m) return null;
+  // A non-greedy field can stop at the wrong (inner) closing paren/bracket
+  // when a real argument contains its own parens, e.g. matching only
+  // "summ(n=0, k, (-1)" instead of the full call. Reject any match whose
+  // consumed span isn't itself paren/bracket-balanced, rather than
+  // silently truncating — the caller falls back to the (correct)
+  // depth-counting path for calls this can't safely handle.
+  var consumed = m[0];
+  var parenBalance  = (consumed.match(/\(/g) || []).length - (consumed.match(/\)/g) || []).length;
+  var bracketBalance = (consumed.match(/\[/g) || []).length - (consumed.match(/\]/g) || []).length;
+  if (parenBalance !== 0 || bracketBalance !== 0) return null;
+  var fields = built.fieldNums.map(function(_, i) { return m[i + 1]; });
+  return { end: pos + m[0].length, fields: fields };
+}
+
 function detectSnippetTrigger(full, pos) {
+  // Any code fence, any language — ```py, ```java, ```c, ```output, ... Use
+  // the real "code" VSCode snippet (```${1:lang}\n${2:code}\n```\n$0) so
+  // typing "code" shows the real dropdown, then the language and body get
+  // filled in as separate tabstops, same as it really happens in the editor.
+  var fenceM = /^```([a-zA-Z0-9_+-]*)/.exec(full.slice(pos));
+  if (fenceM) {
+    var codeDef = DEMO_SNIPPETS['code'];
+    if (codeDef) {
+      var parsedByCode = parseByRealSnippet(full, pos, codeDef);
+      if (parsedByCode) {
+        return { prefix: 'code', def: codeDef, end: parsedByCode.end, fields: parsedByCode.fields };
+      }
+    }
+    var parsedFence = parseFenceBlock(full, pos, fenceM[0]);
+    if (parsedFence) {
+      var lang  = fenceM[1];
+      var label = lang || 'code';
+      var fenceDef = {
+        prefix: label,
+        body: '```' + lang + '\n${1:code}\n```\n$0',
+      };
+      return { prefix: label, def: fenceDef, end: parsedFence.end, fields: parsedFence.fields, skipPrefix: true };
+    }
+  }
+
+  // #pseudo[...] — prefer the real "Induction proof" snippet (types
+  // "induct", shows the dropdown, then expands into all 4 real fields —
+  // goal, base case, hypothesis, inductive step — tabbing through each
+  // exactly like the real editor) if the content matches its scaffold;
+  // otherwise fall back to a generic single-field reveal.
+  if (full.startsWith('#pseudo[', pos)) {
+    var inductDef = DEMO_SNIPPETS['induct'];
+    if (inductDef) {
+      var parsedInduct = parseByRealSnippet(full, pos, inductDef);
+      if (parsedInduct) {
+        return { prefix: 'induct', def: inductDef, end: parsedInduct.end, fields: parsedInduct.fields };
+      }
+    }
+    var parsedPseudo = parsePseudoBlock(full, pos);
+    if (parsedPseudo) {
+      var pseudoDef = {
+        prefix: 'pseudo',
+        body: '#pseudo[\n${1:steps}\n]\n$0',
+        description: 'Pseudocode / proof block',
+      };
+      return { prefix: 'pseudo', def: pseudoDef, end: parsedPseudo.end, fields: parsedPseudo.fields, skipPrefix: true };
+    }
+  }
+
+  // Card blocks — use the real VSCode snippet body so title+body fields
+  // match what actually gets typed in the editor.
   for (var i = 0; i < SNIPPET_TRIGGERS.length; i++) {
     var t = SNIPPET_TRIGGERS[i];
-    if (full.startsWith(t.match, pos)) {
-      var end;
-      if (t.match.indexOf('```') === 0) {
-        var fenceClose = full.indexOf('```', pos + 3);
-        if (fenceClose === -1) continue;
-        end = fenceClose + 3;
-      } else {
-        var closeIdx = full.indexOf('\n]', pos);
-        if (closeIdx === -1) continue;
-        end = closeIdx + 2;
-      }
-      return { typed: t.typed, end: end };
-    }
+    if (!full.startsWith(t.match, pos)) continue;
+    var def = DEMO_SNIPPETS[t.prefix];
+    if (!def) continue;
+    var parsed = parseBracketBlock(full, pos);
+    if (!parsed) continue;
+    return { prefix: t.prefix, def: def, end: parsed.end, fields: parsed.fields };
   }
   return null;
 }
 
-var snippetExpandPrefix = null;
-var snippetExpandChar   = 0;
-var snippetExpandEnd    = 0;
+// ── snippet-anim state machine ─────────────────────────────────────────────────
+// phases: 'prefix' → 'dropdown' → 'select' → 'field-hold' → 'field-type' →
+//         'field-pause' (loops back to field-hold for next field) → done
+var snippetAnim = null;
+var TYPE_MS_FAST = 200;
+
+// Lightweight sibling to snippetAnim, for a single display-math equation
+// encountered in plain prose (not inside a card/pseudo/fence). Reuses
+// buildFieldRevealSteps so "$" pairs appear together, same as fields.
+var mathReveal = null;
+
+// Steps produced by revealChunks (for a nested real snippet like sum/frac
+// found inside math or field content) may carry a "dd" dropdown event —
+// perform it and return how long to hold before the next tick, matching
+// the timing the top-level snippetAnim uses for the same phases.
+// Whitespace types much faster than real characters everywhere in the demo
+// (see the plain top-level typing loop below) — steps advanced through
+// buildFieldRevealSteps (card fields, math reveal) grow by one character at
+// a time in the common case, so the newly-revealed tail character tells us
+// whether this step just typed whitespace.
+function stepCharDelay(step, fallback) {
+  if (!step || !step.display) return fallback;
+  var last = step.display[step.display.length - 1];
+  return (last === ' ' || last === '\t') ? 8 : fallback;
+}
+
+function applyStepDropdown(step, defaultDelay) {
+  if (!step) return defaultDelay;
+  if (step.dd === 'show')  { showDropdown(step.ddDef); return 850; }
+  if (step.dd === 'flash') { flashDropdown(); return 220; }
+  if (step.dd === 'hide')  { hideDropdown(); return 450; }
+  if (step.holdMs) return step.holdMs;
+  return stepCharDelay(step, defaultDelay);
+}
+
+function advanceMathReveal() {
+  mathReveal.step++;
+  renderCode();
+  scrollToBottom();
+  if (mathReveal.step < mathReveal.steps.length - 1) {
+    scheduleTick(applyStepDropdown(mathReveal.steps[mathReveal.step], CHAR_MS));
+  } else {
+    charPos = mathReveal.spanEnd;
+    mathReveal = null;
+    scheduleTick(CHAR_MS);
+  }
+}
+
+// Build the sequence of "revealed so far" strings for typing a field's real
+// value, at the same fidelity as a real editor: whenever a $...$ math span
+// is reached, both $ delimiters are placed immediately (like the "im"/"dm"
+// snippets do — $$ with the cursor in between), then the interior is typed
+// character by character, matching how the rest of the demo already reveals
+// its surrounding scaffold (e.g. the closing "]" of a block) before the
+// content inside is filled in.
+// Each step tracks two strings: `display` (exactly what's shown — the real
+// characters typed so far, nothing added) and `compileSafe` (the same, but
+// with any parens/brackets opened-but-not-yet-closed inside the CURRENT
+// math span auto-closed, e.g. mid-typing "mat(a_11, dots, a" gets a
+// trailing ")" appended only for compilation). Without this, a $...$ span
+// is already fully delimited (both $ appear together) so the old
+// odd-dollar-count check in closePartial() never kicks in, and the preview
+// just freezes on unbalanced-paren syntax errors until the whole
+// expression is typed.
+function autoCloseMathInterior(s) {
+  var opens  = (s.match(/\(/g)  || []).length - (s.match(/\)/g)  || []).length;
+  var bracks = (s.match(/\[/g)  || []).length - (s.match(/\]/g)  || []).length;
+  if (opens  > 0) s += ')'.repeat(opens);
+  if (bracks > 0) s += ']'.repeat(bracks);
+  return s;
+}
+
+// Reveal a piece of math text so that function calls like "summ(...)" or
+// "mat(...)" get their parens placed together first ("summ()"), then the
+// arguments typed between them — instead of typing "(" and eventually ")"
+// far apart in strict left-to-right order. Recurses into arguments so
+// nested calls (e.g. a summ(...) inside another summ(...)) get the same
+// treatment. Returns an array of progressively-revealed plain strings.
+// Find the index just after the ")" that balances an opening "(" at
+// openIdx, or -1 if unbalanced.
+function matchBalancedParen(text, openIdx) {
+  var depth = 1;
+  var j = openIdx + 1;
+  while (j < text.length && depth > 0) {
+    if (text[j] === '(') depth++;
+    else if (text[j] === ')') depth--;
+    j++;
+  }
+  return depth === 0 ? j : -1;
+}
+
+// Real tempst snippets whose expansion doesn't start with "identifier(" —
+// "sum"/"integral"/"product" now expand to native "sum_(a)^(b) c" syntax,
+// not a function call — so they need to be checked as their own bare
+// pattern rather than via the "identifier(" call detector below.
+var BARE_SNIPPET_KEYS = ['sum', 'integral', 'product'];
+
+// Push a plain step (no dropdown event) with the given text.
+function pushChunk(chunks, text, dd, ddDef) {
+  var chunk = { text: text };
+  if (dd) { chunk.dd = dd; chunk.ddDef = ddDef; }
+  chunks.push(chunk);
+}
+
+// Append the "type prefix → show dropdown → flash → hide → expand" steps
+// for a real snippet, given the already-typed prefix string `rPrefix` and
+// the snippet def — mirrors the real card-block snippetAnim's
+// prefix/dropdown/select phases, but inline within a chunk sequence
+// instead of the tick loop.
+function pushSnippetIntro(chunks, rPrefix, realDef, typedPrefix, placeholderText) {
+  for (var ni = 1; ni <= typedPrefix.length; ni++) {
+    pushChunk(chunks, rPrefix + typedPrefix.slice(0, ni));
+  }
+  var afterPrefix = rPrefix + typedPrefix;
+  chunks.push({ text: afterPrefix, dd: 'show', ddDef: { prefix: realDef.prefix, description: realDef.description } });
+  chunks.push({ text: afterPrefix, dd: 'flash' });
+  chunks.push({ text: afterPrefix, dd: 'hide' });
+  pushChunk(chunks, rPrefix + placeholderText);
+}
+
+// Full reveal of a matched real snippet: prefix/dropdown/expand, then
+// overwrite each field with its real value (recursing so nested calls
+// inside an argument get the same treatment).
+function pushRealSnippetReveal(chunks, rPrefix, realDef, matched) {
+  var scaffoldBody = realDef.body.replace(/\\\$/g, '$');
+  var segs = parseSnippetFields(scaffoldBody);
+  var ord = fieldOrder(segs);
+  var placeholderText = segs.map(function(seg) { return seg.value; }).join('');
+  pushSnippetIntro(chunks, rPrefix, realDef, realDef.prefix, placeholderText);
+  for (var fi = 0; fi < ord.length; fi++) {
+    var realVal = matched.fields[fi] || '';
+    var partialChunks = revealChunks(realVal);
+    for (var pk = 1; pk < partialChunks.length; pk++) {
+      var composed = segs.map(function(seg) {
+        if (seg.type === 'text') return seg.value;
+        var pos = ord.indexOf(seg.index);
+        if (pos < fi) return matched.fields[pos] || '';
+        if (pos === fi) return partialChunks[pk].text;
+        return seg.value;
+      }).join('');
+      pushChunk(chunks, rPrefix + composed, partialChunks[pk].dd, partialChunks[pk].ddDef);
+    }
+  }
+}
+
+function revealChunks(text) {
+  var chunks = [{ text: '' }];
+  var i = 0;
+  while (i < text.length) {
+    var barePrefix = chunks[chunks.length - 1].text;
+    var bareMatched = null;
+    var bareDef = null;
+    for (var bk = 0; bk < BARE_SNIPPET_KEYS.length; bk++) {
+      var candDef = DEMO_SNIPPETS[BARE_SNIPPET_KEYS[bk]];
+      if (!candDef) continue;
+      var candMatched = parseByRealSnippet(text, i, candDef);
+      if (candMatched) { bareMatched = candMatched; bareDef = candDef; break; }
+    }
+    if (bareMatched) {
+      pushRealSnippetReveal(chunks, barePrefix, bareDef, bareMatched);
+      i = bareMatched.end;
+      continue;
+    }
+
+    var callM = /^([a-zA-Z_][a-zA-Z0-9_.]*)\(/.exec(text.slice(i));
+    if (callM) {
+      var openLen = callM[0].length;
+      var depth = 1;
+      var j = i + openLen;
+      while (j < text.length && depth > 0) {
+        if (text[j] === '(') depth++;
+        else if (text[j] === ')') depth--;
+        j++;
+      }
+      if (depth === 0) {
+        var namePart = callM[1] + '(';
+        var argsText = text.slice(i + openLen, j - 1);
+        var cPrefix = chunks[chunks.length - 1].text;
+        pushChunk(chunks, cPrefix + namePart + ')');
+        var argChunks = revealChunks(argsText);
+        for (var a = 1; a < argChunks.length; a++) {
+          pushChunk(chunks, cPrefix + namePart + argChunks[a].text + ')', argChunks[a].dd, argChunks[a].ddDef);
+        }
+        i = j;
+        continue;
+      }
+    }
+
+    // Fraction "(num)/(den)" — the real "frac" snippet's shape. Type "frac"
+    // as a prefix, show the dropdown, expand to "()/()", then fill the
+    // numerator and denominator in tabstop order. Tolerates optional
+    // whitespace around the slash ("(a)/(b)" and "(a) / (b)" both appear).
+    if (text[i] === '(') {
+      var numEnd = matchBalancedParen(text, i);
+      if (numEnd !== -1) {
+        var afterNumM = /^\s*\/\s*\(/.exec(text.slice(numEnd));
+        if (afterNumM) {
+          var denOpenIdx = numEnd + afterNumM[0].length - 1; // index of den's "("
+          var denEnd = matchBalancedParen(text, denOpenIdx);
+          if (denEnd !== -1) {
+            var numText = text.slice(i + 1, numEnd - 1);
+            var denText = text.slice(denOpenIdx + 1, denEnd - 1);
+            var sep = text.slice(numEnd, denOpenIdx); // whitespace + "/" + whitespace, as written
+            var fPrefix = chunks[chunks.length - 1].text;
+            var fracDef = DEMO_SNIPPETS['frac'];
+            if (fracDef) {
+              pushSnippetIntro(chunks, fPrefix, fracDef, fracDef.prefix || 'frac', '()' + sep + '()');
+            } else {
+              pushChunk(chunks, fPrefix + '()' + sep + '()');
+            }
+            var numChunks = revealChunks(numText);
+            for (var nA = 1; nA < numChunks.length; nA++) {
+              pushChunk(chunks, fPrefix + '(' + numChunks[nA].text + ')' + sep + '()', numChunks[nA].dd, numChunks[nA].ddDef);
+            }
+            var denChunks = revealChunks(denText);
+            for (var dA = 1; dA < denChunks.length; dA++) {
+              pushChunk(chunks, fPrefix + '(' + numText + ')' + sep + '(' + denChunks[dA].text + ')', denChunks[dA].dd, denChunks[dA].ddDef);
+            }
+            i = denEnd;
+            continue;
+          }
+        }
+      }
+    }
+
+    pushChunk(chunks, chunks[chunks.length - 1].text + text[i]);
+    i++;
+  }
+  return chunks;
+}
+
+function buildFieldRevealSteps(text) {
+  var steps = [{ display: '', compileSafe: '' }];
+  var i = 0;
+  while (i < text.length) {
+    // Code fence NESTED inside this field's own content (e.g. a ```py
+    // block inside #example[...]) — place both fences immediately, then
+    // reveal the code between them, same trick as top-level fences get
+    // from detectSnippetTrigger. Without this, a fence inside a card's
+    // field just gets typed as plain characters with no special reveal.
+    var fenceM = /^```([a-zA-Z0-9_+-]*)\n/.exec(text.slice(i));
+    if (fenceM) {
+      var fenceOpen = fenceM[0];
+      var afterOpen = i + fenceOpen.length;
+      var closeMatch = /\n[ \t]*```/.exec(text.slice(afterOpen));
+      if (closeMatch) {
+        var fClose = closeMatch[0];
+        var closeIdx = afterOpen + closeMatch.index;
+        var code = text.slice(afterOpen, closeIdx);
+        var fPrefix = steps[steps.length - 1].display;
+        steps.push({ display: fPrefix + fenceOpen + fClose, compileSafe: fPrefix + fenceOpen + fClose });
+        for (var fk = 1; fk <= code.length; fk++) {
+          var fpc = code.slice(0, fk);
+          steps.push({
+            display:     fPrefix + fenceOpen + fpc + fClose,
+            compileSafe: fPrefix + fenceOpen + fpc + fClose,
+          });
+        }
+        i = closeIdx + fClose.length;
+        continue;
+      }
+    }
+    if (text[i] === '$') {
+      var close = text.indexOf('$', i + 1);
+      if (close === -1) {
+        var prev0 = steps[steps.length - 1];
+        steps.push({ display: prev0.display + text[i], compileSafe: prev0.compileSafe + text[i] });
+        i++;
+        continue;
+      }
+      var interior = text.slice(i + 1, close);
+      var prefix = steps[steps.length - 1].display;
+
+      // Typst renders "$ ... $" (space touching both delimiters) as DISPLAY
+      // math and "$...$" as INLINE math. If we just grew the interior left
+      // to right, the mandatory trailing space wouldn't appear until the
+      // very last character — so the whole span would render inline for
+      // the entire animation and only flip to display math on the final
+      // keystroke. Instead, detect a display span upfront and keep both
+      // boundary spaces present from the first step, only growing the core
+      // content between them.
+      var leadM  = interior.match(/^\s+/);
+      var trailM = interior.match(/\s+$/);
+      var isDisplay = !!leadM && !!trailM && leadM[0].length + trailM[0].length < interior.length + 1;
+      if (isDisplay) {
+        var lead  = leadM[0];
+        var trail = trailM[0];
+        var core  = interior.slice(lead.length, interior.length - trail.length);
+        steps.push({ display: prefix + '$' + lead + trail + '$', compileSafe: prefix + '$' + lead + trail + '$' });
+        var coreChunks = revealChunks(core);
+        for (var k = 1; k < coreChunks.length; k++) {
+          steps.push({
+            display:     prefix + '$' + lead + coreChunks[k].text + trail + '$',
+            compileSafe: prefix + '$' + lead + autoCloseMathInterior(coreChunks[k].text) + trail + '$',
+            dd: coreChunks[k].dd,
+            ddDef: coreChunks[k].ddDef,
+          });
+        }
+      } else {
+        steps.push({ display: prefix + '$$', compileSafe: prefix + '$$' });
+        var interiorChunks = revealChunks(interior);
+        for (var j = 1; j < interiorChunks.length; j++) {
+          steps.push({
+            display:     prefix + '$' + interiorChunks[j].text + '$',
+            compileSafe: prefix + '$' + autoCloseMathInterior(interiorChunks[j].text) + '$',
+            dd: interiorChunks[j].dd,
+            ddDef: interiorChunks[j].ddDef,
+          });
+        }
+      }
+      i = close + 1;
+      continue;
+    }
+
+    // *bold* / _italic_ — mimic typing the plain word first, then
+    // "selecting" it (highlighted, like double-clicking a word) and
+    // applying the formatting, rather than typing the markers inline as if
+    // they were just more characters.
+    if (text[i] === '*' || text[i] === '_') {
+      var marker = text[i];
+      var mClose = text.indexOf(marker, i + 1);
+      if (mClose !== -1) {
+        var inner = text.slice(i + 1, mClose);
+        var mPrefix = steps[steps.length - 1].display;
+        for (var mk = 1; mk <= inner.length; mk++) {
+          var mPartial = inner.slice(0, mk);
+          steps.push({ display: mPrefix + mPartial, compileSafe: mPrefix + mPartial });
+        }
+        // Hold the whole word highlighted (as if just selected) before the
+        // markers land — the sentinel-wrapped copy renders as a selection
+        // span in highlightTypstClient but compiles as the plain word.
+        steps.push({
+          display:     mPrefix + '' + inner + '',
+          compileSafe: mPrefix + inner,
+          holdMs: 550,
+        });
+        steps.push({
+          display:     mPrefix + marker + inner + marker,
+          compileSafe: mPrefix + marker + inner + marker,
+        });
+        i = mClose + 1;
+        continue;
+      }
+    }
+
+    var prev = steps[steps.length - 1];
+    steps.push({ display: prev.display + text[i], compileSafe: prev.compileSafe + text[i] });
+    i++;
+  }
+  return steps;
+}
+
+function startSnippetAnim(trigger) {
+  var segments = parseSnippetFields(trigger.def.body);
+  snippetAnim = {
+    trigger: trigger,
+    segments: segments,
+    order: fieldOrder(segments),
+    prefixCharPos: 0,
+    fieldIdx: 0,
+    fieldStep: 0,
+    fieldSteps: [{ display: '', compileSafe: '' }],
+    // Fences and #pseudo skip straight to placing the scaffold and typing
+    // its field — no prefix-typing/dropdown for something that isn't
+    // really "picked from a list" the way a card block snippet is.
+    phase: trigger.skipPrefix ? 'field-hold' : 'prefix',
+  };
+  renderCode();
+  scrollToBottom();
+  scheduleTick(trigger.skipPrefix ? CHAR_MS : TYPE_MS_FAST);
+}
+
+function ddRowsHtml(def) {
+  var alts = ['ion', 'ive'].map(function(suf) { return def.prefix + suf; });
+  return (
+    '<div class="dd-row active">' +
+      '<span class="dd-icon"></span>' +
+      '<span class="dd-prefix"><b>' + def.prefix + '</b></span>' +
+      '<span class="dd-desc">' + def.description + '</span>' +
+    '</div>' +
+    alts.map(function(a) {
+      return (
+        '<div class="dd-row">' +
+          '<span class="dd-icon abc">abc</span>' +
+          '<span class="dd-prefix"><b>' + def.prefix + '</b>' + a.slice(def.prefix.length) + '</span>' +
+        '</div>'
+      );
+    }).join('')
+  );
+}
+
+function positionDropdown(ddEl) {
+  var cursor = codeEl.querySelector('.cur');
+  if (!cursor || !editorBody) return;
+  var curRect  = cursor.getBoundingClientRect();
+  var bodyRect = editorBody.getBoundingClientRect();
+  ddEl.style.left = Math.max(0, curRect.left - bodyRect.left + editorBody.scrollLeft) + 'px';
+  ddEl.style.top  = (curRect.bottom - bodyRect.top + editorBody.scrollTop + 4) + 'px';
+}
+
+function showDropdown(def) {
+  var ddEl = document.getElementById('demo-dropdown');
+  ddEl.innerHTML = ddRowsHtml(def);
+  positionDropdown(ddEl);
+  ddEl.classList.add('visible');
+}
+
+function flashDropdown() {
+  var ddEl = document.getElementById('demo-dropdown');
+  var active = ddEl.querySelector('.dd-row.active');
+  if (active) active.classList.add('flash');
+}
+
+function hideDropdown() {
+  var ddEl = document.getElementById('demo-dropdown');
+  ddEl.classList.remove('visible', 'flash');
+  ddEl.innerHTML = '';
+}
+
+// HTML for the block currently being animated (prefix typing / dropdown / field fill)
+function renderSnippetAnimHtml(sa) {
+  // The cursor is embedded directly in this HTML (right after the prefix, or
+  // right after the currently-active field), never appended at the very end
+  // of the whole document the way plain typing does — otherwise it would
+  // sit past later, not-yet-reached fields/text instead of where typing is
+  // actually happening.
+  if (sa.phase === 'prefix' || sa.phase === 'dropdown' || sa.phase === 'select') {
+    return '<span class="ch-kw">' + escapeHtml(sa.trigger.prefix.slice(0, sa.prefixCharPos)) + '</span><span class="cur">▮</span>';
+  }
+  // field-hold / field-type / field-pause: render the snippet body, replacing
+  // each field placeholder with its real value as it gets "typed" over it.
+  var activeFieldIndex = sa.order[sa.fieldIdx];
+  return sa.segments.map(function(seg) {
+    if (seg.type === 'text') return highlightTypstClient(seg.value);
+    var fieldPos = sa.order.indexOf(seg.index);
+    var isDone   = fieldPos !== -1 && fieldPos < sa.fieldIdx;
+    var isActive = seg.index === activeFieldIndex;
+    var display;
+    if (isDone) {
+      display = sa.trigger.fields[fieldPos] || '';
+      return highlightTypstClient(display);
+    }
+    if (isActive) {
+      display = sa.phase === 'field-type' ? sa.fieldSteps[sa.fieldStep].display : seg.value;
+      return '<span class="ts-field ts-active">' + highlightTypstClient(display) + '</span><span class="cur">▮</span>';
+    }
+    return '<span class="ts-field">' + highlightTypstClient(seg.value) + '</span>';
+  }).join('');
+}
+
+// Plain (unhighlighted) reconstruction of the same content, used to build the
+// compiler source string — same field-fill rules as renderSnippetAnimHtml.
+function plainSnippetAnimText(sa) {
+  // Before the snippet is actually "chosen" from the dropdown, nothing but
+  // the prefix has really been typed yet — the real editor wouldn't compile
+  // the scaffold just because the autocomplete list is open. Matches what
+  // renderSnippetAnimHtml already shows on screen for these phases.
+  if (sa.phase === 'prefix' || sa.phase === 'dropdown' || sa.phase === 'select') {
+    return sa.trigger.prefix.slice(0, sa.prefixCharPos);
+  }
+  var activeFieldIndex = sa.order[sa.fieldIdx];
+  return sa.segments.map(function(seg) {
+    if (seg.type === 'text') return seg.value;
+    var fieldPos = sa.order.indexOf(seg.index);
+    var isDone   = fieldPos !== -1 && fieldPos < sa.fieldIdx;
+    if (isDone) return sa.trigger.fields[fieldPos] || '';
+    if (seg.index === activeFieldIndex) {
+      return sa.phase === 'field-type' ? sa.fieldSteps[sa.fieldStep].compileSafe : seg.value;
+    }
+    return seg.value;
+  }).join('');
+}
+
+function advanceSnippetAnim() {
+  var sa = snippetAnim;
+
+  if (sa.phase === 'prefix') {
+    sa.prefixCharPos++;
+    renderCode();
+    scrollToBottom();
+    if (sa.prefixCharPos < sa.trigger.prefix.length) {
+      scheduleTick(TYPE_MS_FAST);
+    } else {
+      sa.phase = 'dropdown';
+      showDropdown(sa.trigger.def);
+      scheduleTick(850);
+    }
+    return;
+  }
+
+  if (sa.phase === 'dropdown') {
+    sa.phase = 'select';
+    flashDropdown();
+    scheduleTick(220);
+    return;
+  }
+
+  if (sa.phase === 'select') {
+    hideDropdown();
+    sa.phase = 'field-hold';
+    renderCode();
+    scrollToBottom();
+    scheduleTick(450);
+    return;
+  }
+
+  if (sa.phase === 'field-hold') {
+    sa.phase = 'field-type';
+    sa.fieldSteps = buildFieldRevealSteps(sa.trigger.fields[sa.fieldIdx] || '');
+    sa.fieldStep = 0;
+    renderCode();
+    scrollToBottom();
+    scheduleTick(stepCharDelay(sa.fieldSteps[1], CHAR_MS));
+    return;
+  }
+
+  if (sa.phase === 'field-type') {
+    sa.fieldStep++;
+    renderCode();
+    scrollToBottom();
+    if (sa.fieldStep < sa.fieldSteps.length - 1) {
+      scheduleTick(applyStepDropdown(sa.fieldSteps[sa.fieldStep], CHAR_MS));
+      return;
+    }
+    sa.fieldIdx++;
+    if (sa.fieldIdx < sa.order.length) {
+      sa.phase = 'field-pause';
+      scheduleTick(300);
+    } else {
+      var end = sa.trigger.end;
+      setTimeout(function() {
+        charPos = end;
+        snippetAnim = null;
+        renderCode();
+        scrollToBottom();
+        scheduleTick(CHAR_MS);
+      }, 400);
+    }
+    return;
+  }
+
+  if (sa.phase === 'field-pause') {
+    sa.phase = 'field-hold';
+    renderCode();
+    scrollToBottom();
+    scheduleTick(300);
+    return;
+  }
+}
 
 // ── render ────────────────────────────────────────────────────────────────────
 function renderCode() {
   var demo          = DEMOS[di];
   var preambleLines = demo.lines.slice(0, demo.preamble + 1); // +1 for blank separator
-  var contentLines  = demo.lines.slice(demo.preamble + 1);
-  var contentFull   = contentLines.join('\n');
-  var contentTyped  = contentFull.slice(0, charPos) +
-    (snippetExpandPrefix ? snippetExpandPrefix.slice(0, snippetExpandChar) : '');
+  var contentFull   = demo.lines.slice(demo.preamble + 1).join('\n');
+  var beforeAnim    = contentFull.slice(0, charPos);
+  var animHtml      = '';
+  var animPlain     = '';
+  if (snippetAnim) {
+    animHtml  = renderSnippetAnimHtml(snippetAnim);
+    animPlain = plainSnippetAnimText(snippetAnim);
+  } else if (mathReveal) {
+    var mrStep = mathReveal.steps[mathReveal.step];
+    animHtml  = highlightTypstClient(mrStep.display);
+    animPlain = mrStep.compileSafe;
+  }
+  var plainSoFar    = beforeAnim + animPlain;
 
-  var displayText   = preambleLines.join('\n') + '\n' + contentTyped;
+  var displayText   = preambleLines.join('\n') + '\n' + plainSoFar;
   var allLines      = displayText.split('\n');
 
   // preamble rendered dim, content rendered normally
   var preambleHtml = '<span style="opacity:0.35">' + hl(preambleLines.join('\n')) + '</span>\n';
-  codeEl.innerHTML = preambleHtml + hl(contentTyped) + '<span class="cur">▮</span>';
+  // A snippet's own HTML already embeds the cursor at the field currently
+  // being typed (see renderSnippetAnimHtml) — appending another one here
+  // would put it after the whole scaffold instead, past fields not yet
+  // reached.
+  codeEl.innerHTML = preambleHtml + hl(beforeAnim) + animHtml + (snippetAnim ? '' : '<span class="cur">▮</span>');
   lineEl.innerHTML = Array.from({length: allLines.length}, function(_, i) {
     return '<span>' + (i+1) + '</span>';
   }).join('');
 
-  if (contentTyped.length > 0 && !snippetExpandPrefix) {
+  if (plainSoFar.length > 0) {
     var hidden = (demo.hiddenDefs || []).join('\n');
-    var src = hidden ? hidden + '\n' + contentTyped : contentTyped;
+    var src = hidden ? hidden + '\n' + plainSoFar : plainSoFar;
     triggerCompile(src);
   }
 }
 
 // ── animation loop ────────────────────────────────────────────────────────────
+// Every scheduled step goes through here so switching demos (or any other
+// state reset) can cancel a still-pending timer instead of leaving it to
+// fire later and silently double up with the new chain — that overlap was
+// the cause of typing speed compounding after clicking around demos.
+var tickTimer = null;
+function scheduleTick(ms) {
+  clearTimeout(tickTimer);
+  tickTimer = setTimeout(tick, ms);
+}
+
 function tick() {
   var contentLines = DEMOS[di].lines.slice(DEMOS[di].preamble + 1);
   var full = contentLines.join('\n');
 
   if (phase === 'typing') {
-    if (snippetExpandPrefix) {
-      snippetExpandChar++;
-      renderCode();
-      scrollToBottom();
-      if (snippetExpandChar < snippetExpandPrefix.length) {
-        setTimeout(tick, 70);
-      } else {
-        var end = snippetExpandEnd;
-        setTimeout(function() {
-          charPos = end;
-          snippetExpandPrefix = null;
-          snippetExpandChar   = 0;
-          renderCode();
-          scrollToBottom();
-          setTimeout(tick, CHAR_MS);
-        }, 260);
-      }
+    if (snippetAnim) {
+      advanceSnippetAnim();
+      return;
+    }
+    if (mathReveal) {
+      advanceMathReveal();
       return;
     }
 
     if (charPos < full.length) {
-      var atLineStart = charPos === 0 || full[charPos - 1] === '\n';
+      // Allow leading whitespace before the trigger (e.g. a ```py fence
+      // indented inside an #example[...] block) — only require nothing
+      // but whitespace typed so far on the current line.
+      var lineStart   = full.lastIndexOf('\n', charPos - 1) + 1;
+      var atLineStart = /^[ \t]*$/.test(full.slice(lineStart, charPos));
       var trigger = atLineStart ? detectSnippetTrigger(full, charPos) : null;
       if (trigger) {
-        snippetExpandPrefix = trigger.typed;
-        snippetExpandChar   = 0;
-        snippetExpandEnd    = trigger.end;
-        renderCode();
-        scrollToBottom();
-        setTimeout(tick, 70);
+        startSnippetAnim(trigger);
         return;
       }
+
+      // Display math ("$ ... $", space touching both delimiters) needs its
+      // trailing space present before Typst treats it as display rather
+      // than inline — typing through it one character at a time means it
+      // renders inline the whole time and only flips to display on the
+      // very last keystroke, which reads as a glitch. Reuse the same
+      // "place both $ first, then type the interior" trick already used
+      // for snippet fields, instead of just pasting the whole equation.
+      if (full[charPos] === '$' && /\s/.test(full[charPos + 1] || '')) {
+        var priorDollars = (full.slice(0, charPos).match(/\$/g) || []).length;
+        if (priorDollars % 2 === 0) {
+          var mathCloseIdx = full.indexOf('$', charPos + 1);
+          if (mathCloseIdx !== -1) {
+            mathReveal = {
+              spanStart: charPos,
+              spanEnd: mathCloseIdx + 1,
+              steps: buildFieldRevealSteps(full.slice(charPos, mathCloseIdx + 1)),
+              step: 0,
+            };
+            renderCode();
+            scrollToBottom();
+            scheduleTick(stepCharDelay(mathReveal.steps[1], CHAR_MS));
+            return;
+          }
+        }
+      }
+
+      // *bold* / _italic_ in plain prose — same "type the word, then
+      // select-and-apply the formatting" trick as buildFieldRevealSteps
+      // already does for field content.
+      if (full[charPos] === '*' || full[charPos] === '_') {
+        var emMarker = full[charPos];
+        var emClose = full.indexOf(emMarker, charPos + 1);
+        if (emClose !== -1) {
+          mathReveal = {
+            spanStart: charPos,
+            spanEnd: emClose + 1,
+            steps: buildFieldRevealSteps(full.slice(charPos, emClose + 1)),
+            step: 0,
+          };
+          renderCode();
+          scrollToBottom();
+          scheduleTick(stepCharDelay(mathReveal.steps[1], CHAR_MS));
+          return;
+        }
+      }
+
       charPos++;
       // rush past consecutive blank lines instantly
       while (charPos < full.length && full[charPos - 1] === '\n' && full[charPos] === '\n') {
@@ -860,16 +1706,20 @@ function tick() {
     }
     renderCode();
     scrollToBottom();
-    setTimeout(tick, charPos < full.length && full[charPos] === ' ' ? 10 : CHAR_MS);
+    // Rush through whitespace (spaces, tabs, indentation) — no reason to
+    // pace those at the same speed as real characters.
+    var justTyped = full[charPos - 1];
+    var justTypedIsSpace = justTyped === ' ' || justTyped === '\t';
+    scheduleTick(justTypedIsSpace ? 8 : CHAR_MS);
 
   } else if (phase === 'hold') {
     holdMs += 16;
     if (holdMs < HOLD_MS) {
-      setTimeout(tick, 16);
+      scheduleTick(16);
     } else {
       phase   = 'clearing';
       clearMs = 0;
-      setTimeout(tick, 16);
+      scheduleTick(16);
     }
 
   } else { // clearing
@@ -879,7 +1729,7 @@ function tick() {
     lineEl.style.opacity = 1 - t;
     outEl.style.opacity  = 1 - t;
     if (t < 1) {
-      setTimeout(tick, 16);
+      scheduleTick(16);
     } else {
       goToDemo((di + 1) % DEMOS.length);
     }
@@ -893,13 +1743,15 @@ function updatePickerActive() {
 }
 
 function goToDemo(index) {
+  clearTimeout(tickTimer);
   di      = index;
   charPos = 0;
   phase   = 'typing';
   holdMs  = 0;
   clearMs = 0;
-  snippetExpandPrefix = null;
-  snippetExpandChar   = 0;
+  if (snippetAnim) hideDropdown();
+  snippetAnim = null;
+  mathReveal  = null;
   compileBusy = false;
   pendingText = null;
   autoScroll  = true;
@@ -913,7 +1765,9 @@ function goToDemo(index) {
   codeEl.innerHTML = '<span class="cur">▮</span>';
   lineEl.innerHTML = '<span>1</span>';
   updatePickerActive();
-  setTimeout(tick, 300);
+  presizeWindow(DEMOS[di], function() {
+    scheduleTick(300);
+  });
 }
 
 document.querySelectorAll('.demo-picker-dot').forEach(function(btn) {
@@ -926,7 +1780,7 @@ document.querySelectorAll('.demo-picker-dot').forEach(function(btn) {
 window.__demoMeta = DEMOS[di];
 updatePickerActive();
 
-tick();
+presizeWindow(DEMOS[di], function() { tick(); });
 
 
 })();
@@ -940,15 +1794,79 @@ tick();
     var title  = (meta && meta.title)  || 'Course Notes';
     var course = (meta && meta.course) || '';
     return [
-      '#set page(width: 500pt, height: 350pt, margin: (x: 30pt, top: 38pt, bottom: 20pt))',
+      // height: auto — a fixed height would force a second page once content
+      // (e.g. a theorem/definition card) makes the note taller than one
+      // page, and typst.svg() renders all pages stacked into one SVG, which
+      // made fitOutputToBox() shrink everything to fit that taller image
+      // (looked like an unwanted "zoom out"). Auto keeps it exactly one
+      // page sized to its content, so the box never has to shrink for that.
+      '#set page(width: 500pt, height: auto, margin: (x: 30pt, top: 38pt, bottom: 20pt))',
       '#set text(size: 12pt, font: "New Computer Modern")',
       '#let loss = $cal(L)$',
       '#let apx = $approx$',
       '#let RR = $bb(R)$',
+      '#let EE = $bb(E)$',
       '#let mid = "|"',
       '#let px(f, x) = $(partial #f) / (partial #x)$',
-      '#let pv(f, x) = $(d #f) / (d #x)$',
-      '#let dx = $upright(d)x$',
+      '#let dv(f, x) = $(dif #f) / (dif #x)$',
+      '#let dx = $dif x$',
+      '#let norm(x) = $parallel #x parallel$',
+      '#let inv(x) = $#x^sans(-1)$',
+      // Real tempst shorthand, reused as-is (trivial, no external deps).
+      '#let summ(a, b, c) = $sum_(#a)^(#b) #c$',
+      '#let kplus = $k+1$',
+      '#let qquad = $quad quad$',
+      // Real sdust's #pseudo — pseudocode-list(body) from the actual
+      // lovelace package (fetched live via Snippet.fetchPackageRegistry(),
+      // same as codly), so this matches real sdust exactly instead of
+      // being a hand-rolled lookalike.
+      '#import "@preview/lovelace:0.3.0": *',
+      '#let pseudo(body) = {',
+      '  show math.equation.where(block: true): eq => block(width: 100%, align(center, eq))',
+      '  pseudocode-list(body)',
+      '}',
+      // Lightweight, self-contained stand-ins for sdust's theorem-style card
+      // blocks (matching its colors) — avoids importing the real sdust
+      // package here, which would pull in its full @preview dependency
+      // chain (fletcher, cetz, lovelace, ...) just for this preview pane.
+      '#let _card(title, header-fill, body-fill, border, body-text-fill, content) = block(',
+      '  width: 100%, stroke: 0.5pt + border, radius: 2pt, clip: true, inset: 0pt,',
+      '  stack(spacing: 0pt,',
+      '    block(width: 100%, above: 0pt, below: 0pt, fill: header-fill, inset: (left: 14pt, right: 14pt, top: 8pt, bottom: 8pt), text(fill: white, weight: "bold", size: 10.5pt, title)),',
+      '    block(width: 100%, above: 0pt, below: 0pt, fill: body-fill, inset: (left: 14pt, right: 14pt, top: 10pt, bottom: 10pt), { set text(fill: body-text-fill, size: 10.5pt); content }),',
+      '  ),',
+      ')',
+      // Auto-prefix card titles with their kind ("Definition: Matrix"),
+      // unless no custom title was given — then just the bare kind name.
+      '#let _labeled(kind, title) = if title == kind { kind } else { kind + ": " + title }',
+      '#let theorem(title: "Theorem", content) = _card(_labeled("Theorem", title), rgb("#1565c0"), rgb("#ecf3fc"), rgb("#b3cdeb"), rgb("#0d2e57"), content)',
+      '#let definition(title: "Definition", content) = _card(_labeled("Definition", title), rgb("#2e7d32"), rgb("#ecfdf5"), rgb("#a7f3d0"), rgb("#14532d"), content)',
+      '#let example(title: "Example", content) = _card(_labeled("Example", title), rgb("#c62828"), rgb("#fdeced"), rgb("#f2b9bc"), rgb("#5a1212"), content)',
+      '#let corollary(title: "Corollary", content) = _card(_labeled("Corollary", title), rgb("#6d28d9"), rgb("#f3ecfd"), rgb("#d8b9f2"), rgb("#3b1257"), content)',
+      '#let QED = [#h(1fr) $square$]',
+      '#let proof(title: "Proof", content) = _card(_labeled("Proof", title), rgb("#4b5563"), white, rgb("#d1d5db"), rgb("#1f2937"), [#content #QED])',
+      // Real codly (same as sdust's actual code-style), fetched live from
+      // the @preview registry via Snippet.fetchPackageRegistry() above.
+      '#import "@preview/codly:1.3.0": codly, codly-init, no-codly',
+      '#import "@preview/codly-languages:0.1.10": codly-languages',
+      '#show: codly-init',
+      '#codly(',
+      '  languages: codly-languages,',
+      '  zebra-fill: luma(246),',
+      '  display-name: true,',
+      '  display-icon: true,',
+      '  radius: 5pt,',
+      '  inset: (left: 6pt, right: 6pt, top: 4pt, bottom: 4pt),',
+      '  stroke: 0.8pt + luma(220),',
+      // codly leaves non-zebra rows transparent by default, so a code block
+      // nested inside a colored card (e.g. #example) let that card's tint
+      // bleed through every other line — force an opaque white base instead.
+      '  fill: white,',
+      ')',
+      '#show raw.where(block: false): it => box(',
+      '  fill: rgb("#eeeeee"), inset: (x: 3pt, y: 0pt), outset: (y: 3pt), radius: 2pt,',
+      '  text(fill: rgb("#1c1e26"), font: ("Menlo", "DejaVu Sans Mono"), size: 9pt, it),',
+      ')',
       '#set par(leading: 0.65em)',
       '#set block(spacing: 0.75em)',
       '#set math.equation(numbering: none)',
@@ -1002,6 +1920,13 @@ tick();
     typst.use(
       Snippet.preloadFontAssets({ assets: ['text'] })
     );
+
+    // Let real @preview packages (codly, codly-languages) resolve over the
+    // network, so the code blocks can use the actual codly styling instead
+    // of a hand-rolled lookalike.
+    try {
+      typst.use(await Snippet.fetchPackageRegistry());
+    } catch (e) { /* non-fatal — falls back to whatever's already cached */ }
 
     typst.setCompilerInitOptions({
       getModule: function() {
@@ -1218,7 +2143,8 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   margin-bottom: 2.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
   width: calc(100vw - 4rem);
-  aspect-ratio: 1000 / 350;
+  aspect-ratio: 1000 / 650; /* fixed size — never changed by JS, so it never grows/shrinks */
+  transition: height 0.25s ease;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
@@ -1305,12 +2231,27 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: #2a2a2a #111;
+  position: relative;
 }
 
 .editor-inner {
   display: flex;
   min-height: 100%;
 }
+
+.demo-snippet-dropdown {
+  position: absolute;
+  z-index: 5;
+  display: none;
+  min-width: 300px;
+  background: #1c1c1c;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+.demo-snippet-dropdown.visible { display: block; }
 
 .line-nums {
   display: flex;
@@ -1356,11 +2297,11 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 .output-body {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow: hidden; /* the window is always resized to fit content exactly — no scroll needed */
   padding: 16px;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   box-sizing: border-box;
 }
 
@@ -1369,7 +2310,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   background: #fff;
   transition: opacity 0.15s ease;
   overflow: hidden;
-  transform-origin: center center;
+  transform-origin: top center;
 }
 
 .render-out svg {
@@ -1630,6 +2571,12 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 :global(.ts-field.ts-active) {
   background: rgba(70, 140, 200, 0.5);
 }
+/* mimics a real editor's "select word" highlight, held briefly right
+   before emphasis markers wrap the word */
+:global(.word-sel) {
+  background: rgba(70, 140, 200, 0.5);
+  border-radius: 2px;
+}
 
 .note-row {
   display: flex;
@@ -1720,5 +2667,54 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   background: rgba(77,182,196,0.08);
   padding: 1px 4px;
   border-radius: 3px;
+}
+
+.package-import {
+  margin-top: 1rem;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+}
+.package-import .ce-code-wrap { min-height: 0; }
+
+.useful-package-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.9rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.useful-package-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+.useful-package-card:hover { border-color: var(--accent); }
+
+.useful-package-name {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.useful-package-card:hover .useful-package-name { color: var(--accent); }
+
+.useful-package-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.package-import .ce-code {
+  font-size: 0.82rem;
+  line-height: 22px;
+  padding: 12px 16px;
+}
+.package-import .ce-line-nums {
+  padding: 12px 8px;
+  line-height: 22px;
 }
 </style>

@@ -29,14 +29,29 @@
     "prefix": "grid",
     "body": [
       "#grid(",
-      "  columns: (${1:1fr, 1fr}),",
-      "  column-gutter: ${2:1em},",
-      "  row-gutter: ${3:1em},",
-      "  ${4:cell1}, ${5:cell2},",
+      "  columns: 2,",
+      "  column-gutter: 2em,",
+      "  rows: 2,",
+      "  row-gutter: 2em,",
+      "  ${1:cell1}, ${2:cell2},",
+      "  ${3:cell3}, ${4:cell4},",
       ")",
       "$0"
     ],
-    "description": "Grid layout with columns/gutters"
+    "description": "2x2 grid layout with columns/gutters"
+  },
+  "Table layout": {
+    "prefix": "table",
+    "body": [
+      "#table(",
+      "  columns: ${1:2},",
+      "  align: center + horizon,",
+      "  ${2:cell1}, ${3:cell2},",
+      "  ${4:cell3}, ${5:cell4},",
+      ")",
+      "$0"
+    ],
+    "description": "Table layout with columns"
   },
   "Theorem": {
     "prefix": "theorem",
@@ -67,6 +82,16 @@
       "$0"
     ],
     "description": "Red example block (sdust)"
+  },
+  "Corollary": {
+    "prefix": "corollary",
+    "body": [
+      "#corollary(title: \"${1:Corollary}\")[",
+      "  ${2:statement}",
+      "]",
+      "$0"
+    ],
+    "description": "Purple corollary block (sdust)"
   },
   "Proof": {
     "prefix": "proof",
@@ -146,16 +171,42 @@
     ],
     "description": "Induction proof template"
   },
+  "Graph (sdust)": {
+    "prefix": "graph",
+    "body": [
+      "#graph(",
+      "  nodes: (",
+      "    (pos: (0,0), label: \\$${1:1}\\$),",
+      "    (pos: (1,1), label: \\$${2:2}\\$),",
+      "    (pos: (2,0), label: \\$${3:3}\\$),",
+      "  ),",
+      "  edges: (",
+      "    ((0,0), (1,1)),",
+      "    ((1,1), (2,0)),",
+      "    ((0,0), (2,0)),",
+      "  ),",
+      "  caption: [${4:Caption text}],",
+      ")",
+      "$0"
+    ],
+    "description": "Node/edge graph diagram (sdust, fletcher-based)"
+  },
   "SDU template import": {
     "prefix": "sdust",
     "body": ["#import \"@local/sdust:0.1.0\": *",
              "$0"],
     "description": "Import the SDU temp.typ template"
   },
+  "Personal template import": {
+    "prefix": "tempst",
+    "body": ["#import \"@local/tempst:0.1.0\": *",
+             "$0"],
+    "description": "Import the SDU temp.typ template"
+  },
   "SDU note": {
     "prefix": "note",
     "body": [
-      "#import \"@local/sdust:0.1.0\": *",
+      "#import \"@local/tempst:0.1.0\": *",
       "#show: note.with(",
       "  title:         \"${1:Lecture Notes}\",",
       "  course:        \"${2:DM000 — Course Name}\",",
@@ -173,7 +224,7 @@
   "SDU exercise": {
     "prefix": "exercise",
     "body": [
-      "#import \"@local/sdust:0.1.0\": *",
+      "#import \"@local/tempst:0.1.0\": *",
       "#show: exercise.with(",
       "  title:         \"${1:Exercises 1}\",",
       "  course:        \"${2:DM000 — Course Name}\",",
@@ -191,23 +242,39 @@
   "SDU project": {
     "prefix": "project",
     "body": [
-      "#import \"@local/sdust:0.1.0\": *",
+      "#import \"@local/tempst:0.1.0\": *",
       "#show: project.with(",
-      "  title:         \"${1:Project Title}\",",
-      "  course:        \"${2:DM000 — Course Name}\",",
-      "  author:        \"${3:Simon Holm}\",",
-      "  date:          \"${4:date}\",",
-      "  group:         \"${5:Group no.}\",",
-      "  supervisor:    \"${6:Prof. Firstname Lastname}\",",
+      "  title:         \"${2:Project Title}\",",
+      "  subtitle:      \"${3:Project Subtitle}\",",
+      "  course:        \"${4:DM000 — Course Name}\",",
+      "  author:        \"${5:Simon Holm}\",",
+      "  date:          \"${6:date}\",",
+      "  group:         \"${7:Group no.}\",",
+      "  supervisor:    \"${8:Prof. Firstname Lastname}\",",
       "  university:    \"University of Southern Denmark\",",
       "  outline:       true,",
       "  outline-depth: 2,",
       ")",
-      "",
-      "= ${7:Introduction}",
       "$0"
     ],
     "description": "SDU project document template"
+  },
+  "SDU exam": {
+    "prefix": "exam",
+    "body": [
+      "#import \"@local/tempst:0.1.0\": *",
+      "#show: exam.with(",
+      "  title:         \"${2:Exam Title}\",",
+      "  course:        \"${4:DM000 — Course Name}\",",
+      "  author:        \"${5:Simon Holm}\",",
+      "  date:          \"${6:date}\",",
+      "  university:    \"University of Southern Denmark\",",
+      "  outline:       true,",
+      "  outline-depth: 2,",
+      ")",
+      "$0"
+    ],
+    "description": "SDU exam document template"
   },
   "Python code block": {
     "prefix": "pycode",
@@ -218,8 +285,17 @@
       "$0"
     ],
     "description": "Fenced Python code block"
-  }
-  ,
+  },
+  "Code block": {
+    "prefix": "code",
+    "body": [
+      "```${1:lang}",
+      "${2:code}",
+      "```",
+      "$0"
+    ],
+    "description": "Fenced code block, any language"
+  },
   "Output/terminal code block": {
   "prefix": "outcode",
     "body": [
@@ -229,5 +305,54 @@
       "$0"
     ],
     "description": "Fenced terminal style code block"
+  },
+  "enum a)": {
+  "prefix": "enuma",
+    "body": [
+      "#set enum(numbering: \"a)\")"
+    ],
+    "description": "Enum by a)"
+  },
+  "enum 1)": {
+  "prefix": "enum1",
+    "body": [
+      "#set enum(numbering: \"1.\")"
+    ],
+    "description": "Enum by 1"
+  },
+  "sum": {
+  "prefix": "sum",
+    "body": [
+      "sum_(${1:i=1})^(${2:n}) ${3:a_i}$0"
+    ],
+    "description": "native sum"
+  },
+  "integral": {
+  "prefix": "int",
+    "body": [
+      "integral_(${1:a})^(${2:b}) ${3:f(x) dif x}$0"
+    ],
+    "description": "native integral from a to b"
+  },
+  "product": {
+  "prefix": "prod",
+    "body": [
+      "product_(${1:i=1})^(${2:n}) ${3:a_i}$0"
+    ],
+    "description": "native product"
+  },
+  "limit": {
+  "prefix": "lim",
+    "body": [
+      "lim_(${1:x to a}) ${2:f(x)}$0"
+    ],
+    "description": "native fraction"
+  },
+  "fractions": {
+  "prefix": "frac",
+    "body": [
+      "(${1:})/(${2:})$0"
+    ],
+    "description": "native fraction"
   }
 }

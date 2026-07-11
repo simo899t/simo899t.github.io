@@ -1,31 +1,14 @@
-// PREAMBLE (lines 1-5 shown as #import/#show in the animation, not editable)
-// Edit the content below (after // ── CONTENT) to change the animation.
-// Run: bash public/demo/build.sh  — to regenerate the rendered SVGs.
-// Then push. The animation will reflect your changes automatically.
-#let loss = $cal(L)$
-#let px = $(partial)/(partial x)$
-#let pv(f, x) = $(partial #f)/(partial #x)$
-#let dx = $space upright(d)x$
-// ── CONTENT ──────────────────────────────────────────────────
-= Fundamental Theorem
+= Taylor Series
 
-If $f$ continuous on $[a, b]$, $F' = f$:
+#definition(title: "Taylor Series")[
+  If $f$ is infinitely differentiable at $a$, its Taylor series there is
+  $ f(x) = sum_(n=0)^(oo) (f^((n))(a)) / (n!) (x-a)^n $
+]
 
-$ integral_a^b f(x) dx = F(b) - F(a) $
+Centered at $a = 0$ this is the *Maclaurin series*:
+$ f(x) = f(0) + f'(0) x + (f''(0))/(2!) x^2 + (f'''(0))/(3!) x^3 + dots.c $
 
-= Chain Rule
+Some common Taylor expansions are
 
-For $h(x) = f(g(x))$:
-
-$ pv(h, x) = pv(f, g) dot pv(g, x) $
-
-= Backpropagation
-
-At layer $l$ with $z^((l)) = W^((l)) a^((l-1))$:
-
-$ px(loss, W^((l)))
-  = px(loss, z^((l)))
-  dot px(z^((l)), W^((l))) $
-
-where $px(loss, z^((l))) = delta^((l))$
-is the *error signal* at layer $l$.
+$ e^x &= sum_(n=0)^(oo) x^n/(n!) = 1 + x + x^2/(2!) + x^3/(3!) + dots.c \
+  sin x &= sum_(n=0)^(oo) (-1)^n x^(2n+1)/((2n+1)!) = x - x^3/(3!) + x^5/(5!) - dots.c $
