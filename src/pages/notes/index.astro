@@ -109,7 +109,7 @@ function resolveSnippetBody(body: string): string {
 
 // VSCode snippets — copy your typst.json into public/snippets/typst.json to show them here.
 // Only these snippets get an animated card; edit this list to change the selection.
-const SNIPPET_WHITELIST = ['Definition', 'Tree (tidy-tree)', 'SDU template import', 'Induction proof', 'Pseudocode algorithm', 'SDU note'];
+const SNIPPET_WHITELIST = ['Definition', 'Tree (tidy-tree)', 'SDU template import', 'Induction proof', 'Pseudocode algorithm', 'SDU note', 'tex math', 'uml diagram'];
 
 const snippetsPath = resolve('public/snippets/typst.json');
 let snippets: { name: string; prefix: string; body: string; expanded: string; description: string; json: string; height: number }[] = [];
@@ -202,7 +202,7 @@ const packages = [
     name: 'sdust',
     repo: 'https://github.com/simo899t/sdust',
     tag: 'SDU themed package',
-    desc: `A package for writing Typst documents faster: document templates (<code>note</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, <code>exam</code>), theorem-style blocks like <code>#theorem</code> and <code>#definition</code>, and helpers for graphs, trees, and pseudocode.`,
+    desc: `A package for writing Typst documents faster: document templates (<code>note</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, <code>exam</code>), theorem-style blocks like <code>#theorem</code> and <code>#definition</code>, helpers for graphs, trees, and pseudocode, <code>#tex[]</code> for dropping in raw LaTeX math (via mitex), and <code>#uml()</code> for quick list-format node/edge diagrams (via fletcher).`,
     importCode: '#import "@local/sdust:0.1.0": *\n#show: note.with(\n  title:  "Lecture Notes",\n  course: "DM000 — Course Name",\n)',
   },
   {
@@ -252,6 +252,7 @@ const usefulPackages = [
 
       <!-- Live Demo -->
       <div class="tab-panel active" id="panel-live-demo">
+        <p class="snippets-intro">This is a live demo showing how fast formatting a PDF in Typst can be with the right snippets and packages. It's animated to use may of the same shortcuts/snippets which i use in my writing (It may take a few seconds to load the first time).</p>
         <div class="demo-window">
           <div class="pane pane-src">
             <div class="titlebar">
@@ -2142,7 +2143,7 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   margin-top: 16px;
   margin-bottom: 2.5rem;
   box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-  width: calc(100vw - 4rem);
+  width: calc((100vw - 4rem) * 0.75);
   aspect-ratio: 1000 / 650; /* fixed size — never changed by JS, so it never grows/shrinks */
   transition: height 0.25s ease;
   position: relative;

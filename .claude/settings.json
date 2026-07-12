@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/simonholm/Library/Application Support/typst/packages/local/sdust/0.1.0/**)",
+      "Read(//Users/simonholm/GitHub/sdust/**)"
+    ]
+  }
+}
