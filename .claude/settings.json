@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Read(//Users/simonholm/Library/Application Support/typst/packages/local/sdust/0.1.0/**)",
-      "Read(//Users/simonholm/GitHub/sdust/**)"
+      "Read(//Users/simonholm/GitHub/sdust/**)",
+      "Read(//Users/simonholm/Library/Caches/typst/packages/preview/cetz/0.3.4/src/**)",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)"
+    ],
+    "additionalDirectories": [
+      "/Users/simonholm/GitHub/sdust",
+      "/Users/simonholm/Library/Application Support/Code/User/snippets"
     ]
   }
 }

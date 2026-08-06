@@ -246,13 +246,14 @@ const usefulPackages = [
       <button class="demo-tab" data-tab="assignment-examples">Assignment Examples</button>
       <button class="demo-tab" data-tab="snippets">Snippets</button>
       <button class="demo-tab" data-tab="my-packages">Packages</button>
+      <button class="demo-tab" data-tab="inkscape">Inkscape</button>
     </div>
 
     <div class="tab-panels">
 
       <!-- Live Demo -->
       <div class="tab-panel active" id="panel-live-demo">
-        <p class="snippets-intro">This is a live demo showing how fast formatting a PDF in Typst can be with the right snippets and packages. It's animated to use may of the same shortcuts/snippets which i use in my writing (It may take a few seconds to load the first time).</p>
+        <p class="snippets-intro">This is an animation, not a recording — it types out a document using the same snippets, shortcuts, and packages shown throughout this page, and is intended to illustrate the core advantages of Typst: fast formatting, reusable templates, and a much shorter feedback loop than traditional typesetting languages (it may take a few seconds to load the first time).</p>
         <div class="demo-window">
           <div class="pane pane-src">
             <div class="titlebar">
@@ -433,6 +434,21 @@ const usefulPackages = [
             </a>
           ))}
         </div>
+      </div>
+
+      <!-- Inkscape -->
+      <div class="tab-panel" id="panel-inkscape">
+        <p class="snippets-intro">Inkscape is a free, open-source vector graphics editor, comparable to tools such as Adobe Illustrator. I use it to produce figures and diagrams as SVG files. Because SVGs are stored as editable vector paths rather than fixed pixels, individual elements can be revised at any time without redrawing the figure from scratch. These SVGs are imported directly into my Typst documents via <code>#image()</code> and render at full resolution regardless of output size.</p>
+
+        <h2 class="blurb-heading">Creating figures with Inkscape</h2>
+        <video class="inkscape-video" autoplay loop muted playsinline preload="auto" poster="/videos/inkscape-poster.jpg">
+          <source src="/videos/inkscape-demo.mp4" type="video/mp4" />
+        </video>
+
+        <h2 class="blurb-heading">Editing figures with Inkscape</h2>
+        <video class="inkscape-video" autoplay loop muted playsinline preload="auto">
+          <source src="/videos/inkscape-edit-demo.mp4" type="video/mp4" />
+        </video>
       </div>
 
     </div>
@@ -2132,6 +2148,16 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
 }
 
 /* ── demo window ── */
+.inkscape-video {
+  display: block;
+  width: calc((100vw - 4rem) * 0.75);
+  max-width: 100%;
+  border-radius: 8px;
+  border: 1px solid #2a2a2a;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  margin: 16px auto 2.5rem;
+}
+
 .demo-window {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -381,7 +381,7 @@
   "tex math": {
     "prefix": "tex",
     "body": [
-      "#tex[${1:\\\\int_a^b f(x)\\\\,dx = F(b) - F(a)}]$0"
+      "#tex(`${1:\\\\int_a^b f(x)\\\\,dx = F(b) - F(a)}`)$0"
     ],
     "description": "raw LaTeX math via mitex"
   },
