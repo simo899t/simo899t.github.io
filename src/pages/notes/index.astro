@@ -441,10 +441,14 @@ const usefulPackages = [
         <p class="snippets-intro">Inkscape is a free, open-source vector graphics editor, comparable to tools such as Adobe Illustrator. I use it to produce figures and diagrams as SVG files. Because SVGs are stored as editable vector paths rather than fixed pixels, individual elements can be revised at any time without redrawing the figure from scratch. These SVGs are imported directly into my Typst documents via <code>#image()</code> and render at full resolution regardless of output size.</p>
 
         <h2 class="blurb-heading">Creating figures with Inkscape</h2>
-        <img class="inkscape-video" src="/videos/inkscape-demo.gif" alt="Creating a new figure in Inkscape" />
+        <video class="inkscape-video" autoplay loop muted playsinline preload="auto" poster="/videos/inkscape-poster.jpg">
+          <source src="/videos/inkscape-demo.mp4" type="video/mp4" />
+        </video>
 
         <h2 class="blurb-heading">Editing figures with Inkscape</h2>
-        <img class="inkscape-video" src="/videos/inkscape-edit-demo.gif" alt="Editing an existing figure in Inkscape" />
+        <video class="inkscape-video" autoplay loop muted playsinline preload="auto">
+          <source src="/videos/inkscape-edit-demo.mp4" type="video/mp4" />
+        </video>
 
         <h2 class="blurb-heading">How the workflow above is automated</h2>
         <p class="snippets-intro">Both clips rely on editor tooling rather than manual file management: an <a href="https://marketplace.visualstudio.com/items?itemName=draivin.hsnips" target="_blank">hsnips</a> snippet (<code>ink</code>) creates and opens new figures, and a VSCode task reopens existing ones. This setup is specific to VSCode, and the equivalent in another editor will look quite different.</p>
@@ -550,8 +554,9 @@ document.querySelectorAll('.demo-tab').forEach(btn => {
       initSnippetAnimations();
     }
     if (tab === 'inkscape') {
-      document.querySelectorAll('#panel-inkscape img.inkscape-video').forEach(img => {
-        img.src = img.src.split('?')[0] + '?t=' + Date.now();
+      document.querySelectorAll('#panel-inkscape video').forEach(v => {
+        v.currentTime = 0;
+        v.play();
       });
     }
   });
