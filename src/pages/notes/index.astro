@@ -229,7 +229,7 @@ const usefulPackages = [
     <div class="typst-blurb">
       <h1>How I write my notes</h1>
       <p>
-        All my lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a pair of packages I built myself to make documents easier to build — see the <strong>Packages</strong> tab below for details.
+        All my lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a pair of packages I built myself to make documents easier to build — see the <strong>Packages</strong> tab below for details. Figures and diagrams are produced separately as SVGs in <a href="https://inkscape.org/" target="_blank">Inkscape</a> and imported directly into the documents.
       </p>
 
       <h2 class="blurb-heading">What is Typst?</h2>
@@ -253,7 +253,7 @@ const usefulPackages = [
 
       <!-- Live Demo -->
       <div class="tab-panel active" id="panel-live-demo">
-        <p class="snippets-intro">This is an animation, not a recording — it types out a document using the same snippets, shortcuts, and packages shown throughout this page, and is intended to illustrate the core advantages of Typst: fast formatting, reusable templates, and a much shorter feedback loop than traditional typesetting languages (it may take a few seconds to load the first time).</p>
+        <p class="snippets-intro">This is an animation, not a screen recording. It types out a document using the same snippets, shortcuts, and packages shown throughout this page, and is intended to illustrate the core advantages of Typst: fast formatting, reusable templates, and a much shorter feedback loop than traditional typesetting languages. Note that it may take a few seconds to load the first time.</p>
         <div class="demo-window">
           <div class="pane pane-src">
             <div class="titlebar">
@@ -441,14 +441,91 @@ const usefulPackages = [
         <p class="snippets-intro">Inkscape is a free, open-source vector graphics editor, comparable to tools such as Adobe Illustrator. I use it to produce figures and diagrams as SVG files. Because SVGs are stored as editable vector paths rather than fixed pixels, individual elements can be revised at any time without redrawing the figure from scratch. These SVGs are imported directly into my Typst documents via <code>#image()</code> and render at full resolution regardless of output size.</p>
 
         <h2 class="blurb-heading">Creating figures with Inkscape</h2>
-        <video class="inkscape-video" autoplay loop muted playsinline preload="auto" poster="/videos/inkscape-poster.jpg">
-          <source src="/videos/inkscape-demo.mp4" type="video/mp4" />
-        </video>
+        <img class="inkscape-video" src="/videos/inkscape-demo.gif" alt="Creating a new figure in Inkscape" />
 
         <h2 class="blurb-heading">Editing figures with Inkscape</h2>
-        <video class="inkscape-video" autoplay loop muted playsinline preload="auto">
-          <source src="/videos/inkscape-edit-demo.mp4" type="video/mp4" />
-        </video>
+        <img class="inkscape-video" src="/videos/inkscape-edit-demo.gif" alt="Editing an existing figure in Inkscape" />
+
+        <h2 class="blurb-heading">How the workflow above is automated</h2>
+        <p class="snippets-intro">Both clips rely on editor tooling rather than manual file management: an <a href="https://marketplace.visualstudio.com/items?itemName=draivin.hsnips" target="_blank">hsnips</a> snippet (<code>ink</code>) creates and opens new figures, and a VSCode task reopens existing ones. This setup is specific to VSCode, and the equivalent in another editor will look quite different.</p>
+
+        <details class="script-details">
+          <summary>Snippet: <code>ink</code> (hsnips)</summary>
+          <pre class="script-code"><code>{`snippet ink "New Inkscape figure image (auto-create + open)"
+image("figures/\`\`
+const fs = require('fs');
+const pathMod = require('path');
+const cp = require('child_process');
+const filePath = decodeURIComponent(path.replace('file://', ''));
+const dir = pathMod.join(pathMod.dirname(filePath), 'figures');
+fs.mkdirSync(dir, { recursive: true });
+let n = 1;
+while (fs.existsSync(pathMod.join(dir, 'figure-' + n + '.svg'))) n++;
+const slug = 'figure-' + n;
+const svgPath = pathMod.join(dir, slug + '.svg');
+const template = '<?xml version="1.0" encoding="UTF-8"?>\\n' +
+  '<svg width="120mm" height="90mm" viewBox="0 0 120 90" xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd">\\n' +
+  '  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25" inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" inkscape:document-units="mm" inkscape:zoom="2.1166667" inkscape:cx="226.53543" inkscape:cy="170.07874" inkscape:window-width="1440" inkscape:window-height="900" inkscape:window-maximized="1" />\\n' +
+  '</svg>\\n';
+fs.writeFileSync(svgPath, template);
+cp.exec('/Applications/Inkscape.app/Contents/MacOS/inkscape -g "' + svgPath + '"');
+rv = slug;
+\`\`.svg")$0
+endsnippet`}</code></pre>
+        </details>
+
+        <p class="snippets-intro">Editing uses a task bound to <code>Cmd+Option+E</code>, which lists the SVGs in that document's <code>figures/</code> folder via <a href="https://github.com/junegunn/fzf" target="_blank">fzf</a> and opens the pick in Inkscape. <code>Cmd+S</code> there is a plain native save straight back to the same file, so the update shows up as soon as I switch back to the editor.</p>
+
+        <details class="script-details">
+          <summary>Keybinding: <code>Cmd+Option+E</code> (keybindings.json)</summary>
+          <pre class="script-code"><code>{`{
+  "key": "cmd+alt+e",
+  "command": "workbench.action.tasks.runTask",
+  "args": "Typst: Edit Figure",
+  "when": "editorLangId == 'typst'"
+}`}</code></pre>
+        </details>
+
+        <details class="script-details">
+          <summary>Task: "Typst: Edit Figure" (.vscode/tasks.json)</summary>
+          <pre class="script-code"><code>{`{
+  "label": "Typst: Edit Figure",
+  "type": "process",
+  "command": "\${env:HOME}/bin/typst-figure-edit.sh",
+  "args": ["\${fileDirname}/figures"],
+  "problemMatcher": [],
+  "presentation": {
+    "reveal": "always",
+    "panel": "dedicated",
+    "focus": true,
+    "close": true
+  }
+}`}</code></pre>
+        </details>
+
+        <details class="script-details">
+          <summary>Script: typst-figure-edit.sh</summary>
+          <pre class="script-code"><code>{`#!/bin/bash
+set -euo pipefail
+DIR="$1"
+
+if [ ! -d "$DIR" ] || [ -z "$(ls -A "$DIR"/*.svg 2>/dev/null)" ]; then
+  echo "No figures found in $DIR" >&2
+  exit 1
+fi
+
+SELECTED=$(cd "$DIR" && ls *.svg | fzf --prompt="Edit figure> " --height=40% --reverse)
+
+if [ -z "$SELECTED" ]; then
+  echo "No figure selected." >&2
+  exit 1
+fi
+
+open -a Inkscape "$DIR/$SELECTED"
+sleep 0.5
+osascript -e 'tell application "Inkscape" to activate'
+echo "Opened $DIR/$SELECTED in Inkscape."`}</code></pre>
+        </details>
       </div>
 
     </div>
@@ -471,6 +548,11 @@ document.querySelectorAll('.demo-tab').forEach(btn => {
     if (tab === 'snippets' && !snippetAnimsStarted) {
       snippetAnimsStarted = true;
       initSnippetAnimations();
+    }
+    if (tab === 'inkscape') {
+      document.querySelectorAll('#panel-inkscape img.inkscape-video').forEach(img => {
+        img.src = img.src.split('?')[0] + '?t=' + Date.now();
+      });
     }
   });
 });
@@ -2374,6 +2456,47 @@ h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 0.35rem; }
   background: rgba(192, 112, 58, 0.1);
   padding: 1px 5px;
   border-radius: 3px;
+}
+
+.script-details {
+  margin: 0.5rem 0 1.25rem;
+  border: 1px solid #2a2a2a;
+  border-radius: 6px;
+  overflow: clip;
+}
+.script-details summary {
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: #141414;
+  list-style: none;
+}
+.script-details summary::-webkit-details-marker { display: none; }
+.script-details summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.15s ease;
+}
+.script-details[open] summary::before {
+  transform: rotate(90deg);
+}
+.script-details summary code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+.script-code {
+  margin: 0;
+  padding: 12px 14px;
+  background: #0d0d0d;
+  color: #ddd;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: pre;
 }
 
 .snippets-paths {
