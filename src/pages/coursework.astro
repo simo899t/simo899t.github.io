@@ -1,0 +1,259 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+// Built by scripts/generate_notes_manifest.py in the SDU repo and synced here
+// by that repo's "Publish notes hub" workflow. See public/coursework/manifest.json.
+let manifest: any = { semesters: [], count: 0, generated: null };
+try {
+  manifest = JSON.parse(readFileSync(resolve('public/coursework/manifest.json'), 'utf8'));
+} catch {
+  // manifest not synced yet — page renders an empty state
+}
+
+const semesters = manifest.semesters ?? [];
+const generated = manifest.generated
+  ? new Date(manifest.generated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+  : null;
+
+const SECTION_ORDER = ['Lectures', 'Exercises', 'Exam prep', 'Projects', 'Exams', 'Other'];
+function orderSections(sections: any[]) {
+  return [...sections].sort(
+    (a, b) => (SECTION_ORDER.indexOf(a.name) + 99) % 99 - (SECTION_ORDER.indexOf(b.name) + 99) % 99
+  );
+}
+---
+
+<Layout title="Coursework" description="Every lecture note, exercise and assignment from my degree, as compiled PDFs.">
+  <div class="container page">
+    <header class="cw-head">
+      <h1>Coursework</h1>
+      <p>
+        Every set of lecture notes, exercise solution and assignment I wrote during my
+        Computer Science / AI degree at SDU — {manifest.count} compiled PDFs, organised by
+        semester and course. Each one links to its Typst source on GitHub. Curious how these
+        are written? See <a href="/notes">how I write my notes</a>.
+      </p>
+      {generated && <p class="cw-generated">Last synced {generated}</p>}
+    </header>
+
+    {semesters.length === 0 ? (
+      <p class="cw-empty">The manifest hasn't been synced yet — check back shortly.</p>
+    ) : (
+      <>
+        <div class="cw-controls">
+          <input id="cw-search" type="search" placeholder="Filter by course or title…" autocomplete="off" />
+          <div class="cw-pills" id="cw-pills">
+            <button class="cw-pill active" data-sem="all">all</button>
+            {semesters.map((s: any) => (
+              <button class="cw-pill" data-sem={s.semester}>{s.semester.replace('. semester', '')}</button>
+            ))}
+          </div>
+        </div>
+
+        <div id="cw-list">
+          {semesters.map((s: any) => (
+            <section class="cw-sem" data-sem={s.semester}>
+              <h2 class="cw-sem-title">{s.semester}</h2>
+              {s.courses.map((c: any) => (
+                <article class="cw-course" data-search={`${c.code} ${c.name}`.toLowerCase()}>
+                  <div class="cw-course-head">
+                    <span class="cw-code">{c.code}</span>
+                    <span class="cw-name">{c.name}</span>
+                  </div>
+                  {orderSections(c.sections).map((sec: any) => (
+                    <div class="cw-section">
+                      <span class="cw-section-label">{sec.name}</span>
+                      <ul class="cw-items">
+                        {sec.items.map((it: any) => (
+                          <li class="cw-item" data-search={`${c.code} ${c.name} ${it.title}`.toLowerCase()}>
+                            <a class="cw-item-main" href={`/coursework/${it.pdf}`} target="_blank" rel="noopener">
+                              <span class="cw-item-title">{it.title}</span>
+                              {it.description && <span class="cw-item-desc">{it.description}</span>}
+                            </a>
+                            <span class="cw-item-links">
+                              <a href={`/coursework/${it.pdf}`} target="_blank" rel="noopener" class="cw-tag pdf">PDF</a>
+                              <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </article>
+              ))}
+            </section>
+          ))}
+        </div>
+        <p class="cw-noresults" id="cw-noresults" hidden>No notes match that filter.</p>
+      </>
+    )}
+  </div>
+</Layout>
+
+<style>
+  .cw-head { margin-bottom: 2rem; }
+  .cw-head h1 { font-size: 1.5rem; margin-bottom: 0.6rem; }
+  .cw-head p { font-size: 0.9rem; }
+  .cw-generated { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); margin-top: 0.4rem; }
+  .cw-empty, .cw-noresults { color: var(--text-muted); font-size: 0.875rem; }
+
+  .cw-controls {
+    position: sticky; top: 0; z-index: 3;
+    background: var(--bg);
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+  #cw-search {
+    width: 100%;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 5px;
+  }
+  #cw-search:focus { outline: none; border-color: var(--accent); }
+
+  .cw-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem; }
+  .cw-pill {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .cw-pill:hover { color: var(--text-muted); }
+  .cw-pill.active { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+
+  .cw-sem { margin-bottom: 2.5rem; }
+  .cw-sem-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-transform: lowercase;
+    letter-spacing: 0.04em;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.1rem;
+  }
+
+  .cw-course {
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.9rem;
+    background: linear-gradient(180deg, var(--bg-2), var(--bg));
+    transition: border-color 0.12s;
+  }
+  .cw-course:hover { border-color: #3a3a3a; }
+  .cw-course-head { display: flex; align-items: baseline; gap: 0.55rem; margin-bottom: 0.75rem; }
+  .cw-code {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 0.05rem 0.35rem;
+    flex-shrink: 0;
+  }
+  .cw-name { font-size: 0.95rem; color: var(--text); font-weight: 600; }
+
+  .cw-section { margin-bottom: 0.7rem; }
+  .cw-section:last-child { margin-bottom: 0; }
+  .cw-section-label {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-dim);
+  }
+  .cw-items { list-style: none; margin: 0.3rem 0 0; }
+
+  .cw-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .cw-item:last-child { border-bottom: none; }
+  .cw-item-main { display: flex; flex-direction: column; min-width: 0; }
+  .cw-item-title { font-size: 0.85rem; color: var(--text); }
+  .cw-item-main:hover .cw-item-title { color: var(--accent); text-decoration: none; }
+  .cw-item-desc { font-size: 0.75rem; color: var(--text-muted); }
+  .cw-item-links { display: flex; gap: 0.4rem; flex-shrink: 0; }
+  .cw-tag {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    padding: 0.12rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .cw-tag.pdf:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+  .cw-tag.src:hover { color: var(--text); border-color: var(--text-muted); text-decoration: none; }
+
+  @media (max-width: 480px) {
+    .cw-item { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    const search = document.getElementById('cw-search');
+    const pills = document.getElementById('cw-pills');
+    const noresults = document.getElementById('cw-noresults');
+    if (!search || !pills) return;
+    let sem = 'all';
+    let q = '';
+
+    function apply() {
+      let anyVisible = false;
+      document.querySelectorAll('.cw-sem').forEach(function (semEl) {
+        const semOk = sem === 'all' || semEl.getAttribute('data-sem') === sem;
+        let semVisible = false;
+        semEl.querySelectorAll('.cw-course').forEach(function (courseEl) {
+          const courseHay = courseEl.getAttribute('data-search') || '';
+          let courseVisible = false;
+          courseEl.querySelectorAll('.cw-item').forEach(function (itemEl) {
+            const hay = itemEl.getAttribute('data-search') || '';
+            const ok = semOk && (q === '' || hay.indexOf(q) !== -1 || courseHay.indexOf(q) !== -1);
+            itemEl.hidden = !ok;
+            if (ok) courseVisible = true;
+          });
+          courseEl.querySelectorAll('.cw-section').forEach(function (secEl) {
+            const hasVisible = secEl.querySelector('.cw-item:not([hidden])');
+            secEl.hidden = !hasVisible;
+          });
+          courseEl.hidden = !courseVisible;
+          if (courseVisible) semVisible = true;
+        });
+        semEl.hidden = !semVisible;
+        if (semVisible) anyVisible = true;
+      });
+      if (noresults) noresults.hidden = anyVisible;
+    }
+
+    search.addEventListener('input', function () {
+      q = search.value.trim().toLowerCase();
+      apply();
+    });
+    pills.addEventListener('click', function (e) {
+      const btn = e.target.closest('.cw-pill');
+      if (!btn) return;
+      pills.querySelectorAll('.cw-pill').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      sem = btn.getAttribute('data-sem');
+      apply();
+    });
+  })();
+</script>
