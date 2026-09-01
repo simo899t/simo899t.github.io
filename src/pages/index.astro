@@ -1,5 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+const GITHUB_USER = 'simo899t';
+const socials = [
+  { label: 'GitHub', href: `https://github.com/${GITHUB_USER}` },
+  { label: 'IMADA Fagråd', href: 'https://imadafagraad.dk' },
+  { label: 'CV', href: '/cv' },
+];
 ---
 
 <Layout title="Simon Holm" description="AI student at SDU. Chairperson of IMADA Fagråd.">
@@ -7,35 +14,52 @@ import Layout from '../layouts/Layout.astro';
 
     <div class="layout">
       <div class="content">
+        <p class="eyebrow">AI &amp; Computer Science · SDU Odense</p>
         <h1><strong>Simon</strong> Holm</h1>
 
         <p>
-          4th-semester AI student at SDU. I'm very passionate about machine learning, with a key interest in mechanistic interpretability and
-          Danish and European AI/technology sovereignty.
+          AI student at SDU, passionate about machine learning with a key interest in
+          mechanistic interpretability and Danish and European AI/technology sovereignty.
         </p>
         <p>
-          I chair the <a href="https://imadafagraad.dk" target="_blank">IMADA Fagråd</a>, a student council
-          for the institute of math &amp; computer science at my university. Outside that my main interests are: Math, science-fiction, music, gaming.
+          I chair the <a href="https://imadafagraad.dk" target="_blank">IMADA Fagråd</a>, the
+          student council for the institute of math &amp; computer science at my university.
+          Outside that: math, science-fiction, music, gaming.
         </p>
         <p>
-          I write study notes and assignments using <a href="https://typst.app" target="_blank">Typst</a>.
-          If you want to learn the how to do it like i and many others, check out <a href="https://simo899t.github.io/notes/" target="_blank">my notes preview</a> or play my browser game:
-          <a href="https://simo899t.github.io/typstnique" target="_blank">Typstnique</a>.
+          I write my study notes and assignments in <a href="https://typst.app" target="_blank">Typst</a>.
+          See <a href="/notes">how I do it</a>, browse <a href="/coursework">all my coursework</a>,
+          or play my browser game <a href="/typstnique">Typstnique</a>.
         </p>
       </div>
 
-      <div class="sidebar">
-        <img src="/profile.png" alt="Simon Holm" class="photo" />
-        <p class="address">Institute of Mathematics and Computer Science, SDU<br />Odense, Denmark</p>
-      </div>
+      <aside class="sidebar">
+        <div class="photo-ring">
+          <img src="/profile.png" alt="Simon Holm" class="photo" />
+        </div>
+        <p class="address">Institute of Mathematics<br />and Computer Science, SDU<br />Odense, Denmark</p>
+        <div class="socials">
+          {socials.map((s) => (
+            <a href={s.href} target={s.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{s.label}</a>
+          ))}
+        </div>
+      </aside>
     </div>
 
-    <div class="links">
-      <a href="/projects">Projects</a>
-      <a href="/cv">CV</a>
-      <a href="/notes">Notes</a>
-      <a href="/contact">Contact</a>
-    </div>
+    <section class="contrib" id="contrib" data-user={GITHUB_USER} hidden>
+      <div class="contrib-head">
+        <h2>GitHub activity</h2>
+        <span class="contrib-total" id="contrib-total"></span>
+      </div>
+      <div class="contrib-scroll">
+        <div class="contrib-grid" id="contrib-grid"></div>
+      </div>
+      <div class="contrib-legend">
+        <span>Less</span>
+        <i data-level="0"></i><i data-level="1"></i><i data-level="2"></i><i data-level="3"></i><i data-level="4"></i>
+        <span>More</span>
+      </div>
+    </section>
 
   </div>
 </Layout>
@@ -43,23 +67,31 @@ import Layout from '../layouts/Layout.astro';
 <style>
 .layout {
   display: grid;
-  grid-template-columns: 1fr 180px;
+  grid-template-columns: 1fr 200px;
   gap: 3rem;
   align-items: start;
   padding-top: 1.5rem;
 }
 
-h1 {
-  font-size: 2.2rem;
-  font-weight: 300;
-  letter-spacing: -0.01em;
-  margin-bottom: 1.25rem;
-  line-height: 1.2;
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
 }
 
+h1 {
+  font-size: 2.4rem;
+  font-weight: 300;
+  letter-spacing: -0.015em;
+  margin-bottom: 1.25rem;
+  line-height: 1.15;
+}
 h1 strong { font-weight: 700; }
 
-p {
+.content p {
   font-size: 0.9rem;
   margin-bottom: 0.9rem;
   color: var(--text-muted);
@@ -70,45 +102,146 @@ p {
   flex-direction: column;
   align-items: center;
   gap: 0.9rem;
-  padding-top: 0.5rem;
+  padding-top: 0.25rem;
 }
 
+.photo-ring {
+  padding: 3px;
+  border-radius: 50%;
+  background: conic-gradient(from 210deg, var(--accent), #6d5bd0, var(--accent));
+}
 .photo {
-  width: 150px;
-  height: 150px;
+  width: 154px;
+  height: 154px;
   border-radius: 50%;
   object-fit: cover;
+  display: block;
+  border: 3px solid var(--bg);
 }
 
 .address {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   color: var(--text-dim);
   text-align: center;
   line-height: 1.7;
   margin: 0;
 }
 
-.links {
+.socials {
   display: flex;
-  gap: 1.25rem;
-  margin-top: 1.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 0.75rem;
 }
-
-.links a {
-  font-size: 0.875rem;
+.socials a {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   color: var(--text-muted);
 }
+.socials a:hover { color: var(--text); text-decoration: none; }
 
-.links a:hover {
-  color: var(--text);
-  text-decoration: none;
+/* GitHub contributions */
+.contrib {
+  margin-top: 3rem;
+  padding: 1.1rem 1.25rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: linear-gradient(180deg, var(--bg-2), var(--bg));
 }
+.contrib-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+.contrib-head h2 { font-size: 0.95rem; }
+.contrib-total { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); }
+
+.contrib-scroll { overflow-x: auto; padding-bottom: 0.3rem; }
+.contrib-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 11px);
+  grid-auto-columns: 11px;
+  gap: 3px;
+  min-width: max-content;
+}
+.contrib-grid i {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+}
+.contrib-grid i[data-level="1"] { background: rgba(77,182,196,0.30); border-color: transparent; }
+.contrib-grid i[data-level="2"] { background: rgba(77,182,196,0.52); border-color: transparent; }
+.contrib-grid i[data-level="3"] { background: rgba(77,182,196,0.74); border-color: transparent; }
+.contrib-grid i[data-level="4"] { background: rgba(77,182,196,1);    border-color: transparent; }
+
+.contrib-legend {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--text-dim);
+}
+.contrib-legend span { margin: 0 0.35rem; }
+.contrib-legend i {
+  width: 11px; height: 11px; border-radius: 2px;
+  background: var(--bg-2); border: 1px solid var(--border);
+}
+.contrib-legend i[data-level="1"] { background: rgba(77,182,196,0.30); border-color: transparent; }
+.contrib-legend i[data-level="2"] { background: rgba(77,182,196,0.52); border-color: transparent; }
+.contrib-legend i[data-level="3"] { background: rgba(77,182,196,0.74); border-color: transparent; }
+.contrib-legend i[data-level="4"] { background: rgba(77,182,196,1);    border-color: transparent; }
 
 @media (max-width: 560px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar { flex-direction: row; align-items: center; gap: 1.25rem; }
-  .photo { width: 72px; height: 72px; }
+  .layout { grid-template-columns: 1fr; gap: 1.75rem; }
+  .sidebar { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 1rem; }
+  .photo-ring { align-self: flex-start; }
+  .photo { width: 84px; height: 84px; }
   .address { text-align: left; }
+  .socials { justify-content: flex-start; }
 }
 </style>
+
+<script is:inline>
+  (function () {
+    const el = document.getElementById('contrib');
+    if (!el) return;
+    const user = el.dataset.user;
+    const grid = document.getElementById('contrib-grid');
+    const totalEl = document.getElementById('contrib-total');
+
+    fetch('https://github-contributions-api.jogruber.de/v4/' + user + '?y=last')
+      .then(function (r) { if (!r.ok) throw new Error('bad status'); return r.json(); })
+      .then(function (data) {
+        const days = (data && data.contributions) || [];
+        if (!days.length) return;
+
+        // pad so the first column starts on Sunday (getDay() === 0)
+        const firstDow = new Date(days[0].date + 'T00:00:00').getDay();
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < firstDow; i++) {
+          const pad = document.createElement('i');
+          pad.style.visibility = 'hidden';
+          frag.appendChild(pad);
+        }
+        let total = 0;
+        days.forEach(function (d) {
+          total += d.count || 0;
+          const cell = document.createElement('i');
+          cell.setAttribute('data-level', String(d.level || 0));
+          cell.title = d.count + ' on ' + d.date;
+          frag.appendChild(cell);
+        });
+        grid.appendChild(frag);
+        if (totalEl) totalEl.textContent = total.toLocaleString() + ' contributions in the last year';
+        el.hidden = false;
+      })
+      .catch(function () { /* leave the widget hidden on failure */ });
+  })();
+</script>
