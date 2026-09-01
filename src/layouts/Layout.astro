@@ -21,8 +21,18 @@ const isActive = (href: string) =>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content={description} />
+  <meta name="theme-color" content="#141414" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fdfdfc" media="(prefers-color-scheme: light)" />
   <title>{title === 'Simon Holm' ? 'Simon Holm' : `${title} — Simon Holm`}</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <script is:inline>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <nav>
@@ -35,6 +45,12 @@ const isActive = (href: string) =>
         <li><a href="/notes"    class={isActive('/notes')    ? 'active' : ''}>notes</a></li>
         <li><a href="/coursework" class={isActive('/coursework') ? 'active' : ''}>coursework</a></li>
         <li><a href="/contact"  class={isActive('/contact')  ? 'active' : ''}>contact</a></li>
+        <li>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle colour theme" title="Toggle colour theme">
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          </button>
+        </li>
       </ul>
     </div>
   </nav>
@@ -51,7 +67,25 @@ const isActive = (href: string) =>
 </body>
 </html>
 
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var root = document.documentElement;
+      var current = root.getAttribute('data-theme');
+      if (!current) {
+        current = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      var next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+  })();
+</script>
+
 <script>
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.getElementById('plexus') as HTMLCanvasElement;
 const ctx    = canvas.getContext('2d')!;
 const dpr    = window.devicePixelRatio || 1;
@@ -140,8 +174,10 @@ function firePass() {
   }
 }
 
-firePass();
-setInterval(firePass, LAYERS.length * 900 + 1400);
+if (!prefersReducedMotion) {
+  firePass();
+  setInterval(firePass, LAYERS.length * 900 + 1400);
+}
 
 // ── draw ─────────────────────────────────────────────
 function draw() {
@@ -221,7 +257,7 @@ function draw() {
 function tick() { draw(); requestAnimationFrame(tick); }
 resize();
 window.addEventListener('resize', resize);
-tick();
+if (prefersReducedMotion) { draw(); } else { tick(); }
 </script>
 
 <style is:global>
@@ -240,5 +276,4 @@ tick();
 }
 
 main { position: relative; z-index: 1; }
-nav  { position: relative; z-index: 2; }
 </style>

@@ -1,36 +1,100 @@
+/* ── Theme tokens ─────────────────────────────────────
+   Dark is the default. Light applies when the viewer
+   picks it (data-theme="light") or their OS prefers it
+   and they haven't overridden to dark.                */
 :root {
   --bg:         #141414;
   --bg-2:       #1e1e1e;
+  --bg-elev:    #242424;
   --border:     #2a2a2a;
-  --text:       #d0d0d0;
-  --text-muted: #888;
-  --text-dim:   #555;
+  --border-2:   #3a3a3a;
+  --text:       #e4e4e4;
+  --text-muted: #9a9a9a;
+  --text-dim:   #6a6a6a;
   --accent:     #4db6c4;
+  --accent-2:   #6d5bd0;
+  --accent-rgb: 77, 182, 196;
+  --selection:  rgba(77, 182, 196, 0.25);
+  --shadow:     0 1px 2px rgba(0, 0, 0, 0.4);
+
   --font-sans:  system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:  'Consolas', 'Menlo', 'Courier New', monospace;
+  --font-mono:  ui-monospace, 'SF Mono', 'Consolas', 'Menlo', monospace;
   --font-size:  15px;
   --max-w:      660px;
+
+  --ease:       cubic-bezier(0.4, 0, 0.2, 1);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:         #fdfdfc;
+    --bg-2:       #f4f4f2;
+    --bg-elev:    #ffffff;
+    --border:     #e4e4e0;
+    --border-2:   #d0d0ca;
+    --text:       #1c1c1c;
+    --text-muted: #575757;
+    --text-dim:   #8a8a86;
+    --accent:     #2b8f9e;
+    --accent-2:   #5a49b8;
+    --selection:  rgba(43, 143, 158, 0.18);
+    --shadow:     0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+    color-scheme: light;
+  }
+}
+
+:root[data-theme="light"] {
+  --bg:         #fdfdfc;
+  --bg-2:       #f4f4f2;
+  --bg-elev:    #ffffff;
+  --border:     #e4e4e0;
+  --border-2:   #d0d0ca;
+  --text:       #1c1c1c;
+  --text-muted: #575757;
+  --text-dim:   #8a8a86;
+  --accent:     #2b8f9e;
+  --accent-2:   #5a49b8;
+  --selection:  rgba(43, 143, 158, 0.18);
+  --shadow:     0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+  color-scheme: light;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
 html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: 15px;
+  font-size: var(--font-size);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
 }
 
-a { color: var(--accent); text-decoration: none; }
+::selection { background: var(--selection); }
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s var(--ease);
+}
 a:hover { text-decoration: underline; }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
 
 h1, h2, h3 {
   color: var(--text);
   font-weight: 600;
   line-height: 1.3;
+  text-wrap: balance;
 }
 
 p { color: var(--text-muted); }
@@ -56,12 +120,39 @@ hr {
   padding: 0 1.25rem;
 }
 
-.page { padding: 3.5rem 0 5rem; }
+.page {
+  padding: 3.5rem 0 5rem;
+  animation: page-in 0.4s var(--ease) both;
+}
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Shared inner-page header — keeps h1 sizing consistent
+   across projects / cv / notes / coursework / contact. */
+.page-title {
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.4rem;
+}
+.page-lead {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 2.5rem;
+  max-width: 52ch;
+}
 
 /* Nav */
 nav {
   border-bottom: 1px solid var(--border);
-  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: saturate(1.4) blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .nav-inner {
@@ -71,20 +162,24 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
 }
 
 .nav-logo {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   color: var(--text-muted) !important;
+  white-space: nowrap;
 }
-
 .nav-logo:hover { color: var(--text) !important; text-decoration: none; }
 
 .nav-links {
   display: flex;
-  gap: 1.25rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.6rem 1.1rem;
   list-style: none;
+  align-items: center;
 }
 
 .nav-links a {
@@ -92,6 +187,19 @@ nav {
   color: var(--text-dim);
   font-family: var(--font-mono);
   opacity: 1 !important;
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.18s var(--ease);
 }
 
 .nav-links a:hover,
@@ -99,11 +207,42 @@ nav {
   color: var(--text);
   text-decoration: none;
 }
+.nav-links a:hover::after,
+.nav-links a.active::after { transform: scaleX(1); }
+
+/* Theme toggle */
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+}
+.theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-2);
+  background: var(--bg-2);
+}
+.theme-toggle svg { width: 14px; height: 14px; display: block; }
+.theme-toggle .icon-sun  { display: none; }
+.theme-toggle .icon-moon { display: block; }
+:root[data-theme="light"] .theme-toggle .icon-sun  { display: block; }
+:root[data-theme="light"] .theme-toggle .icon-moon { display: none; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .theme-toggle .icon-sun  { display: block; }
+  :root:not([data-theme="dark"]) .theme-toggle .icon-moon { display: none; }
+}
 
 /* Footer */
 footer {
   border-top: 1px solid var(--border);
-  padding: 1.5rem 1.25rem;
+  padding: 1.75rem 1.25rem;
   text-align: center;
 }
 
@@ -133,4 +272,13 @@ footer a:hover { color: var(--text-muted); text-decoration: none; }
   line-height: 1.5;
   margin-bottom: 0.9rem;
   font-family: var(--font-mono);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .page { animation: none; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

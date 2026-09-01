@@ -108,7 +108,9 @@ h1 strong { font-weight: 700; }
 .photo-ring {
   padding: 3px;
   border-radius: 50%;
-  background: conic-gradient(from 210deg, var(--accent), #6d5bd0, var(--accent));
+  background: conic-gradient(from 210deg, var(--accent), var(--accent-2), var(--accent));
+  box-shadow: 0 0 0 1px var(--border), 0 0 28px rgba(var(--accent-rgb), 0.14);
+  animation: ring-spin 14s linear infinite;
 }
 .photo {
   width: 154px;
@@ -117,6 +119,11 @@ h1 strong { font-weight: 700; }
   object-fit: cover;
   display: block;
   border: 3px solid var(--bg);
+  animation: ring-spin 14s linear infinite reverse;
+}
+
+@keyframes ring-spin {
+  to { transform: rotate(360deg); }
 }
 
 .address {
@@ -138,8 +145,17 @@ h1 strong { font-weight: 700; }
   font-family: var(--font-mono);
   font-size: 0.72rem;
   color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background-color 0.15s var(--ease);
 }
-.socials a:hover { color: var(--text); text-decoration: none; }
+.socials a:hover {
+  color: var(--text);
+  border-color: var(--border-2);
+  background: var(--bg-2);
+  text-decoration: none;
+}
 
 /* GitHub contributions */
 .contrib {
