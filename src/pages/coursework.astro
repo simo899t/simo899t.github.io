@@ -64,7 +64,8 @@ const intro = manifest.intro ||
                       <span class="cw-section-label">{sec.name}</span>
                       <ul class="cw-items">
                         {sec.items.map((it: any) => {
-                          const href = it.url ? it.url : `/coursework/${it.pdf}`;
+                          const href = it.url || (it.pdf ? `/coursework/${it.pdf}` : it.source);
+                          const tag = it.url ? 'open ↗' : it.pdf ? 'PDF' : 'source ↗';
                           return (
                           <li class="cw-item" data-search={`${c.code ?? ''} ${c.name} ${it.title}`.toLowerCase()}>
                             <a class="cw-item-main" href={href} target="_blank" rel="noopener">
@@ -72,8 +73,8 @@ const intro = manifest.intro ||
                               {it.description && <span class="cw-item-desc">{it.description}</span>}
                             </a>
                             <span class="cw-item-links">
-                              <a href={href} target="_blank" rel="noopener" class="cw-tag pdf">{it.url ? 'open ↗' : 'PDF'}</a>
-                              {it.source && <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>}
+                              <a href={href} target="_blank" rel="noopener" class="cw-tag pdf">{tag}</a>
+                              {it.source && (it.pdf || it.url) && <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>}
                             </span>
                           </li>
                           );

@@ -1,14 +1,70 @@
 {
-  "generated": "2026-09-02T10:37:39.580994+00:00",
-  "count": 79,
-  "intro": "Every set of lecture notes, exercise solution and assignment I wrote during my Computer Science / AI degree at SDU, organised by semester and course. Each links to its Typst source on GitHub.",
+  "generated": "2026-09-02T20:11:02.450402+00:00",
+  "count": 86,
+  "intro": "Every set of lecture notes, exercise solution, project and exam answer I wrote during my Computer Science / AI degree at SDU, organised by semester and course.",
   "semesters": [
+    {
+      "semester": "6. semester",
+      "courses": [
+        {
+          "code": "DM553",
+          "name": "Complexity and Computability",
+          "sections": [
+            {
+              "name": "Lectures",
+              "items": [
+                {
+                  "title": "Lecture notes",
+                  "description": "",
+                  "source": "https://github.com/simo899t/SDU/blob/main/6sem/DM553-Complexity_and_Computability/Lectures",
+                  "updated": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "DM887",
+          "name": "Reinforcement Learning",
+          "sections": [
+            {
+              "name": "Lectures",
+              "items": [
+                {
+                  "title": "Lecture notes",
+                  "description": "",
+                  "source": "https://github.com/simo899t/SDU/blob/main/6sem/DM887-Reinforcement_Learning/Lectures",
+                  "updated": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "DM800",
+          "name": "Bachelor Project",
+          "sections": [
+            {
+              "name": "Project",
+              "items": [
+                {
+                  "title": "Bachelor project",
+                  "description": "",
+                  "source": "https://github.com/simo899t/SDU/blob/main/6sem/BachelorProject",
+                  "updated": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
     {
       "semester": "5. semester",
       "courses": [
         {
           "code": "AI508",
-          "name": "Computervision",
+          "name": "Computer Vision",
           "sections": [
             {
               "name": "Lectures",
@@ -16,9 +72,9 @@
                 {
                   "title": "Lecture 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI508-Computervision/Lectures/lec01/ai508-lec01_notes.typ",
                   "pdf": "pdf/27532245361f.pdf",
-                  "updated": "2026-09-01T21:19:23+02:00"
+                  "updated": "2026-09-01T21:19:23+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI508-Computervision/Lectures/lec01/ai508-lec01_notes.typ"
                 }
               ]
             }
@@ -34,9 +90,9 @@
                 {
                   "title": "Lecture 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI509-Natural_Language_Processing/Lectures/lec01/ai509-lec01_notes.typ",
                   "pdf": "pdf/68e390440a54.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI509-Natural_Language_Processing/Lectures/lec01/ai509-lec01_notes.typ"
                 }
               ]
             },
@@ -46,9 +102,9 @@
                 {
                   "title": "Exercise 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI509-Natural_Language_Processing/Exercises/ex1/ai509-ex1.typ",
                   "pdf": "pdf/90cb7b6c458d.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI509-Natural_Language_Processing/Exercises/ex1/ai509-ex1.typ"
                 }
               ]
             }
@@ -56,7 +112,7 @@
         },
         {
           "code": "AI510",
-          "name": "Cybersecurity and Innovation",
+          "name": "Cybersecurity & Innovation",
           "sections": [
             {
               "name": "Lectures",
@@ -64,16 +120,16 @@
                 {
                   "title": "Lecture 0",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec00/ai510-lec00_notes.typ",
                   "pdf": "pdf/06abd5b56c86.pdf",
-                  "updated": "2026-09-01T21:19:23+02:00"
+                  "updated": "2026-09-01T21:19:23+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec00/ai510-lec00_notes.typ"
                 },
                 {
                   "title": "Lecture 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec01/ai510-lec01_notes.typ",
                   "pdf": "pdf/4d8e98ab7623.pdf",
-                  "updated": "2026-09-01T21:19:23+02:00"
+                  "updated": "2026-09-01T21:19:23+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec01/ai510-lec01_notes.typ"
                 }
               ]
             },
@@ -83,9 +139,9 @@
                 {
                   "title": "Exercise 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI510-Cybersecurity_and_Innovation/Exercises/ex1/ai510-ex1.typ",
                   "pdf": "pdf/0ef65bcde923.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI510-Cybersecurity_and_Innovation/Exercises/ex1/ai510-ex1.typ"
                 }
               ]
             }
@@ -101,9 +157,9 @@
                 {
                   "title": "Lecture 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI802-Algorithmic_Game_Theory/Lectures/lec01/ai508-lec01_notes.typ",
                   "pdf": "pdf/001904de2874.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI802-Algorithmic_Game_Theory/Lectures/lec01/ai508-lec01_notes.typ"
                 }
               ]
             },
@@ -113,9 +169,9 @@
                 {
                   "title": "Exercise 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI802-Algorithmic_Game_Theory/Exercises/ex1/ai508-ex1.typ",
                   "pdf": "pdf/a0fdb854d0ad.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/5sem/AI802-Algorithmic_Game_Theory/Exercises/ex1/ai508-ex1.typ"
                 }
               ]
             }
@@ -134,67 +190,67 @@
               "name": "Lectures",
               "items": [
                 {
-                  "title": "Lecture 10",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec10/ai504-lec10.typ",
-                  "pdf": "pdf/841974bae71f.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Lecture 11",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec11/ai504-lec11.typ",
-                  "pdf": "pdf/6349d9c2a74b.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Lecture 12",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec12/ai504-lec12.typ",
-                  "pdf": "pdf/9821346d7bf2.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Lecture 13",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec13/ai504-lec13.typ",
-                  "pdf": "pdf/f99459c82a54.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Lecture 14",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec14/ai504-lec14.typ",
-                  "pdf": "pdf/1c922f90c885.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
                   "title": "Lecture 5",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec05/ai504-lec05 notes.typ",
                   "pdf": "pdf/259c4b7ae503.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec05/ai504-lec05%20notes.typ"
                 },
                 {
                   "title": "Lecture 7",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec07/ai504-lec07 notes.typ",
                   "pdf": "pdf/d5d3e1c68d56.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec07/ai504-lec07%20notes.typ"
                 },
                 {
                   "title": "Lecture 8",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec08/ai504-lec08 notes.typ",
                   "pdf": "pdf/0bcf3f635478.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec08/ai504-lec08%20notes.typ"
                 },
                 {
                   "title": "Lecture 9",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec09/ai504-lec09 notes.typ",
                   "pdf": "pdf/17b99cfefd3f.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec09/ai504-lec09%20notes.typ"
+                },
+                {
+                  "title": "Lecture 10",
+                  "description": "",
+                  "pdf": "pdf/841974bae71f.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec10/ai504-lec10.typ"
+                },
+                {
+                  "title": "Lecture 11",
+                  "description": "",
+                  "pdf": "pdf/6349d9c2a74b.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec11/ai504-lec11.typ"
+                },
+                {
+                  "title": "Lecture 12",
+                  "description": "",
+                  "pdf": "pdf/9821346d7bf2.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec12/ai504-lec12.typ"
+                },
+                {
+                  "title": "Lecture 13",
+                  "description": "",
+                  "pdf": "pdf/f99459c82a54.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec13/ai504-lec13.typ"
+                },
+                {
+                  "title": "Lecture 14",
+                  "description": "",
+                  "pdf": "pdf/1c922f90c885.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Lectures/lec14/ai504-lec14.typ"
                 }
               ]
             },
@@ -202,32 +258,32 @@
               "name": "Exercises",
               "items": [
                 {
+                  "title": "Exercise 1",
+                  "description": "",
+                  "pdf": "pdf/5cb90c7f71c9.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Exercises/ex1/ai504%20exercise%20canonical%20models.typ"
+                },
+                {
                   "title": "Exercise 2",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Exercises/ex2/ai504 exercise 2.typ",
                   "pdf": "pdf/ba693b90d632.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Exercises/ex2/ai504%20exercise%202.typ"
                 },
                 {
                   "title": "Exercise 3",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Exercises/ex3/ai504 exercise 3.typ",
                   "pdf": "pdf/4bc16f6adb0f.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Exercises/ex3/ai504%20exercise%203.typ"
                 },
                 {
-                  "title": "Exercise canonical models",
+                  "title": "Ai504 exercises for exam",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Exercises/ex1/ai504 exercise canonical models.typ",
-                  "pdf": "pdf/5cb90c7f71c9.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Exercises for exam",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Exercises/ai504 exercises_for_exam.typ",
                   "pdf": "pdf/4b7bacaf9214.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Exercises/ai504%20exercises_for_exam.typ"
                 }
               ]
             },
@@ -237,44 +293,44 @@
                 {
                   "title": "Problem set 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem sets/set 1/report.typ",
                   "pdf": "pdf/b87a7e39bd4e.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem%20sets/set%201/report.typ"
                 },
                 {
                   "title": "Problem set 2",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem sets/set 2/report.typ",
                   "pdf": "pdf/9476451b817f.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem%20sets/set%202/report.typ"
+                },
+                {
+                  "title": "Problem set 3",
+                  "description": "",
+                  "pdf": "pdf/ca7338392a4b.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem%20sets/set%203/programming.typ"
+                },
+                {
+                  "title": "Problem set 3",
+                  "description": "",
+                  "pdf": "pdf/6941d46d897d.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem%20sets/set%203/written.typ"
                 },
                 {
                   "title": "Problem set 4",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem sets/set 4/report.typ",
                   "pdf": "pdf/69752e657840.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem%20sets/set%204/report.typ"
                 },
                 {
                   "title": "Problem set 6",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem sets/set 6/ai504 problem set 6.typ",
                   "pdf": "pdf/74b23e0f7c79.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Programming",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem sets/set 3/programming.typ",
-                  "pdf": "pdf/ca7338392a4b.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Written",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem sets/set 3/written.typ",
-                  "pdf": "pdf/6941d46d897d.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/Problem%20sets/set%206/ai504%20problem%20set%206.typ"
                 }
               ]
             },
@@ -282,11 +338,11 @@
               "name": "Exams",
               "items": [
                 {
-                  "title": "Exam",
+                  "title": "Exam answers",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/exam/exam.typ",
                   "pdf": "pdf/e6264c245f14.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI504-Knowledge_Representation/exam/exam.typ"
                 }
               ]
             }
@@ -302,51 +358,51 @@
                 {
                   "title": "Lecture 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec01/ai505-lec01_notes.typ",
                   "pdf": "pdf/730218427926.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Lecture 12",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec12/ai505-lec12 notes.typ",
-                  "pdf": "pdf/b08ae05a758b.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Lecture 13",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec13/ai505-lec13.typ",
-                  "pdf": "pdf/0871c6b99f4b.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
-                },
-                {
-                  "title": "Lecture 14",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec14/lec14.typ",
-                  "pdf": "pdf/b0260bbb618b.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec01/ai505-lec01_notes.typ"
                 },
                 {
                   "title": "Lecture 2",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec02/ai505-lec02_notes.typ",
                   "pdf": "pdf/557f1340b35c.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec02/ai505-lec02_notes.typ"
                 },
                 {
                   "title": "Lecture 3",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec03/ai505-lec03_notes.typ",
                   "pdf": "pdf/b64e6a990a3f.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec03/ai505-lec03_notes.typ"
                 },
                 {
                   "title": "Lecture 4",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec04/ai505-lec04_notes.typ",
                   "pdf": "pdf/07381a114aea.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec04/ai505-lec04_notes.typ"
+                },
+                {
+                  "title": "Lecture 12",
+                  "description": "",
+                  "pdf": "pdf/b08ae05a758b.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec12/ai505-lec12%20notes.typ"
+                },
+                {
+                  "title": "Lecture 13",
+                  "description": "",
+                  "pdf": "pdf/0871c6b99f4b.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec13/ai505-lec13.typ"
+                },
+                {
+                  "title": "Lecture 14",
+                  "description": "",
+                  "pdf": "pdf/b0260bbb618b.pdf",
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Lectures/lec14/lec14.typ"
                 }
               ]
             },
@@ -356,23 +412,23 @@
                 {
                   "title": "Sheet 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Exercises/sheet01/ai505_sheet01.typ",
                   "pdf": "pdf/12d14995875b.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Exercises/sheet01/ai505_sheet01.typ"
                 },
                 {
                   "title": "Sheet 5",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Exercises/sheet05/ai505_sheet05.typ",
                   "pdf": "pdf/d31d05b06f33.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Exercises/sheet05/ai505_sheet05.typ"
                 },
                 {
                   "title": "Sheet 9",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Exercises/sheet09/ai505_sheet09.typ",
                   "pdf": "pdf/05b14b91ee58.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/Exercises/sheet09/ai505_sheet09.typ"
                 }
               ]
             },
@@ -382,9 +438,9 @@
                 {
                   "title": "Exam functions",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/exam/exam_functions/exam_functions.typ",
                   "pdf": "pdf/a146ca7d4bf4.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI505-Optimization/exam/exam_functions/exam_functions.typ"
                 }
               ]
             }
@@ -400,16 +456,16 @@
                 {
                   "title": "Lecture 5",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/Lectures/lec05/lec05 notes.typ",
                   "pdf": "pdf/207c671022df.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/Lectures/lec05/lec05%20notes.typ"
                 },
                 {
-                  "title": "Transformers",
+                  "title": "Lecture 10",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/Lectures/lec10/ai510-transformers.typ",
                   "pdf": "pdf/43422f627b42.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/Lectures/lec10/ai510-transformers.typ"
                 }
               ]
             },
@@ -419,37 +475,37 @@
                 {
                   "title": "Presentation 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres1.typ",
                   "pdf": "pdf/82bf66437145.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres1.typ"
                 },
                 {
                   "title": "Presentation 2",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres2.typ",
                   "pdf": "pdf/cb2554ad09d6.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres2.typ"
                 },
                 {
                   "title": "Presentation 3",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres3.typ",
                   "pdf": "pdf/cd08eedb9873.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres3.typ"
                 },
                 {
                   "title": "Presentation 4",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres4.typ",
                   "pdf": "pdf/3c7257c6d9c0.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres4.typ"
                 },
                 {
                   "title": "Presentation 5",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres5.typ",
                   "pdf": "pdf/a71aa20873db.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/4sem/AI506-Advanced_Machine_Learning/exam/pres5.typ"
                 }
               ]
             }
@@ -470,56 +526,37 @@
                 {
                   "title": "Homework 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework1/Homework1.typ",
                   "pdf": "pdf/5a79e2830ff8.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework1/Homework1.typ"
                 },
                 {
                   "title": "Homework 2",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework2/Homework2.typ",
                   "pdf": "pdf/4ba0addd7e02.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework2/Homework2.typ"
                 },
                 {
                   "title": "Homework 3",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework3/Homework3.typ",
                   "pdf": "pdf/e33b2e9d0d56.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework3/Homework3.typ"
                 },
                 {
                   "title": "Homework 4",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework4/Homework4.typ",
                   "pdf": "pdf/4fca72c36cfe.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework4/Homework4.typ"
                 },
                 {
                   "title": "Homework 5",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework5/Homework5.typ",
                   "pdf": "pdf/f19bd7920cd2.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
-                }
-              ]
-            },
-            {
-              "name": "Exams",
-              "items": [
-                {
-                  "title": "Written Exam Simon",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/exam/WrittenExamSimon.typ",
-                  "pdf": "pdf/b672cbd5188b.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
-                },
-                {
-                  "title": "Written Exam Simon 2",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/exam/WrittenExamSimon_2.typ",
-                  "pdf": "pdf/2475c3fa84ce.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/excercises/homework5/Homework5.typ"
                 }
               ]
             },
@@ -529,9 +566,28 @@
                 {
                   "title": "Calc Project",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/Project/CalcProject.typ",
                   "pdf": "pdf/866758edb047.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/Project/CalcProject.typ"
+                }
+              ]
+            },
+            {
+              "name": "Exams",
+              "items": [
+                {
+                  "title": "Written Exam Simon",
+                  "description": "",
+                  "pdf": "pdf/b672cbd5188b.pdf",
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/exam/WrittenExamSimon.typ"
+                },
+                {
+                  "title": "Written Exam Simon 2",
+                  "description": "",
+                  "pdf": "pdf/2475c3fa84ce.pdf",
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI503-Calculus/exam/WrittenExamSimon_2.typ"
                 }
               ]
             }
@@ -545,95 +601,95 @@
               "name": "Cases",
               "items": [
                 {
+                  "title": "Cases \u2014 literatur",
+                  "description": "",
+                  "pdf": "pdf/c94768a1b41d.pdf",
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/literatur.typ"
+                },
+                {
                   "title": "Case 1",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case1.typ",
                   "pdf": "pdf/1dbb5b5ce007.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
-                },
-                {
-                  "title": "Case 10",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case10.typ",
-                  "pdf": "pdf/6ca5ab617531.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
-                },
-                {
-                  "title": "Case 11",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case11.typ",
-                  "pdf": "pdf/007c00c11b28.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
-                },
-                {
-                  "title": "Case 12",
-                  "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case12.typ",
-                  "pdf": "pdf/9a0c124f5b82.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case1.typ"
                 },
                 {
                   "title": "Case 2",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case2.typ",
                   "pdf": "pdf/4a1db60e940d.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case2.typ"
                 },
                 {
                   "title": "Case 3",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case3.typ",
                   "pdf": "pdf/d00014fc0ddc.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case3.typ"
                 },
                 {
                   "title": "Case 4",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case4.typ",
                   "pdf": "pdf/890135923dfc.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case4.typ"
                 },
                 {
                   "title": "Case 5",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case5.typ",
                   "pdf": "pdf/6e8086100b52.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case5.typ"
                 },
                 {
                   "title": "Case 6",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case6.typ",
                   "pdf": "pdf/0428e55bad03.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case6.typ"
                 },
                 {
                   "title": "Case 7",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case7.typ",
                   "pdf": "pdf/62b7669b0e44.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case7.typ"
                 },
                 {
                   "title": "Case 8",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case8.typ",
                   "pdf": "pdf/0ad98c6c3852.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case8.typ"
                 },
                 {
                   "title": "Case 9",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case9.typ",
                   "pdf": "pdf/b8c7d09adc20.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case9.typ"
                 },
                 {
-                  "title": "Literatur",
+                  "title": "Case 10",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/literatur.typ",
-                  "pdf": "pdf/c94768a1b41d.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "pdf": "pdf/6ca5ab617531.pdf",
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case10.typ"
+                },
+                {
+                  "title": "Case 11",
+                  "description": "",
+                  "pdf": "pdf/007c00c11b28.pdf",
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case11.typ"
+                },
+                {
+                  "title": "Case 12",
+                  "description": "",
+                  "pdf": "pdf/9a0c124f5b82.pdf",
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/AI504-Ethics_and_Privacy/cases/case12.typ"
                 }
               ]
             }
@@ -647,11 +703,11 @@
               "name": "Exams",
               "items": [
                 {
-                  "title": "Exam 2025",
+                  "title": "Ai511exam2025",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/DM511-Linear_Algebra/exam/2025 exam/ai511exam2025.typ",
                   "pdf": "pdf/553ba12980e9.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/DM511-Linear_Algebra/exam/2025%20exam/ai511exam2025.typ"
                 }
               ]
             }
@@ -662,14 +718,85 @@
           "name": "Functional Programming",
           "sections": [
             {
-              "name": "Projects",
+              "name": "Notes",
               "items": [
                 {
                   "title": "Hs Rapport",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/DM580-Functional_Programming/hsRapport.typ",
                   "pdf": "pdf/4280b45d987a.pdf",
-                  "updated": "2026-06-22T23:38:10+02:00"
+                  "updated": "2026-06-22T23:38:10+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/3sem/DM580-Functional_Programming/hsRapport.typ"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "semester": "2. semester",
+      "courses": [
+        {
+          "code": "DM575",
+          "name": "Object-Oriented Programming",
+          "sections": [
+            {
+              "name": "Exam",
+              "items": [
+                {
+                  "title": "Pacman \u2014 OOP exam project",
+                  "description": "JavaFX Pacman game",
+                  "url": "https://github.com/simo899t/pacman",
+                  "source": "https://github.com/simo899t/pacman",
+                  "updated": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "DM576",
+          "name": "Database Systems",
+          "sections": [
+            {
+              "name": "Project",
+              "items": [
+                {
+                  "title": "Database project report",
+                  "description": "",
+                  "pdf": "pdf/211790af17f7.pdf",
+                  "updated": "2026-09-02T12:40:33+02:00",
+                  "source": "https://github.com/simo899t/SDU/tree/main/2sem/DM576-Databasesystems/Project"
+                }
+              ]
+            },
+            {
+              "name": "Exam",
+              "items": [
+                {
+                  "title": "Exam answers",
+                  "description": "",
+                  "pdf": "pdf/ffc47bbd6465.pdf",
+                  "updated": "2026-09-02T12:40:33+02:00",
+                  "source": "https://github.com/simo899t/SDU/tree/main/2sem/DM576-Databasesystems/Exam"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "DM578",
+          "name": "Algorithms and Data Structures",
+          "sections": [
+            {
+              "name": "Notes",
+              "items": [
+                {
+                  "title": "Course notes",
+                  "description": "",
+                  "pdf": "pdf/14933db02ba2.pdf",
+                  "updated": "2026-09-02T12:40:33+02:00",
+                  "source": "https://github.com/simo899t/SDU/tree/main/2sem/DM578-Algorithms_and_Datastructures/notes"
                 }
               ]
             }
@@ -682,17 +809,17 @@
       "courses": [
         {
           "code": "DM500",
-          "name": "Studyintroduction to Artificial Intelligence and Computer Science",
+          "name": "Study Introduction to AI & CS",
           "sections": [
             {
-              "name": "Exams",
+              "name": "Notes",
               "items": [
                 {
                   "title": "Take home exam",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM500-Studyintroduction_to_Artificial_Intelligence_and_Computer_Science/take_home_exam/take_home_exam.typ",
                   "pdf": "pdf/797cf25870bf.pdf",
-                  "updated": "2026-07-12T10:17:43+02:00"
+                  "updated": "2026-07-12T10:17:43+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM500-Studyintroduction_to_Artificial_Intelligence_and_Computer_Science/take_home_exam/take_home_exam.typ"
                 }
               ]
             }
@@ -708,65 +835,65 @@
                 {
                   "title": "Counting",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/counting.typ",
                   "pdf": "pdf/33966440b90f.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/counting.typ"
                 },
                 {
                   "title": "Functions",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/functions.typ",
                   "pdf": "pdf/6d634311bba0.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/functions.typ"
                 },
                 {
                   "title": "Induction",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/induction.typ",
                   "pdf": "pdf/8959e1657a39.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/induction.typ"
                 },
                 {
                   "title": "Matrices",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/matrices.typ",
                   "pdf": "pdf/5a7aba7aafec.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/matrices.typ"
                 },
                 {
                   "title": "Number theory",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/number_theory.typ",
                   "pdf": "pdf/d4ed2b74e322.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/number_theory.typ"
                 },
                 {
                   "title": "Propositions and logic",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/propositions_and_logic.typ",
                   "pdf": "pdf/0a81e23a2338.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/propositions_and_logic.typ"
                 },
                 {
                   "title": "Relations",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/relations.typ",
                   "pdf": "pdf/b063f9fb9c1b.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/relations.typ"
                 },
                 {
                   "title": "Sequences",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/sequences.typ",
                   "pdf": "pdf/71f4cde2bd88.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-01T22:06:11+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/sequences.typ"
                 },
                 {
                   "title": "Sets",
                   "description": "",
-                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/sets.typ",
                   "pdf": "pdf/d6994a3eac96.pdf",
-                  "updated": "2026-09-01T22:06:11+02:00"
+                  "updated": "2026-09-02T12:40:33+02:00",
+                  "source": "https://github.com/simo899t/SDU/blob/main/1sem/DM549-Discrete_Mathematics/Exam_Preperations/sets.typ"
                 }
               ]
             }
