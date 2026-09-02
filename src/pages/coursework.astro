@@ -2,24 +2,50 @@
 import Layout from '../layouts/Layout.astro';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import yaml from 'js-yaml';
 
-// Built by scripts/generate_notes_manifest.py in the SDU repo and synced here
-// by that repo's "Publish notes hub" workflow. See public/coursework/manifest.json.
-let manifest: any = { semesters: [], count: 0, generated: null };
+// The page is rendered straight from src/data/coursework.yml — the single
+// hand-maintained list of pointers. Nothing is generated or synced; a `pdf:` /
+// `source:` value is a path inside the public SDU repo and is turned into a
+// github.com link here. `url:` is used verbatim.
+const SDU_BLOB = 'https://github.com/simo899t/SDU/blob/main';
+const enc = (p: string) => p.split('/').map(encodeURIComponent).join('/');
+const isUrl = (s: string) => /^https?:\/\//.test(s);
+const link = (s: string) => (isUrl(s) ? s : `${SDU_BLOB}/${enc(s)}`);
+
+let spec: any = { semesters: [], intro: '' };
 try {
-  manifest = JSON.parse(readFileSync(resolve('public/coursework/manifest.json'), 'utf8'));
-} catch {
-  // manifest not synced yet — page renders an empty state
-}
+  spec = yaml.load(readFileSync(resolve('src/data/coursework.yml'), 'utf8')) ?? spec;
+} catch {}
 
-const semesters = manifest.semesters ?? [];
-const generated = manifest.generated
-  ? new Date(manifest.generated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-  : null;
+let count = 0;
+const semesters = (spec.semesters ?? [])
+  .map((s: any) => ({
+    semester: s.name,
+    courses: (s.courses ?? []).map((c: any) => ({
+      code: c.code ?? '',
+      name: c.name,
+      url: c.url,
+      sections: (c.sections ?? []).map((sec: any) => ({
+        name: sec.name,
+        items: (sec.items ?? []).map((it: any) => {
+          count++;
+          const source = it.source
+            ? link(it.source)
+            : it.pdf ? link(it.pdf.replace(/\.pdf$/i, '.typ')) : undefined;
+          if (it.url) return { title: it.title, description: it.description, href: it.url, tag: 'open ↗', source: it.source ? link(it.source) : undefined };
+          if (it.pdf) return { title: it.title, description: it.description, href: link(it.pdf), tag: 'PDF', source };
+          return { title: it.title, description: it.description, href: source, tag: 'source ↗', source: undefined };
+        }),
+      })),
+    })),
+  }))
+  .filter((s: any) => s.courses.length);
 
-// Sections and their order come straight from coursework.yml — render as authored.
-const intro = manifest.intro ||
+const generated = null;
+const intro = (spec.intro || '').trim() ||
   `Every set of lecture notes, exercise solution and assignment I wrote during my Computer Science / AI degree at SDU, organised by semester and course.`;
+const manifest = { count };
 ---
 
 <Layout title="Coursework" description="Every lecture note, exercise and assignment from my degree, as compiled PDFs.">
@@ -30,11 +56,10 @@ const intro = manifest.intro ||
         {intro} <span class="cw-count">{manifest.count} items.</span> Curious how these
         are written? See <a href="/notes">how I write my notes</a>.
       </p>
-      {generated && <p class="cw-generated">Last synced {generated}</p>}
     </header>
 
     {semesters.length === 0 ? (
-      <p class="cw-empty">The manifest hasn't been synced yet — check back shortly.</p>
+      <p class="cw-empty">Nothing here yet — check back shortly.</p>
     ) : (
       <>
         <div class="cw-controls">
@@ -63,22 +88,18 @@ const intro = manifest.intro ||
                     <div class="cw-section">
                       <span class="cw-section-label">{sec.name}</span>
                       <ul class="cw-items">
-                        {sec.items.map((it: any) => {
-                          const href = it.url || (it.pdf ? `/coursework/${it.pdf}` : it.source);
-                          const tag = it.url ? 'open ↗' : it.pdf ? 'PDF' : 'source ↗';
-                          return (
+                        {sec.items.map((it: any) => (
                           <li class="cw-item" data-search={`${c.code ?? ''} ${c.name} ${it.title}`.toLowerCase()}>
-                            <a class="cw-item-main" href={href} target="_blank" rel="noopener">
+                            <a class="cw-item-main" href={it.href} target="_blank" rel="noopener">
                               <span class="cw-item-title">{it.title}</span>
                               {it.description && <span class="cw-item-desc">{it.description}</span>}
                             </a>
                             <span class="cw-item-links">
-                              <a href={href} target="_blank" rel="noopener" class="cw-tag pdf">{tag}</a>
-                              {it.source && (it.pdf || it.url) && <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>}
+                              <a href={it.href} target="_blank" rel="noopener" class="cw-tag pdf">{it.tag}</a>
+                              {it.source && <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>}
                             </span>
                           </li>
-                          );
-                        })}
+                        ))}
                       </ul>
                     </div>
                   ))}
