@@ -1,14 +1,11 @@
 # coursework.yml — single source of truth for the /coursework page on simo899t.github.io
 #
-# semesters[] -> courses[] -> sections[] -> items[].  Order here = order on the page.
-# An item is one of:
-#   pdf:    <repo-relative path to a compiled PDF>   -> bundled at /coursework/pdf/<hash>.pdf
-#   url:    <external link, e.g. a project/exam repo> -> not bundled
-#   source: <repo path or URL>   alone = 'source only' (PDF not compiled yet); with pdf/url = extra link
-# Optional per item: description, updated (YYYY-MM-DD; else from git history).
-# A pdf: path that doesn't exist fails the CI build.
-#
-# --- workflow: compile a note's PDF, commit it, add a `pdf:` line here, push. ---
+# Read at build time by src/pages/coursework.astro. Order here = order on the page.
+# Each item is one of:
+#   pdf:    <path in the simo899t/SDU repo>  -> GitHub PDF view + a 'source' link to the sibling .typ/.tex
+#   url:    <any link>                       -> e.g. a code folder or project repo
+#   source: <path or URL> alone             -> 'source only' link (PDF not compiled yet)
+# Optional per item: description, updated.  Only my own work is listed here.
 
 intro: >-
   Every set of lecture notes, exercise solution, project and exam answer I wrote
@@ -16,29 +13,7 @@ intro: >-
 
 semesters:
   - name: "6. semester"
-    # In progress. Add entries as notes get compiled.
-    courses:
-      - code: "DM553"
-        name: "Complexity and Computability"
-        sections:
-          - name: "Lectures"
-            items:
-              - title: "Lecture notes"
-                source: "6sem/DM553-Complexity_and_Computability/Lectures"   # TODO: point at a compiled PDF
-      - code: "DM887"
-        name: "Reinforcement Learning"
-        sections:
-          - name: "Lectures"
-            items:
-              - title: "Lecture notes"
-                source: "6sem/DM887-Reinforcement_Learning/Lectures"   # TODO: point at a compiled PDF
-      - code: "DM800"
-        name: "Bachelor Project"
-        sections:
-          - name: "Project"
-            items:
-              - title: "Bachelor project"
-                source: "6sem/BachelorProject"   # TODO: link the report PDF or its repo
+    courses: []
   - name: "5. semester"
     courses:
       - code: "AI508"
@@ -167,6 +142,10 @@ semesters:
             items:
               - title: "Exam functions"
                 pdf: "4sem/AI505-Optimization/exam/exam_functions/exam_functions.pdf"
+          - name: "Code"
+            items:
+              - title: "COCO/BBOB experiment code"
+                url: "4sem/AI505-Optimization/cocoex-example"
       - code: "AI506"
         name: "Advanced Machine Learning"
         sections:
@@ -188,6 +167,10 @@ semesters:
                 pdf: "4sem/AI506-Advanced_Machine_Learning/exam/pres4.pdf"
               - title: "Presentation 5"
                 pdf: "4sem/AI506-Advanced_Machine_Learning/exam/pres5.pdf"
+          - name: "Code"
+            items:
+              - title: "Exercise notebooks (PyTorch)"
+                url: "4sem/AI506-Advanced_Machine_Learning/exercises"
   - name: "3. semester"
     courses:
       - code: "AI503"
@@ -215,12 +198,23 @@ semesters:
                 pdf: "3sem/AI503-Calculus/exam/WrittenExamSimon.pdf"
               - title: "Written Exam Simon 2"
                 pdf: "3sem/AI503-Calculus/exam/WrittenExamSimon_2.pdf"
+          - name: "Notes"
+            items:
+              - title: "Calc Notes"
+                pdf: "3sem/AI503-Calculus/TeXnotes/calcNotes.pdf"
+              - title: "Calc Notes"
+                pdf: "3sem/AI503-Calculus/notes/calcNotes.pdf"
+          - name: "Handwritten notes"
+            items:
+              - title: "AI503: Calculus"
+                pdf: "3sem/AI503-Calculus/handwritten/AI503: Calculus.pdf"
+                source: "3sem/AI503-Calculus/handwritten"
       - code: "AI504"
-        name: "Ethics and Privacy"
+        name: "Ethics & Privacy"
         sections:
           - name: "Cases"
             items:
-              - title: "Cases — literature"
+              - title: "Cases"
                 pdf: "3sem/AI504-Ethics_and_Privacy/cases/literature.pdf"
               - title: "Case 1"
                 pdf: "3sem/AI504-Ethics_and_Privacy/cases/case1.pdf"
@@ -246,6 +240,29 @@ semesters:
                 pdf: "3sem/AI504-Ethics_and_Privacy/cases/case11.pdf"
               - title: "Case 12"
                 pdf: "3sem/AI504-Ethics_and_Privacy/cases/case12.pdf"
+          - name: "Handwritten notes"
+            items:
+              - title: "Etik materiale"
+                pdf: "3sem/AI504-Ethics_and_Privacy/etik/handwritten/Etik materiale.pdf"
+                source: "3sem/AI504-Ethics_and_Privacy/etik/handwritten"
+              - title: "AI502: Etik og privathed"
+                pdf: "3sem/AI504-Ethics_and_Privacy/etik/handwritten/AI502: Etik og privathed.pdf"
+                source: "3sem/AI504-Ethics_and_Privacy/etik/handwritten"
+      - code: "AI512"
+        name: "Introduction to Machine Learning"
+        sections:
+          - name: "Notes"
+            items:
+              - title: "Autodiff software"
+                pdf: "3sem/AI512-Introduction_to_Machine_Learning/notes/autodiff-software.pdf"
+                source: "3sem/AI512-Introduction_to_Machine_Learning/notes"
+              - title: "AI512: Intro til ML"
+                pdf: "3sem/AI512-Introduction_to_Machine_Learning/AI512: Intro til ML.pdf"
+                source: "3sem/AI512-Introduction_to_Machine_Learning"
+          - name: "Code"
+            items:
+              - title: "Exercise notebooks"
+                url: "3sem/AI512-Introduction_to_Machine_Learning/exercises"
       - code: "DM511"
         name: "Linear Algebra"
         sections:
@@ -253,6 +270,10 @@ semesters:
             items:
               - title: "Ai511exam2025"
                 pdf: "3sem/DM511-Linear_Algebra/exam/2025 exam/ai511exam2025.pdf"
+          - name: "Code"
+            items:
+              - title: "Python scripts"
+                url: "3sem/DM511-Linear_Algebra/python"
       - code: "DM580"
         name: "Functional Programming"
         sections:
@@ -260,36 +281,37 @@ semesters:
             items:
               - title: "Hs Rapport"
                 pdf: "3sem/DM580-Functional_Programming/hsRapport.pdf"
+          - name: "Code"
+            items:
+              - title: "Exercise + project code (Haskell)"
+                url: "3sem/DM580-Functional_Programming/exercises"
   - name: "2. semester"
-    # Your 2nd-semester work is code/reports, not Typst notes — fill in below.
-    # `url:` points an item at a separate project/exam repo.
     courses:
       - code: "DM575"
         name: "Object-Oriented Programming"
         sections:
-          - name: "Exam"
+          - name: "Exams"
             items:
-              - title: "Pacman — OOP exam project"
-                url: "https://github.com/simo899t/pacman"   # TODO: confirm repo URL
-                description: "JavaFX Pacman game"
-      - code: "DM576"
-        name: "Database Systems"
-        sections:
-          - name: "Project"
+              - title: "Pacman Project OOP"
+                pdf: "2sem/DM575-Objectoriented_Programming/Exam/Pacman_Project_OOP.pdf"
+              - title: "Pacman — OOP exam project (repo)"
+                url: "https://github.com/simo899t/pacman"
+          - name: "Code"
             items:
-              - title: "Database project report"
-                pdf: "2sem/DM576-Databasesystems/Project/Databasesystemer_project.pdf"   # TODO: confirm this is your write-up, not a handout
-          - name: "Exam"
-            items:
-              - title: "Exam answers"
-                pdf: "2sem/DM576-Databasesystems/Exam/Databasesystemer_24_EXAM.pdf"   # TODO: confirm authorship
+              - title: "Exercise solutions (Java)"
+                url: "2sem/DM575-Objectoriented_Programming/Exercises"
       - code: "DM578"
-        name: "Algorithms and Data Structures"
+        name: "Algorithms & Data Structures"
         sections:
           - name: "Notes"
             items:
-              - title: "Course notes"
-                pdf: "2sem/DM578-Algorithms_and_Datastructures/notes/Algorithms_and_datastructures.pdf"   # TODO: confirm this is yours
+              - title: "Algorithms and datastructures"
+                pdf: "2sem/DM578-Algorithms_and_Datastructures/notes/Algorithms_and_datastructures.pdf"
+                source: "2sem/DM578-Algorithms_and_Datastructures/notes"
+          - name: "Code"
+            items:
+              - title: "Algorithm implementations (Java + Python)"
+                url: "2sem/DM578-Algorithms_and_Datastructures/implementations"
   - name: "1. semester"
     courses:
       - code: "DM500"
@@ -322,3 +344,91 @@ semesters:
                 pdf: "1sem/DM549-Discrete_Mathematics/Exam_Preperations/sequences.pdf"
               - title: "Sets"
                 pdf: "1sem/DM549-Discrete_Mathematics/Exam_Preperations/sets.pdf"
+          - name: "Notes"
+            items:
+              - title: "Counting"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Counting.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Fibonacci"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Fibonacci.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Functions"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Functions.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Logik og proportioner"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Logik og proportioner.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Matrixer"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Matrixer.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Number theory"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Number theory.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Proofs"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Proofs.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Rekursive definitioner"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Rekursive definitioner.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Relations"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Relations.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Sets"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Sets.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+      - code: "DM573"
+        name: "Introduction to Computer Science"
+        sections:
+          - name: "Notes"
+            items:
+              - title: "Algebra"
+                pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Algebra.pdf"
+                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+              - title: "Algoritmer"
+                pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Algoritmer.pdf"
+                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+              - title: "Beregninger"
+                pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Beregninger.pdf"
+                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+              - title: "Data. Excersises"
+                pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Data. Excersises.pdf"
+                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+              - title: "Kryptologi"
+                pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Kryptologi.pdf"
+                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+              - title: "Online algoritmer"
+                pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Online algoritmer.pdf"
+                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+          - name: "Code"
+            items:
+              - title: "Exam scripts"
+                url: "1sem/DM573-Introduction_to_Computer_Science/scripts_for_exam"
+      - code: "DM574"
+        name: "Introduction to Programming"
+        sections:
+          - name: "Notes"
+            items:
+              - title: "Datatyper"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Datatyper.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
+              - title: "Filer"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Filer.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
+              - title: "Funktionel"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Funktionel.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
+              - title: "Imperativ programmering"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Imperativ programmering.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
+              - title: "Prog. Excersises"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Prog. Excersises.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
+              - title: "Program Struktur"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Program Struktur.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
+              - title: "Projekt"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Projekt.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
+              - title: "Rekursiv"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Rekursiv.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
