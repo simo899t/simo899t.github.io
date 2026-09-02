@@ -17,12 +17,9 @@ const generated = manifest.generated
   ? new Date(manifest.generated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
   : null;
 
-const SECTION_ORDER = ['Lectures', 'Exercises', 'Exam prep', 'Projects', 'Exams', 'Other'];
-function orderSections(sections: any[]) {
-  return [...sections].sort(
-    (a, b) => (SECTION_ORDER.indexOf(a.name) + 99) % 99 - (SECTION_ORDER.indexOf(b.name) + 99) % 99
-  );
-}
+// Sections and their order come straight from coursework.yml — render as authored.
+const intro = manifest.intro ||
+  `Every set of lecture notes, exercise solution and assignment I wrote during my Computer Science / AI degree at SDU, organised by semester and course.`;
 ---
 
 <Layout title="Coursework" description="Every lecture note, exercise and assignment from my degree, as compiled PDFs.">
@@ -30,9 +27,7 @@ function orderSections(sections: any[]) {
     <header class="cw-head">
       <h1>Coursework</h1>
       <p>
-        Every set of lecture notes, exercise solution and assignment I wrote during my
-        Computer Science / AI degree at SDU — {manifest.count} compiled PDFs, organised by
-        semester and course. Each one links to its Typst source on GitHub. Curious how these
+        {intro} <span class="cw-count">{manifest.count} items.</span> Curious how these
         are written? See <a href="/notes">how I write my notes</a>.
       </p>
       {generated && <p class="cw-generated">Last synced {generated}</p>}
@@ -57,27 +52,32 @@ function orderSections(sections: any[]) {
             <section class="cw-sem" data-sem={s.semester}>
               <h2 class="cw-sem-title">{s.semester}</h2>
               {s.courses.map((c: any) => (
-                <article class="cw-course" data-search={`${c.code} ${c.name}`.toLowerCase()}>
+                <article class="cw-course" data-search={`${c.code ?? ''} ${c.name}`.toLowerCase()}>
                   <div class="cw-course-head">
-                    <span class="cw-code">{c.code}</span>
-                    <span class="cw-name">{c.name}</span>
+                    {c.code && <span class="cw-code">{c.code}</span>}
+                    {c.url
+                      ? <a class="cw-name" href={c.url} target="_blank" rel="noopener">{c.name}</a>
+                      : <span class="cw-name">{c.name}</span>}
                   </div>
-                  {orderSections(c.sections).map((sec: any) => (
+                  {c.sections.map((sec: any) => (
                     <div class="cw-section">
                       <span class="cw-section-label">{sec.name}</span>
                       <ul class="cw-items">
-                        {sec.items.map((it: any) => (
-                          <li class="cw-item" data-search={`${c.code} ${c.name} ${it.title}`.toLowerCase()}>
-                            <a class="cw-item-main" href={`/coursework/${it.pdf}`} target="_blank" rel="noopener">
+                        {sec.items.map((it: any) => {
+                          const href = it.url ? it.url : `/coursework/${it.pdf}`;
+                          return (
+                          <li class="cw-item" data-search={`${c.code ?? ''} ${c.name} ${it.title}`.toLowerCase()}>
+                            <a class="cw-item-main" href={href} target="_blank" rel="noopener">
                               <span class="cw-item-title">{it.title}</span>
                               {it.description && <span class="cw-item-desc">{it.description}</span>}
                             </a>
                             <span class="cw-item-links">
-                              <a href={`/coursework/${it.pdf}`} target="_blank" rel="noopener" class="cw-tag pdf">PDF</a>
-                              <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>
+                              <a href={href} target="_blank" rel="noopener" class="cw-tag pdf">{it.url ? 'open ↗' : 'PDF'}</a>
+                              {it.source && <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>}
                             </span>
                           </li>
-                        ))}
+                          );
+                        })}
                       </ul>
                     </div>
                   ))}
@@ -165,6 +165,8 @@ function orderSections(sections: any[]) {
     flex-shrink: 0;
   }
   .cw-name { font-size: 0.95rem; color: var(--text); font-weight: 600; }
+  a.cw-name:hover { color: var(--accent); text-decoration: none; }
+  .cw-count { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim); }
 
   .cw-section { margin-bottom: 0.7rem; }
   .cw-section:last-child { margin-bottom: 0; }
