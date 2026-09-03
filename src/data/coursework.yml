@@ -100,8 +100,10 @@ semesters:
                 pdf: "4sem/AI504-Knowledge_Representation/Exercises/ex1/ai504 exercise canonical models.pdf"
               - title: "Exercise 2"
                 pdf: "4sem/AI504-Knowledge_Representation/Exercises/ex2/ai504 exercise 2.pdf"
+              - title: "Exercise 2 — Haskell recap"
+                source: "4sem/AI504-Knowledge_Representation/Exercises/ex2/haskell_recap.hs"
               - title: "Exercise 3"
-                pdf: "4sem/AI504-Knowledge_Representation/Exercises/ex3/ai504 exercise 3.pdf"
+                none: true
               - title: "Ai504 exercises for exam"
                 pdf: "4sem/AI504-Knowledge_Representation/Exercises/ai504 exercises_for_exam.pdf"
           - name: "Problem sets"
@@ -179,10 +181,6 @@ semesters:
             items:
               - title: "Exam functions"
                 pdf: "4sem/AI505-Optimization/exam/exam_functions/exam_functions.pdf"
-          - name: "Code"
-            items:
-              - title: "COCO/BBOB experiment code"
-                url: "https://github.com/simo899t/SDU/tree/main/4sem/AI505-Optimization/cocoex-example"
       - code: "AI506"
         name: "Advanced Machine Learning"
         sections:
