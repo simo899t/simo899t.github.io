@@ -171,17 +171,18 @@ h1 strong { font-weight: 700; }
   gap: 3px;
   min-width: max-content;
 }
-.contrib-grid i {
+/* cells are created in JS, so they carry no Astro scope hash — target them globally */
+.contrib-grid :global(i) {
   width: 11px;
   height: 11px;
   border-radius: 2px;
   background: var(--bg-2);
   border: 1px solid var(--border);
 }
-.contrib-grid i[data-level="1"] { background: rgba(77,182,196,0.30); border-color: transparent; }
-.contrib-grid i[data-level="2"] { background: rgba(77,182,196,0.52); border-color: transparent; }
-.contrib-grid i[data-level="3"] { background: rgba(77,182,196,0.74); border-color: transparent; }
-.contrib-grid i[data-level="4"] { background: rgba(77,182,196,1);    border-color: transparent; }
+.contrib-grid :global(i[data-level="1"]) { background: rgba(77,182,196,0.30); border-color: transparent; }
+.contrib-grid :global(i[data-level="2"]) { background: rgba(77,182,196,0.52); border-color: transparent; }
+.contrib-grid :global(i[data-level="3"]) { background: rgba(77,182,196,0.74); border-color: transparent; }
+.contrib-grid :global(i[data-level="4"]) { background: rgba(77,182,196,1);    border-color: transparent; }
 
 .contrib-legend {
   display: flex;
@@ -236,7 +237,7 @@ h1 strong { font-weight: 700; }
   .photo      { animation: ring-spin 22s linear infinite reverse; }
   @keyframes ring-spin { to { transform: rotate(360deg); } }
 
-  .contrib-grid i {
+  .contrib-grid :global(i) {
     animation: cell-in 0.4s ease both;
     animation-delay: var(--d, 0ms);
   }
