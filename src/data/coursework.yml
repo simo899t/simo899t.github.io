@@ -5,6 +5,7 @@
 #   pdf:    <path in the simo899t/SDU repo>  -> GitHub PDF view + a 'source' link to the sibling .typ/.tex
 #   url:    <any link>                       -> e.g. a code folder or project repo
 #   source: <path or URL> alone             -> 'source only' link (PDF not compiled yet)
+#   none:   true  (or a string)             -> dimmed "no notes" row, no link, not counted
 # Optional per item: description, updated.  Only my own work is listed here.
 
 intro: >-
@@ -65,8 +66,18 @@ semesters:
         sections:
           - name: "Lectures"
             items:
+              - title: "Lecture 1"
+                pdf: "4sem/AI504-Knowledge_Representation/Lectures/lec01/ai504-lec01 notes.pdf"
+              - title: "Lecture 2"
+                pdf: "4sem/AI504-Knowledge_Representation/Lectures/lec02/ai504-lec02 notes.pdf"
+              - title: "Lecture 3"
+                none: true
+              - title: "Lecture 4"
+                none: true
               - title: "Lecture 5"
                 pdf: "4sem/AI504-Knowledge_Representation/Lectures/lec05/ai504-lec05 notes.pdf"
+              - title: "Lecture 6"
+                pdf: "4sem/AI504-Knowledge_Representation/Lectures/lec06/ai504-lec06 notes.pdf"
               - title: "Lecture 7"
                 pdf: "4sem/AI504-Knowledge_Representation/Lectures/lec07/ai504-lec07 notes.pdf"
               - title: "Lecture 8"

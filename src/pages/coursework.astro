@@ -29,6 +29,16 @@ const semesters = (spec.semesters ?? [])
       sections: (c.sections ?? []).map((sec: any) => ({
         name: sec.name,
         items: (sec.items ?? []).map((it: any) => {
+          // `none: true` (or a custom string) marks an item that has no
+          // compiled notes — rendered as a dimmed row, not counted.
+          if (it.none) {
+            return {
+              title: it.title,
+              description: it.description,
+              empty: true,
+              label: typeof it.none === 'string' ? it.none : 'no notes',
+            };
+          }
           count++;
           const source = it.source
             ? link(it.source)
@@ -89,15 +99,29 @@ const manifest = { count };
                       <span class="cw-section-label">{sec.name}</span>
                       <ul class="cw-items">
                         {sec.items.map((it: any) => (
-                          <li class="cw-item" data-search={`${c.code ?? ''} ${c.name} ${it.title}`.toLowerCase()}>
-                            <a class="cw-item-main" href={it.href} target="_blank" rel="noopener">
-                              <span class="cw-item-title">{it.title}</span>
-                              {it.description && <span class="cw-item-desc">{it.description}</span>}
-                            </a>
-                            <span class="cw-item-links">
-                              <a href={it.href} target="_blank" rel="noopener" class="cw-tag pdf">{it.tag}</a>
-                              {it.source && <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>}
-                            </span>
+                          <li class:list={['cw-item', { 'is-empty': it.empty }]} data-search={`${c.code ?? ''} ${c.name} ${it.title}`.toLowerCase()}>
+                            {it.empty ? (
+                              <>
+                                <span class="cw-item-main">
+                                  <span class="cw-item-title">{it.title}</span>
+                                  {it.description && <span class="cw-item-desc">{it.description}</span>}
+                                </span>
+                                <span class="cw-item-links">
+                                  <span class="cw-tag none">{it.label}</span>
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <a class="cw-item-main" href={it.href} target="_blank" rel="noopener">
+                                  <span class="cw-item-title">{it.title}</span>
+                                  {it.description && <span class="cw-item-desc">{it.description}</span>}
+                                </a>
+                                <span class="cw-item-links">
+                                  <a href={it.href} target="_blank" rel="noopener" class="cw-tag pdf">{it.tag}</a>
+                                  {it.source && <a href={it.source} target="_blank" rel="noopener" class="cw-tag src">source</a>}
+                                </span>
+                              </>
+                            )}
                           </li>
                         ))}
                       </ul>
@@ -225,6 +249,10 @@ const manifest = { count };
   }
   .cw-tag.pdf:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
   .cw-tag.src:hover { color: var(--text); border-color: var(--text-muted); text-decoration: none; }
+  .cw-tag.none { border-style: dashed; color: var(--text-dim); }
+
+  .cw-item.is-empty .cw-item-title { color: var(--text-dim); }
+  .cw-item.is-empty .cw-item-main { cursor: default; }
 
   @media (max-width: 480px) {
     .cw-item { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
