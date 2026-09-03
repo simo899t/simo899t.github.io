@@ -23,6 +23,12 @@ const isActive = (href: string) =>
   <meta name="description" content={description} />
   <title>{title === 'Simon Holm' ? 'Simon Holm' : `${title} — Simon Holm`}</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <script is:inline>
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  </script>
 </head>
 <body>
   <nav>
@@ -35,9 +41,29 @@ const isActive = (href: string) =>
         <li><a href="/notes"    class={isActive('/notes')    ? 'active' : ''}>notes</a></li>
         <li><a href="/coursework" class={isActive('/coursework') ? 'active' : ''}>coursework</a></li>
         <li><a href="/contact"  class={isActive('/contact')  ? 'active' : ''}>contact</a></li>
+        <li><button id="theme-toggle" type="button" aria-label="Toggle light/dark theme" title="Toggle theme">☾</button></li>
       </ul>
     </div>
   </nav>
+
+  <script is:inline>
+    (function () {
+      var btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      function current() {
+        return document.documentElement.getAttribute('data-theme') || (mq.matches ? 'dark' : 'light');
+      }
+      function paint() { btn.textContent = current() === 'dark' ? '☾' : '☀'; }
+      paint();
+      btn.addEventListener('click', function () {
+        var next = current() === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('theme', next); } catch (e) {}
+        paint();
+      });
+    })();
+  </script>
 
   <canvas id="plexus" aria-hidden="true"></canvas>
 
