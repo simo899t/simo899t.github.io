@@ -6,7 +6,9 @@
 #   url:    <any link>                       -> e.g. a code folder or project repo
 #   source: <path or URL> alone             -> 'source only' link (PDF not compiled yet)
 #   none:   true  (or a string)             -> dimmed "no notes" row, no link, not counted
-# Optional per item: description, updated.  Only my own work is listed here.
+# Optional per item: description, updated, nosource: true (suppress the
+# auto 'source' link on a pdf item — e.g. hand-drawn / scanned pages).
+# Only my own work is listed here.
 
 intro: >-
   Every set of lecture notes, exercise solution and assignment I wrote during my
@@ -383,12 +385,15 @@ semesters:
             items:
               - title: "Lecture notes"
                 pdf: "2sem/AI501-Introduction_to_Artificial_Intelligence/lectures/AI LECTURES.pdf"
+                nosource: true
           - name: "Exercises"
             items:
               - title: "Exercise notes"
                 pdf: "2sem/AI501-Introduction_to_Artificial_Intelligence/exercises/Introductions_to_AI_exercises.pdf"
+                nosource: true
               - title: "Worked sessions"
                 pdf: "2sem/AI501-Introduction_to_Artificial_Intelligence/exercises/AI.pdf"
+                nosource: true
       - code: "DM575"
         name: "Object-Oriented Programming"
         sections:
@@ -532,7 +537,7 @@ semesters:
       - code: "DM574"
         name: "Introduction to Programming"
         sections:
-          - name: "Notes"
+          - name: "Notes (hand-drawn)"
             items:
               - title: "Datatyper"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Datatyper.pdf"

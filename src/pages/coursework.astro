@@ -40,9 +40,11 @@ const semesters = (spec.semesters ?? [])
             };
           }
           count++;
+          // A `pdf:` item gets an automatic 'source' link to its sibling
+          // .typ — unless `nosource: true` (e.g. hand-drawn / scanned pages).
           const source = it.source
             ? link(it.source)
-            : it.pdf ? link(it.pdf.replace(/\.pdf$/i, '.typ')) : undefined;
+            : it.pdf && !it.nosource ? link(it.pdf.replace(/\.pdf$/i, '.typ')) : undefined;
           if (it.url) return { title: it.title, description: it.description, href: it.url, tag: 'open ↗', source: it.source ? link(it.source) : undefined };
           if (it.pdf) return { title: it.title, description: it.description, href: link(it.pdf), tag: 'PDF', source };
           return { title: it.title, description: it.description, href: source, tag: 'source ↗', source: undefined };
