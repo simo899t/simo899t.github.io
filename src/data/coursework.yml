@@ -124,12 +124,34 @@ semesters:
                 pdf: "4sem/AI505-Optimization/Lectures/lec03/ai505-lec03_notes.pdf"
               - title: "Lecture 4"
                 pdf: "4sem/AI505-Optimization/Lectures/lec04/ai505-lec04_notes.pdf"
+              - title: "Lecture 5"
+                pdf: "4sem/AI505-Optimization/Lectures/lec05/ai505-lec05 notes.pdf"
+              - title: "Lecture 6"
+                pdf: "4sem/AI505-Optimization/Lectures/lec06/ai505-lec06 notes.pdf"
+              - title: "Lecture 7"
+                pdf: "4sem/AI505-Optimization/Lectures/lec07/ai505-lec07 notes.pdf"
+              - title: "Lecture 8"
+                pdf: "4sem/AI505-Optimization/Lectures/lec08/ai505-lec08 notes.pdf"
+              - title: "Lecture 9"
+                pdf: "4sem/AI505-Optimization/Lectures/lec09/ai505-lec09 notes.pdf"
+              - title: "Lecture 10"
+                pdf: "4sem/AI505-Optimization/Lectures/lec09/ai505-lec10 notes.pdf"
+              - title: "Lecture 11"
+                pdf: "4sem/AI505-Optimization/Lectures/lec11/ai505-lec11 notes.pdf"
               - title: "Lecture 12"
                 pdf: "4sem/AI505-Optimization/Lectures/lec12/ai505-lec12 notes.pdf"
               - title: "Lecture 13"
-                pdf: "4sem/AI505-Optimization/Lectures/lec13/ai505-lec13.pdf"
+                pdf: "4sem/AI505-Optimization/Lectures/lec13/ai505-lec13-notes.pdf"
               - title: "Lecture 14"
-                pdf: "4sem/AI505-Optimization/Lectures/lec14/lec14.pdf"
+                pdf: "4sem/AI505-Optimization/Lectures/lec14/ai505-lec14-notes.pdf"
+              - title: "Lecture 15"
+                pdf: "4sem/AI505-Optimization/Lectures/lec15/ai505-lec15-notes.pdf"
+              - title: "Lecture 16"
+                pdf: "4sem/AI505-Optimization/Lectures/lec16/ai505-lec16-notes.pdf"
+              - title: "Lecture 17"
+                pdf: "4sem/AI505-Optimization/Lectures/lec17/ai505-lec17-notes.pdf"
+              - title: "Lecture 18"
+                pdf: "4sem/AI505-Optimization/Lectures/lec18/ai505-lec18-notes.pdf"
           - name: "Exercises"
             items:
               - title: "Sheet 1"
@@ -145,7 +167,7 @@ semesters:
           - name: "Code"
             items:
               - title: "COCO/BBOB experiment code"
-                url: "4sem/AI505-Optimization/cocoex-example"
+                url: "https://github.com/simo899t/SDU/tree/main/4sem/AI505-Optimization/cocoex-example"
       - code: "AI506"
         name: "Advanced Machine Learning"
         sections:
@@ -170,7 +192,7 @@ semesters:
           - name: "Code"
             items:
               - title: "Exercise notebooks (PyTorch)"
-                url: "4sem/AI506-Advanced_Machine_Learning/exercises"
+                url: "https://github.com/simo899t/SDU/tree/main/4sem/AI506-Advanced_Machine_Learning/exercises"
   - name: "3. semester"
     courses:
       - code: "AI503"
@@ -262,7 +284,7 @@ semesters:
           - name: "Code"
             items:
               - title: "Exercise notebooks"
-                url: "3sem/AI512-Introduction_to_Machine_Learning/exercises"
+                url: "https://github.com/simo899t/SDU/tree/main/3sem/AI512-Introduction_to_Machine_Learning/exercises"
       - code: "DM511"
         name: "Linear Algebra"
         sections:
@@ -270,10 +292,20 @@ semesters:
             items:
               - title: "Ai511exam2025"
                 pdf: "3sem/DM511-Linear_Algebra/exam/2025 exam/ai511exam2025.pdf"
+          - name: "Notes"
+            items:
+              - title: "AI511: Linær algebra"
+                pdf: "3sem/DM511-Linear_Algebra/AI511: Linær algebra.pdf"
+                source: "3sem/DM511-Linear_Algebra"
+          - name: "Handwritten notes"
+            items:
+              - title: "AI511: Linær algebra"
+                pdf: "3sem/DM511-Linear_Algebra/handwritten/AI511: Linær algebra.pdf"
+                source: "3sem/DM511-Linear_Algebra/handwritten"
           - name: "Code"
             items:
               - title: "Python scripts"
-                url: "3sem/DM511-Linear_Algebra/python"
+                url: "https://github.com/simo899t/SDU/tree/main/3sem/DM511-Linear_Algebra/python"
       - code: "DM580"
         name: "Functional Programming"
         sections:
@@ -284,7 +316,7 @@ semesters:
           - name: "Code"
             items:
               - title: "Exercise + project code (Haskell)"
-                url: "3sem/DM580-Functional_Programming/exercises"
+                url: "https://github.com/simo899t/SDU/tree/main/3sem/DM580-Functional_Programming/exercises"
   - name: "2. semester"
     courses:
       - code: "DM575"
@@ -299,7 +331,7 @@ semesters:
           - name: "Code"
             items:
               - title: "Exercise solutions (Java)"
-                url: "2sem/DM575-Objectoriented_Programming/Exercises"
+                url: "https://github.com/simo899t/SDU/tree/main/2sem/DM575-Objectoriented_Programming/Exercises"
       - code: "DM578"
         name: "Algorithms & Data Structures"
         sections:
@@ -311,7 +343,7 @@ semesters:
           - name: "Code"
             items:
               - title: "Algorithm implementations (Java + Python)"
-                url: "2sem/DM578-Algorithms_and_Datastructures/implementations"
+                url: "https://github.com/simo899t/SDU/tree/main/2sem/DM578-Algorithms_and_Datastructures/implementations"
   - name: "1. semester"
     courses:
       - code: "DM500"
@@ -355,8 +387,14 @@ semesters:
               - title: "Functions"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Functions.pdf"
                 source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Følger og rækker"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Følger og rækker.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
               - title: "Logik og proportioner"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Logik og proportioner.pdf"
+                source: "1sem/DM549-Discrete_Mathematics/notes"
+              - title: "Mat. Øvelser"
+                pdf: "1sem/DM549-Discrete_Mathematics/notes/Mat. Øvelser.pdf"
                 source: "1sem/DM549-Discrete_Mathematics/notes"
               - title: "Matrixer"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Matrixer.pdf"
@@ -376,6 +414,10 @@ semesters:
               - title: "Sets"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Sets.pdf"
                 source: "1sem/DM549-Discrete_Mathematics/notes"
+          - name: "Code"
+            items:
+              - title: "Exam scripts (Python)"
+                url: "https://github.com/simo899t/SDU/tree/main/1sem/DM549-Discrete_Mathematics/scripts_for_exam"
       - code: "DM573"
         name: "Introduction to Computer Science"
         sections:
@@ -390,6 +432,9 @@ semesters:
               - title: "Beregninger"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Beregninger.pdf"
                 source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+              - title: "Binær"
+                pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Binær.pdf"
+                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
               - title: "Data. Excersises"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Data. Excersises.pdf"
                 source: "1sem/DM573-Introduction_to_Computer_Science/notes"
@@ -399,10 +444,9 @@ semesters:
               - title: "Online algoritmer"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Online algoritmer.pdf"
                 source: "1sem/DM573-Introduction_to_Computer_Science/notes"
-          - name: "Code"
-            items:
-              - title: "Exam scripts"
-                url: "1sem/DM573-Introduction_to_Computer_Science/scripts_for_exam"
+              - title: "Regulære udtryk"
+                pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Regulære udtryk.pdf"
+                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
       - code: "DM574"
         name: "Introduction to Programming"
         sections:
@@ -413,6 +457,9 @@ semesters:
                 source: "1sem/DM574-Introduction_to_Programming/notes"
               - title: "Filer"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Filer.pdf"
+                source: "1sem/DM574-Introduction_to_Programming/notes"
+              - title: "Fremlæggelse"
+                pdf: "1sem/DM574-Introduction_to_Programming/notes/Fremlæggelse.pdf"
                 source: "1sem/DM574-Introduction_to_Programming/notes"
               - title: "Funktionel"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Funktionel.pdf"
