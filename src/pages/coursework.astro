@@ -44,16 +44,16 @@ const semesters = (spec.semesters ?? [])
 
 const generated = null;
 const intro = (spec.intro || '').trim() ||
-  `Every set of lecture notes, exercise solution and assignment I wrote during my Computer Science / AI degree at SDU, organised by semester and course.`;
+  `Every set of lecture notes, exercise solution and assignment I wrote during my Artificial Intelligence degree at SDU, organized by semester and course.`;
 const manifest = { count };
 ---
 
-<Layout title="Coursework" description="Every lecture note, exercise and assignment from my degree, as compiled PDFs.">
+<Layout title="Coursework" description="Every lecture note, exercise and assignment from my degree, as compiled PDFs or scripts.">
   <div class="container page">
     <header class="cw-head">
       <h1>Coursework</h1>
       <p>
-        {intro} <span class="cw-count">{manifest.count} items.</span> Curious how these
+        This page contains {intro} <span class="cw-count">{manifest.count} items.</span> Curious how these
         are written? See <a href="/notes">how I write my notes</a>.
       </p>
     </header>
