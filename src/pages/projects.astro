@@ -132,9 +132,15 @@ li { }
   font-size: 0.875rem;
   color: var(--text);
   font-weight: 500;
+  transition: color 0.15s ease;
 }
 
 .row a:hover { color: var(--accent); text-decoration: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  li { transition: transform 0.15s ease; }
+  li:hover { transform: translateX(3px); }
+}
 
 .note {
   font-family: var(--font-mono);

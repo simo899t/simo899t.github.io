@@ -210,6 +210,44 @@ h1 strong { font-weight: 700; }
   .address { text-align: left; }
   .socials { justify-content: flex-start; }
 }
+
+/* Dynamic touches — staggered entrance, slow ring, cell wave.
+   Only inside no-preference so reduced-motion keeps everything
+   visible and still. */
+@media (prefers-reduced-motion: no-preference) {
+  .content > *, .sidebar, .contrib {
+    opacity: 0;
+    animation: hero-reveal 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+  .content > *:nth-child(1) { animation-delay: 0.03s; }
+  .content > *:nth-child(2) { animation-delay: 0.08s; }
+  .content > *:nth-child(3) { animation-delay: 0.13s; }
+  .content > *:nth-child(4) { animation-delay: 0.18s; }
+  .content > *:nth-child(5) { animation-delay: 0.23s; }
+  .sidebar { animation-delay: 0.12s; }
+  .contrib { animation-delay: 0.28s; }
+
+  @keyframes hero-reveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .photo-ring { animation: ring-spin 22s linear infinite; }
+  .photo      { animation: ring-spin 22s linear infinite reverse; }
+  @keyframes ring-spin { to { transform: rotate(360deg); } }
+
+  .contrib-grid i {
+    animation: cell-in 0.4s ease both;
+    animation-delay: var(--d, 0ms);
+  }
+  @keyframes cell-in {
+    from { opacity: 0; transform: scale(0.4); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .socials a { transition: transform 0.15s ease, color 0.15s ease; }
+  .socials a:hover { transform: translateY(-1px); }
+}
 </style>
 
 <script is:inline>
@@ -238,11 +276,13 @@ h1 strong { font-weight: 700; }
         frag.appendChild(pad);
       }
       var total = 0;
-      days.forEach(function (d) {
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      days.forEach(function (d, idx) {
         total += d.count || 0;
         var cell = document.createElement('i');
         cell.setAttribute('data-level', String(d.level || 0));
         cell.title = d.count + ' on ' + d.date;
+        if (!reduce) cell.style.setProperty('--d', Math.floor((firstDow + idx) / 7) * 12 + 'ms');
         frag.appendChild(cell);
       });
       grid.appendChild(frag);

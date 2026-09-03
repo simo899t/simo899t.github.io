@@ -52,12 +52,22 @@ const isActive = (href: string) =>
 </html>
 
 <script>
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.getElementById('plexus') as HTMLCanvasElement;
 const ctx    = canvas.getContext('2d')!;
 const dpr    = window.devicePixelRatio || 1;
 
 const W = 220;
 let   H = window.innerHeight;
+
+// pointer influence (canvas-local coords); -999 = far away / inactive
+let pointer = { x: -999, y: -999 };
+window.addEventListener('pointermove', (e) => {
+  const r = canvas.getBoundingClientRect();
+  pointer.x = e.clientX - r.left;
+  pointer.y = e.clientY - r.top;
+});
+window.addEventListener('pointerleave', () => { pointer.x = -999; pointer.y = -999; });
 
 function resize() {
   H = window.innerHeight;
@@ -140,8 +150,10 @@ function firePass() {
   }
 }
 
-firePass();
-setInterval(firePass, LAYERS.length * 900 + 1400);
+if (!reduceMotion) {
+  firePass();
+  setInterval(firePass, LAYERS.length * 900 + 1400);
+}
 
 // ── draw ─────────────────────────────────────────────
 function draw() {
@@ -186,6 +198,12 @@ function draw() {
   // neurons
   for (const layer of neurons) {
     for (const n of layer) {
+      // cursor proximity gives a gentle, decaying nudge
+      const dx = n.x - pointer.x;
+      const dy = n.y - pointer.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 90) n.act = Math.max(n.act, (1 - dist / 90) * 0.85);
+
       const alpha = 0.12 + n.act * 0.5;
 
       // glow
@@ -221,7 +239,7 @@ function draw() {
 function tick() { draw(); requestAnimationFrame(tick); }
 resize();
 window.addEventListener('resize', resize);
-tick();
+if (reduceMotion) { draw(); } else { tick(); }
 </script>
 
 <style is:global>
