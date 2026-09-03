@@ -1,266 +1,136 @@
-/* ── Theme tokens ─────────────────────────────────────
-   Dark is the default. Light applies when the viewer
-   picks it (data-theme="light") or their OS prefers it
-   and they haven't overridden to dark.                */
 :root {
-  --bg:         #121212;
-  --bg-2:       #1a1a1a;
-  --bg-elev:    #1f1f1f;
-  --border:     #2b2b2b;
-  --border-2:   #3d3d3d;
-  --text:       #e6e6e6;
-  --text-muted: #9c9c9c;
-  --text-dim:   #6a6a6a;
-  --accent:     #5bb3c0;
-  --accent-rgb: 91, 179, 192;
-  --rule:       #2b2b2b;
-  --selection:  rgba(91, 179, 192, 0.22);
-
+  --bg:         #141414;
+  --bg-2:       #1e1e1e;
+  --border:     #2a2a2a;
+  --text:       #d0d0d0;
+  --text-muted: #888;
+  --text-dim:   #555;
+  --accent:     #4db6c4;
   --font-sans:  system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-serif: 'Iowan Old Style', 'Palatino Linotype', 'Palatino', 'Book Antiqua', Georgia, serif;
-  --font-mono:  ui-monospace, 'SF Mono', 'Consolas', 'Menlo', monospace;
-  --font-size:  15.5px;
-  --max-w:      640px;
-
-  --radius:     2px;
-  --ease:       cubic-bezier(0.4, 0, 0.2, 1);
-  color-scheme: dark;
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg:         #fbfbf9;
-    --bg-2:       #f2f1ec;
-    --bg-elev:    #ffffff;
-    --border:     #e2e0d8;
-    --border-2:   #cbc9be;
-    --text:       #1b1b19;
-    --text-muted: #565650;
-    --text-dim:   #8b897f;
-    --accent:     #2d7f8b;
-    --accent-rgb: 45, 127, 139;
-    --rule:       #e2e0d8;
-    --selection:  rgba(45, 127, 139, 0.16);
-    color-scheme: light;
-  }
-}
-
-:root[data-theme="light"] {
-  --bg:         #fbfbf9;
-  --bg-2:       #f2f1ec;
-  --bg-elev:    #ffffff;
-  --border:     #e2e0d8;
-  --border-2:   #cbc9be;
-  --text:       #1b1b19;
-  --text-muted: #565650;
-  --text-dim:   #8b897f;
-  --accent:     #2d7f8b;
-  --accent-rgb: 45, 127, 139;
-  --rule:       #e2e0d8;
-  --selection:  rgba(45, 127, 139, 0.16);
-  color-scheme: light;
+  --font-mono:  'Consolas', 'Menlo', 'Courier New', monospace;
+  --font-size:  15px;
+  --max-w:      660px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
-  font-size: var(--font-size);
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
 
-::selection { background: var(--selection); }
-
-a {
-  color: var(--text);
-  text-decoration: none;
-  text-decoration-color: var(--border-2);
-  text-underline-offset: 2px;
-}
-a:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-}
-
-:focus-visible {
-  outline: 1px solid var(--accent);
-  outline-offset: 2px;
-}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 h1, h2, h3 {
   color: var(--text);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.3;
 }
 
 p { color: var(--text-muted); }
-
-strong { color: var(--text); font-weight: 600; }
 
 code {
   font-family: var(--font-mono);
   font-size: 0.85em;
   background: var(--bg-2);
   border: 1px solid var(--border);
-  padding: 0.08em 0.32em;
-  border-radius: var(--radius);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
 }
 
 hr {
   border: none;
-  border-top: 1px solid var(--rule);
-  margin: 2.25rem 0;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
 }
 
 .container {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 1.25rem;
 }
 
-.page { padding: 4rem 0 6rem; }
-
-/* Shared inner-page header — consistent across pages. */
-.page-title {
-  font-family: var(--font-serif);
-  font-size: 1.85rem;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-  margin-bottom: 0.5rem;
-}
-.page-lead {
-  font-size: 0.925rem;
-  color: var(--text-muted);
-  margin-bottom: 2.75rem;
-  max-width: 54ch;
-}
+.page { padding: 3.5rem 0 5rem; }
 
 /* Nav */
 nav {
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--border);
   background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 
 .nav-inner {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 1.25rem;
 }
 
 .nav-logo {
-  font-family: var(--font-serif);
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text) !important;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted) !important;
 }
-.nav-logo:hover { text-decoration: none; color: var(--accent) !important; }
+
+.nav-logo:hover { color: var(--text) !important; text-decoration: none; }
 
 .nav-links {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.5rem 1.4rem;
+  gap: 1.25rem;
   list-style: none;
-  align-items: baseline;
 }
 
 .nav-links a {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text-dim);
-  letter-spacing: 0.005em;
+  font-family: var(--font-mono);
   opacity: 1 !important;
-  padding-bottom: 1px;
-  border-bottom: 1px solid transparent;
 }
 
-.nav-links a:hover {
-  color: var(--text);
-  text-decoration: none;
-}
+.nav-links a:hover,
 .nav-links a.active {
   color: var(--text);
-  border-bottom-color: var(--accent);
   text-decoration: none;
-}
-
-/* Theme toggle */
-.theme-toggle {
-  background: transparent;
-  border: none;
-  color: var(--text-dim);
-  padding: 0;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition: color 0.15s var(--ease);
-  position: relative;
-  top: 2px;
-}
-.theme-toggle:hover { color: var(--text); }
-.theme-toggle svg { width: 14px; height: 14px; display: block; }
-.theme-toggle .icon-sun  { display: none; }
-.theme-toggle .icon-moon { display: block; }
-:root[data-theme="light"] .theme-toggle .icon-sun  { display: block; }
-:root[data-theme="light"] .theme-toggle .icon-moon { display: none; }
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) .theme-toggle .icon-sun  { display: block; }
-  :root:not([data-theme="dark"]) .theme-toggle .icon-moon { display: none; }
 }
 
 /* Footer */
 footer {
-  border-top: 1px solid var(--rule);
-  padding: 2rem 1.5rem;
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 1.25rem;
   text-align: center;
 }
 
-footer p { font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.01em; }
-footer a { color: var(--text-dim); text-decoration-color: var(--border-2); }
-footer a:hover { color: var(--text-muted); text-decoration-color: var(--accent); }
+footer p { font-size: 0.75rem; color: var(--text-dim); }
+footer a { color: var(--text-dim); }
+footer a:hover { color: var(--text-muted); text-decoration: none; }
 
 /* Prose */
-.prose h2 { font-size: 1.05rem; margin: 2rem 0 0.5rem; }
-.prose h3 { font-size: 0.92rem; margin: 1.4rem 0 0.4rem; color: var(--text-muted); }
-.prose p  { margin-bottom: 0.95rem; font-size: 0.9rem; }
-.prose ul, .prose ol { margin: 0 0 0.95rem 1.15rem; color: var(--text-muted); font-size: 0.9rem; }
-.prose li { margin-bottom: 0.25rem; }
+.prose h2 { font-size: 1rem; margin: 1.75rem 0 0.5rem; }
+.prose h3 { font-size: 0.9rem; margin: 1.25rem 0 0.4rem; color: var(--text-muted); }
+.prose p  { margin-bottom: 0.9rem; font-size: 0.875rem; }
+.prose ul, .prose ol { margin: 0 0 0.9rem 1.15rem; color: var(--text-muted); font-size: 0.875rem; }
+.prose li { margin-bottom: 0.2rem; }
 .prose blockquote {
-  border-left: 2px solid var(--border-2);
-  padding-left: 1rem;
-  margin: 1.4rem 0;
+  border-left: 2px solid var(--border);
+  padding-left: 0.9rem;
+  margin: 1.25rem 0;
   color: var(--text-dim);
 }
 .prose pre {
   background: var(--bg-2);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 3px;
   padding: 0.9rem 1rem;
   overflow-x: auto;
   font-size: 0.8rem;
   line-height: 1.5;
-  margin-bottom: 0.95rem;
+  margin-bottom: 0.9rem;
   font-family: var(--font-mono);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
 }

@@ -45,7 +45,7 @@ const skills = ['Python', 'Java', 'Haskell', 'SQL', 'PyTorch', 'SciPy', 'Git'];
 
     <div class="cv-header">
       <h1><strong>Simon</strong> Holm</h1>
-      <a href="/cv.pdf" download class="download">Download full cv as PDF ↓</a>
+      <a href="/cv.pdf" download class="download">Download PDF ↓</a>
     </div>
 
     <hr />
@@ -105,29 +105,28 @@ const skills = ['Python', 'Java', 'Haskell', 'SQL', 'PyTorch', 'SciPy', 'Git'];
 }
 
 h1 {
-  font-family: var(--font-serif);
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 2.2rem;
+  font-weight: 300;
   letter-spacing: -0.01em;
 }
 
-h1 strong { font-weight: 600; }
+h1 strong { font-weight: 700; }
 
 .download {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-.download:hover { color: var(--text); }
+.download:hover { color: var(--text); text-decoration: none; }
 
 h2 {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-dim);
-  margin-bottom: 1.4rem;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
 }
 
 .timeline {
@@ -160,7 +159,7 @@ h2 {
 .place {
   display: block;
   font-size: 0.8rem;
-  color: var(--text-muted);
+  color: var(--accent);
   margin-bottom: 0.3rem;
 }
 
