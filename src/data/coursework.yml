@@ -8,8 +8,8 @@
 # Optional per item: description, updated.  Only my own work is listed here.
 
 intro: >-
-  Every set of lecture notes, exercise solution, project and exam answer I wrote
-  during my Computer Science / AI degree at SDU, organised by semester and course.
+  Every set of lecture notes, exercise solution and assignment I wrote during my
+  Artificial Intelligence degree at SDU, organized by semester and course.
 
 semesters:
   - name: "6. semester"
