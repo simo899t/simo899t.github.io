@@ -467,40 +467,40 @@ semesters:
             items:
               - title: "Counting"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Counting.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Fibonacci"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Fibonacci.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Functions"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Functions.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Følger og rækker"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Følger og rækker.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Logik og proportioner"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Logik og proportioner.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Mat. Øvelser"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Mat. Øvelser.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Matrixer"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Matrixer.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Number theory"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Number theory.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Proofs"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Proofs.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Rekursive definitioner"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Rekursive definitioner.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Relations"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Relations.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
               - title: "Sets"
                 pdf: "1sem/DM549-Discrete_Mathematics/notes/Sets.pdf"
-                source: "1sem/DM549-Discrete_Mathematics/notes"
+                nosource: true
           - name: "Code"
             items:
               - title: "Exam scripts (Python)"
@@ -512,28 +512,28 @@ semesters:
             items:
               - title: "Algebra"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Algebra.pdf"
-                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+                nosource: true
               - title: "Algoritmer"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Algoritmer.pdf"
-                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+                nosource: true
               - title: "Beregninger"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Beregninger.pdf"
-                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+                nosource: true
               - title: "Binær"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Binær.pdf"
-                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+                nosource: true
               - title: "Data. Excersises"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Data. Excersises.pdf"
-                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+                nosource: true
               - title: "Kryptologi"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Kryptologi.pdf"
-                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+                nosource: true
               - title: "Online algoritmer"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Online algoritmer.pdf"
-                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+                nosource: true
               - title: "Regulære udtryk"
                 pdf: "1sem/DM573-Introduction_to_Computer_Science/notes/Regulære udtryk.pdf"
-                source: "1sem/DM573-Introduction_to_Computer_Science/notes"
+                nosource: true
       - code: "DM574"
         name: "Introduction to Programming"
         sections:
@@ -541,28 +541,28 @@ semesters:
             items:
               - title: "Datatyper"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Datatyper.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
               - title: "Filer"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Filer.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
               - title: "Fremlæggelse"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Fremlæggelse.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
               - title: "Funktionel"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Funktionel.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
               - title: "Imperativ programmering"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Imperativ programmering.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
               - title: "Prog. Excersises"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Prog. Excersises.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
               - title: "Program Struktur"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Program Struktur.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
               - title: "Projekt"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Projekt.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
               - title: "Rekursiv"
                 pdf: "1sem/DM574-Introduction_to_Programming/notes/Rekursiv.pdf"
-                source: "1sem/DM574-Introduction_to_Programming/notes"
+                nosource: true
