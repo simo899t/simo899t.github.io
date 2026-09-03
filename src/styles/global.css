@@ -3,60 +3,61 @@
    picks it (data-theme="light") or their OS prefers it
    and they haven't overridden to dark.                */
 :root {
-  --bg:         #141414;
-  --bg-2:       #1e1e1e;
-  --bg-elev:    #242424;
-  --border:     #2a2a2a;
-  --border-2:   #3a3a3a;
-  --text:       #e4e4e4;
-  --text-muted: #9a9a9a;
+  --bg:         #121212;
+  --bg-2:       #1a1a1a;
+  --bg-elev:    #1f1f1f;
+  --border:     #2b2b2b;
+  --border-2:   #3d3d3d;
+  --text:       #e6e6e6;
+  --text-muted: #9c9c9c;
   --text-dim:   #6a6a6a;
-  --accent:     #4db6c4;
-  --accent-2:   #6d5bd0;
-  --accent-rgb: 77, 182, 196;
-  --selection:  rgba(77, 182, 196, 0.25);
-  --shadow:     0 1px 2px rgba(0, 0, 0, 0.4);
+  --accent:     #5bb3c0;
+  --accent-rgb: 91, 179, 192;
+  --rule:       #2b2b2b;
+  --selection:  rgba(91, 179, 192, 0.22);
 
   --font-sans:  system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', 'Palatino', 'Book Antiqua', Georgia, serif;
   --font-mono:  ui-monospace, 'SF Mono', 'Consolas', 'Menlo', monospace;
-  --font-size:  15px;
-  --max-w:      660px;
+  --font-size:  15.5px;
+  --max-w:      640px;
 
+  --radius:     2px;
   --ease:       cubic-bezier(0.4, 0, 0.2, 1);
   color-scheme: dark;
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]) {
-    --bg:         #fdfdfc;
-    --bg-2:       #f4f4f2;
+    --bg:         #fbfbf9;
+    --bg-2:       #f2f1ec;
     --bg-elev:    #ffffff;
-    --border:     #e4e4e0;
-    --border-2:   #d0d0ca;
-    --text:       #1c1c1c;
-    --text-muted: #575757;
-    --text-dim:   #8a8a86;
-    --accent:     #2b8f9e;
-    --accent-2:   #5a49b8;
-    --selection:  rgba(43, 143, 158, 0.18);
-    --shadow:     0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+    --border:     #e2e0d8;
+    --border-2:   #cbc9be;
+    --text:       #1b1b19;
+    --text-muted: #565650;
+    --text-dim:   #8b897f;
+    --accent:     #2d7f8b;
+    --accent-rgb: 45, 127, 139;
+    --rule:       #e2e0d8;
+    --selection:  rgba(45, 127, 139, 0.16);
     color-scheme: light;
   }
 }
 
 :root[data-theme="light"] {
-  --bg:         #fdfdfc;
-  --bg-2:       #f4f4f2;
+  --bg:         #fbfbf9;
+  --bg-2:       #f2f1ec;
   --bg-elev:    #ffffff;
-  --border:     #e4e4e0;
-  --border-2:   #d0d0ca;
-  --text:       #1c1c1c;
-  --text-muted: #575757;
-  --text-dim:   #8a8a86;
-  --accent:     #2b8f9e;
-  --accent-2:   #5a49b8;
-  --selection:  rgba(43, 143, 158, 0.18);
-  --shadow:     0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --border:     #e2e0d8;
+  --border-2:   #cbc9be;
+  --text:       #1b1b19;
+  --text-muted: #565650;
+  --text-dim:   #8b897f;
+  --accent:     #2d7f8b;
+  --accent-rgb: 45, 127, 139;
+  --rule:       #e2e0d8;
+  --selection:  rgba(45, 127, 139, 0.16);
   color-scheme: light;
 }
 
@@ -69,87 +70,81 @@ body {
   color: var(--text);
   font-family: var(--font-sans);
   font-size: var(--font-size);
-  line-height: 1.65;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition: background-color 0.25s var(--ease), color 0.25s var(--ease);
 }
 
 ::selection { background: var(--selection); }
 
 a {
-  color: var(--accent);
+  color: var(--text);
   text-decoration: none;
-  transition: color 0.15s var(--ease);
+  text-decoration-color: var(--border-2);
+  text-underline-offset: 2px;
 }
-a:hover { text-decoration: underline; }
+a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+}
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 1px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 2px;
 }
 
 h1, h2, h3 {
   color: var(--text);
   font-weight: 600;
-  line-height: 1.3;
-  text-wrap: balance;
+  line-height: 1.25;
 }
 
 p { color: var(--text-muted); }
+
+strong { color: var(--text); font-weight: 600; }
 
 code {
   font-family: var(--font-mono);
   font-size: 0.85em;
   background: var(--bg-2);
   border: 1px solid var(--border);
-  padding: 0.1em 0.3em;
-  border-radius: 3px;
+  padding: 0.08em 0.32em;
+  border-radius: var(--radius);
 }
 
 hr {
   border: none;
-  border-top: 1px solid var(--border);
-  margin: 2rem 0;
+  border-top: 1px solid var(--rule);
+  margin: 2.25rem 0;
 }
 
 .container {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding: 0 1.5rem;
 }
 
-.page {
-  padding: 3.5rem 0 5rem;
-  animation: page-in 0.4s var(--ease) both;
-}
+.page { padding: 4rem 0 6rem; }
 
-@keyframes page-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Shared inner-page header — keeps h1 sizing consistent
-   across projects / cv / notes / coursework / contact. */
+/* Shared inner-page header — consistent across pages. */
 .page-title {
-  font-size: 1.55rem;
+  font-family: var(--font-serif);
+  font-size: 1.85rem;
   font-weight: 600;
-  letter-spacing: -0.01em;
-  margin-bottom: 0.4rem;
+  letter-spacing: -0.005em;
+  margin-bottom: 0.5rem;
 }
 .page-lead {
-  font-size: 0.9rem;
+  font-size: 0.925rem;
   color: var(--text-muted);
-  margin-bottom: 2.5rem;
-  max-width: 52ch;
+  margin-bottom: 2.75rem;
+  max-width: 54ch;
 }
 
 /* Nav */
 nav {
-  border-bottom: 1px solid var(--border);
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-  backdrop-filter: saturate(1.4) blur(8px);
+  border-bottom: 1px solid var(--rule);
+  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -158,77 +153,65 @@ nav {
 .nav-inner {
   max-width: var(--max-w);
   margin: 0 auto;
-  padding: 0.75rem 1.25rem;
+  padding: 1rem 1.5rem;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .nav-logo {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--text-muted) !important;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text) !important;
+  letter-spacing: -0.01em;
   white-space: nowrap;
 }
-.nav-logo:hover { color: var(--text) !important; text-decoration: none; }
+.nav-logo:hover { text-decoration: none; color: var(--accent) !important; }
 
 .nav-links {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0.6rem 1.1rem;
+  gap: 0.5rem 1.4rem;
   list-style: none;
-  align-items: center;
+  align-items: baseline;
 }
 
 .nav-links a {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-dim);
-  font-family: var(--font-mono);
+  letter-spacing: 0.005em;
   opacity: 1 !important;
-  position: relative;
-  padding-bottom: 2px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid transparent;
 }
 
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 1px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.18s var(--ease);
-}
-
-.nav-links a:hover,
-.nav-links a.active {
+.nav-links a:hover {
   color: var(--text);
   text-decoration: none;
 }
-.nav-links a:hover::after,
-.nav-links a.active::after { transform: scaleX(1); }
+.nav-links a.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+  text-decoration: none;
+}
 
 /* Theme toggle */
 .theme-toggle {
   background: transparent;
-  border: 1px solid var(--border);
+  border: none;
   color: var(--text-dim);
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  display: grid;
-  place-items: center;
+  padding: 0;
   cursor: pointer;
-  flex-shrink: 0;
-  transition: color 0.15s var(--ease), border-color 0.15s var(--ease), background-color 0.15s var(--ease);
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s var(--ease);
+  position: relative;
+  top: 2px;
 }
-.theme-toggle:hover {
-  color: var(--text);
-  border-color: var(--border-2);
-  background: var(--bg-2);
-}
+.theme-toggle:hover { color: var(--text); }
 .theme-toggle svg { width: 14px; height: 14px; display: block; }
 .theme-toggle .icon-sun  { display: none; }
 .theme-toggle .icon-moon { display: block; }
@@ -241,42 +224,41 @@ nav {
 
 /* Footer */
 footer {
-  border-top: 1px solid var(--border);
-  padding: 1.75rem 1.25rem;
+  border-top: 1px solid var(--rule);
+  padding: 2rem 1.5rem;
   text-align: center;
 }
 
-footer p { font-size: 0.75rem; color: var(--text-dim); }
-footer a { color: var(--text-dim); }
-footer a:hover { color: var(--text-muted); text-decoration: none; }
+footer p { font-size: 0.75rem; color: var(--text-dim); letter-spacing: 0.01em; }
+footer a { color: var(--text-dim); text-decoration-color: var(--border-2); }
+footer a:hover { color: var(--text-muted); text-decoration-color: var(--accent); }
 
 /* Prose */
-.prose h2 { font-size: 1rem; margin: 1.75rem 0 0.5rem; }
-.prose h3 { font-size: 0.9rem; margin: 1.25rem 0 0.4rem; color: var(--text-muted); }
-.prose p  { margin-bottom: 0.9rem; font-size: 0.875rem; }
-.prose ul, .prose ol { margin: 0 0 0.9rem 1.15rem; color: var(--text-muted); font-size: 0.875rem; }
-.prose li { margin-bottom: 0.2rem; }
+.prose h2 { font-size: 1.05rem; margin: 2rem 0 0.5rem; }
+.prose h3 { font-size: 0.92rem; margin: 1.4rem 0 0.4rem; color: var(--text-muted); }
+.prose p  { margin-bottom: 0.95rem; font-size: 0.9rem; }
+.prose ul, .prose ol { margin: 0 0 0.95rem 1.15rem; color: var(--text-muted); font-size: 0.9rem; }
+.prose li { margin-bottom: 0.25rem; }
 .prose blockquote {
-  border-left: 2px solid var(--border);
-  padding-left: 0.9rem;
-  margin: 1.25rem 0;
+  border-left: 2px solid var(--border-2);
+  padding-left: 1rem;
+  margin: 1.4rem 0;
   color: var(--text-dim);
 }
 .prose pre {
   background: var(--bg-2);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: var(--radius);
   padding: 0.9rem 1rem;
   overflow-x: auto;
   font-size: 0.8rem;
   line-height: 1.5;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.95rem;
   font-family: var(--font-mono);
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .page { animation: none; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
