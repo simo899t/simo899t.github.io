@@ -183,6 +183,8 @@ semesters:
                 url: "https://github.com/simo899t/SDU/tree/main/4sem/AI505-Optimization/Exercises/sheet04"
               - title: "Sheet 5"
                 pdf: "4sem/AI505-Optimization/Exercises/sheet05/ai505_sheet05.pdf"
+              - title: "Sheet 5"
+                none: true
               - title: "Sheet 5 — code"
                 url: "https://github.com/simo899t/SDU/tree/main/4sem/AI505-Optimization/Exercises/sheet05"
               - title: "Sheet 7 — code"
@@ -374,6 +376,19 @@ semesters:
                 url: "https://github.com/simo899t/SDU/tree/main/3sem/DM580-Functional_Programming/exercises"
   - name: "2. semester"
     courses:
+      - code: "AI501"
+        name: "Introduction to Artificial Intelligence"
+        sections:
+          - name: "Lectures"
+            items:
+              - title: "Lecture notes"
+                pdf: "2sem/AI501-Introduction_to_Artificial_Intelligence/lectures/AI LECTURES.pdf"
+          - name: "Exercises"
+            items:
+              - title: "Exercise notes"
+                pdf: "2sem/AI501-Introduction_to_Artificial_Intelligence/exercises/Introductions_to_AI_exercises.pdf"
+              - title: "Worked sessions"
+                pdf: "2sem/AI501-Introduction_to_Artificial_Intelligence/exercises/AI.pdf"
       - code: "DM575"
         name: "Object-Oriented Programming"
         sections:
@@ -399,6 +414,18 @@ semesters:
             items:
               - title: "Algorithm implementations (Java + Python)"
                 url: "https://github.com/simo899t/SDU/tree/main/2sem/DM578-Algorithms_and_Datastructures/implementations"
+      - code: "DM576"
+        name: "Databasesystems"
+        sections:
+          - name: "Notes"
+            items:
+              - title: "Databasesystems"
+                pdf: "2sem/DM576-Databasesystems/Lectures/Databasesystemer.pdf"
+                source: "2sem/DM578-Algorithms_and_Datastructures/notes"
+          - name: "Code"
+            items:
+              - title: "Using sql with python"
+                source: "2sem/DM576-Databasesystems/Lectures/program_from_lecture8.py"
   - name: "1. semester"
     courses:
       - code: "DM500"
