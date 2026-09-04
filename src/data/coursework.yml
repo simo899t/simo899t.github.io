@@ -63,7 +63,7 @@ semesters:
             items:
               - title: "Lecture 1"
                 pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec01/ai508-lec01_notes.pdf"
-              - title: "Lecture 1"
+              - title: "Lecture 2"
                 pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec01/ai508-lec02_notes.pdf"
   - name: "4. semester"
     courses:
