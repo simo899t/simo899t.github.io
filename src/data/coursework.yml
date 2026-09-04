@@ -273,16 +273,19 @@ semesters:
                 pdf: "3sem/AI503-Calculus/Project/CalcProject.pdf"
           - name: "Exams"
             items:
-              - title: "Written Exam Simon"
+              - title: "Written Exam 1"
                 pdf: "3sem/AI503-Calculus/exam/WrittenExamSimon.pdf"
-              - title: "Written Exam Simon 2"
+              - title: "Written Exam 2"
                 pdf: "3sem/AI503-Calculus/exam/WrittenExamSimon_2.pdf"
+              - title: "Written Sample Exam"
+                pdf: "3sem/AI503-Calculus/tryouts/sample_exam.pdf"
+                
           - name: "Notes"
             items:
-              - title: "Calc Notes"
-                pdf: "3sem/AI503-Calculus/TeXnotes/calcNotes.pdf"
-              - title: "Calc Notes"
-                pdf: "3sem/AI503-Calculus/notes/calcNotes.pdf"
+              - title: "notes (handwritten)"
+                pdf: "3sem/AI503-Calculus/handwritten/AI503: Calculus.pdf"
+              - title: "All exercises/examples from lectures"
+                pdf: "3sem/AI503-Calculus/tryouts/exFromLec.pdf"
           - name: "Handwritten notes"
             items:
               - title: "AI503: Calculus"
