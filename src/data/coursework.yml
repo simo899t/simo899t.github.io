@@ -286,11 +286,7 @@ semesters:
                 pdf: "3sem/AI503-Calculus/handwritten/AI503: Calculus.pdf"
               - title: "All exercises/examples from lectures"
                 pdf: "3sem/AI503-Calculus/tryouts/exFromLec.pdf"
-          - name: "Handwritten notes"
-            items:
-              - title: "AI503: Calculus"
-                pdf: "3sem/AI503-Calculus/handwritten/AI503: Calculus.pdf"
-                source: "3sem/AI503-Calculus/handwritten"
+
       - code: "AI504"
         name: "Ethics & Privacy"
         sections:
