@@ -202,14 +202,14 @@ const packages = [
     name: 'sdust',
     repo: 'https://github.com/simo899t/sdust',
     tag: 'SDU themed package',
-    desc: `SDU-branded document frontpages — <code>thesis</code>, <code>report</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, and <code>exam</code> — plus theorem-style cards like <code>#theorem</code> and <code>#definition</code>.`,
+    desc: `SDU-branded document frontpages. <code>Thesis</code>, <code>report</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, and <code>exam</code>, plus theorem-style cards like <code>#theorem</code> and <code>#definition</code>.`,
     importCode: '#import "@local/sdust:0.1.0": *\n#show: note.with(\n  title:  "Lecture Notes",\n  course: "DM000 — Course Name",\n)',
   },
   {
     name: 'utilst',
     repo: 'https://github.com/simo899t/utilst',
     tag: 'general-purpose academic toolkit',
-    desc: `The general-purpose toolkit: function plotting, proof and AST trees, pseudocode, node graphs, <code>#tex[]</code> for inline LaTeX math (via mitex), and code-block styling. Not SDU-specific — usable on its own in any document.`,
+    desc: `The general-purpose toolkit: function plotting, proof and AST trees, pseudocode, node graphs, <code>#tex[]</code> for inline LaTeX math (via mitex), and code-block styling.`,
     importCode: '#import "@local/utilst:0.1.0": *',
   },
   {
@@ -222,12 +222,14 @@ const packages = [
 ].map(p => ({ ...p, importHighlighted: highlightTypst(p.importCode) }));
 
 const usefulPackages = [
-  { name: 'codly',        repo: 'https://typst.app/universe/package/codly',        desc: 'Nicer code blocks — line numbers, highlighting, and language labels. Used live in the demo above.' },
-  { name: 'lovelace',     repo: 'https://typst.app/universe/package/lovelace',     desc: 'Pseudocode blocks with proper line numbering and indentation. Also used live in the demo above.' },
+  { name: 'codly',        repo: 'https://typst.app/universe/package/codly',        desc: 'Upgraded code-blocks with line numbers, highlighting, and language labels.' },
   { name: 'cetz',         repo: 'https://typst.app/universe/package/cetz',         desc: 'A general-purpose drawing/plotting library for diagrams, plots, and geometry.' },
+  { name: 'lilaq',        repo: 'https://typst.app/universe/package/lilaq',        desc: 'Data plotting with a matplotlib-like API. Line, scatter, bar, and error plots.' },
   { name: 'fletcher',     repo: 'https://typst.app/universe/package/fletcher',     desc: 'Node-and-arrow diagrams (graphs, flowcharts, commutative diagrams), built on cetz.' },
-  { name: 'physica',      repo: 'https://typst.app/universe/package/physica',      desc: 'Shorthands for physics notation — vectors, derivatives, bra-ket, and more.' },
-  { name: 'mitex',        repo: 'https://typst.app/universe/package/mitex',        desc: 'Renders raw LaTeX math syntax directly in Typst — handy for pasting in existing LaTeX.' },
+  { name: 'curryst',      repo: 'https://typst.app/universe/package/curryst',      desc: 'Typesets natural-deduction and sequent-calculus proof trees.' },
+  { name: 'drafting',     repo: 'https://typst.app/universe/package/drafting',     desc: 'Margin notes and inline annotations for drafts and review comments.' },
+  { name: 'maquette',     repo: 'https://typst.app/universe/package/maquette',     desc: 'Render 3D models (PLY, STL, OBJ) as SVG or PNG images.' },
+  { name: 'physica',      repo: 'https://typst.app/universe/package/physica',      desc: 'Shorthands for physics notation, vectors, derivatives, bra-ket, and more.' },
 ];
 ---
 
