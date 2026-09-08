@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { readFileSync, readdirSync } from 'fs';
 import { resolve } from 'path';
 
-// Drop PDFs into public/notes-pdf/ — they appear here automatically.
+// Drop PDFs into public/notes-pdf/ they appear here automatically.
 // Name files like: "DM561 Linear Algebra.pdf" or "AI505-Gradient-Descent.pdf"
 const pdfDir = resolve('public/notes-pdf');
 const pdfs = readdirSync(pdfDir)
@@ -238,7 +238,7 @@ const usefulPackages = [
     <div class="typst-blurb">
       <h1>How I write my notes</h1>
       <p>
-        All my lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a set of packages I built myself to make documents easier to build — see the <strong>Packages</strong> tab below for details. Figures and diagrams are produced separately as SVGs in <a href="https://inkscape.org/" target="_blank">Inkscape</a> and imported directly into the documents.
+        All my lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a set of packages I built myself to make documents easier to build, see the <strong>Packages</strong> tab below for details. Figures and diagrams are produced separately as SVGs in <a href="https://inkscape.org/" target="_blank">Inkscape</a> and imported directly into the documents.
       </p>
 
       <h2 class="blurb-heading">What is Typst?</h2>
