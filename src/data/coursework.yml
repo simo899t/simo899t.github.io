@@ -36,10 +36,6 @@ semesters:
                 pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec04_notes.pdf"
               - title: "Lecture 5"
                 pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec05_notes.pdf"
-          - name: "Exercises"
-            items:
-              - title: "Exercise 1"
-                none: true
       - code: "AI509"
         name: "Natural Language Processing"
         sections:
@@ -60,7 +56,7 @@ semesters:
                 pdf: "5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec00/ai510-lec00_notes.pdf"
               - title: "Lecture 1"
                 pdf: "5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec01/ai510-lec01_notes.pdf"
-              - title: "Lecture 1"
+              - title: "Lecture 2"
                 pdf: "5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec01/ai510-lec02_notes.pdf"
           - name: "Exercises"
             items:
