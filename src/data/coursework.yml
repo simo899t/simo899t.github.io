@@ -25,7 +25,7 @@ semesters:
           - name: "Lectures"
             items:
               - title: "Lecture 0"
-                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec00_notes."
+                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec00_notes.pdf"
               - title: "Lecture 1"
                 pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec01_notes.pdf"
               - title: "Lecture 2"
