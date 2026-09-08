@@ -202,14 +202,21 @@ const packages = [
     name: 'sdust',
     repo: 'https://github.com/simo899t/sdust',
     tag: 'SDU themed package',
-    desc: `A package for writing Typst documents faster: document templates (<code>note</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, <code>exam</code>), theorem-style blocks like <code>#theorem</code> and <code>#definition</code>, helpers for graphs, trees, and pseudocode, <code>#tex[]</code> for dropping in raw LaTeX math (via mitex), and <code>#uml()</code> for quick list-format node/edge diagrams (via fletcher).`,
+    desc: `SDU-branded document frontpages — <code>thesis</code>, <code>report</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, and <code>exam</code> — plus theorem-style cards like <code>#theorem</code> and <code>#definition</code>.`,
     importCode: '#import "@local/sdust:0.1.0": *\n#show: note.with(\n  title:  "Lecture Notes",\n  course: "DM000 — Course Name",\n)',
+  },
+  {
+    name: 'utilst',
+    repo: 'https://github.com/simo899t/utilst',
+    tag: 'general-purpose academic toolkit',
+    desc: `The general-purpose toolkit: function plotting, proof and AST trees, pseudocode, node graphs, <code>#tex[]</code> for inline LaTeX math (via mitex), and code-block styling. Not SDU-specific — usable on its own in any document.`,
+    importCode: '#import "@local/utilst:0.1.0": *',
   },
   {
     name: 'tempst',
     repo: 'https://github.com/simo899t/tempst',
     tag: 'personal shortcut package',
-    desc: `Builds directly on <code>sdust</code> and adds the math shorthands I use day to day, like <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). This is the package my own notes import.`,
+    desc: `Builds on top of both <code>sdust</code> and <code>utilst</code>, re-exports everything they provide, and adds the math shorthands I use day to day, like <code>apx</code> (≈), <code>loss</code> (ℒ), and <code>px(f,x)</code> (∂f/∂x). This is the package my own notes import.`,
     importCode: '#import "@local/tempst:0.1.0": *\n#show: note.with(\n  title:  "Lecture Notes",\n  course: "DM000 — Course Name",\n)',
   },
 ].map(p => ({ ...p, importHighlighted: highlightTypst(p.importCode) }));
@@ -229,7 +236,7 @@ const usefulPackages = [
     <div class="typst-blurb">
       <h1>How I write my notes</h1>
       <p>
-        All my lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a pair of packages I built myself to make documents easier to build — see the <strong>Packages</strong> tab below for details. Figures and diagrams are produced separately as SVGs in <a href="https://inkscape.org/" target="_blank">Inkscape</a> and imported directly into the documents.
+        All my lecture notes, exercises, and assignments are written in <a href="https://typst.app/open-source/" target="_blank">Typst</a> using a set of packages I built myself to make documents easier to build — see the <strong>Packages</strong> tab below for details. Figures and diagrams are produced separately as SVGs in <a href="https://inkscape.org/" target="_blank">Inkscape</a> and imported directly into the documents.
       </p>
 
       <h2 class="blurb-heading">What is Typst?</h2>
@@ -245,8 +252,8 @@ const usefulPackages = [
       <button class="demo-tab" data-tab="code-examples">Code Examples</button>
       <button class="demo-tab" data-tab="assignment-examples">Assignment Examples</button>
       <button class="demo-tab" data-tab="snippets">Snippets</button>
-      <button class="demo-tab" data-tab="my-packages">Packages</button>
       <button class="demo-tab" data-tab="inkscape">Inkscape</button>
+      <button class="demo-tab" data-tab="my-packages">Packages</button>
     </div>
 
     <div class="tab-panels">
@@ -394,8 +401,9 @@ const usefulPackages = [
       <!-- My Packages -->
       <div class="tab-panel" id="panel-my-packages">
         <p class="snippets-intro">
-          Everything on this page is built with two Typst packages I maintain myself, a
-          custom SDU themed package, and a personal shortcut package. Either one is free to use, and shown below.
+          Everything on this page is built with three Typst packages I maintain myself: an
+          SDU themed package, a general-purpose academic toolkit, and a personal shortcut
+          package that ties the two together. All of them are free to use, and shown below.
         </p>
         <div class="package-list">
           {packages.map(p => (
@@ -422,7 +430,7 @@ const usefulPackages = [
             </div>
           ))}
         </div>
-        <p class="snippets-intro">Both packages are actively maintained and may introduce breaking changes.</p>
+        <p class="snippets-intro">All three packages are actively maintained and may introduce breaking changes.</p>
 
         <h2 class="blurb-heading">Other useful packages</h2>
         <p class="snippets-intro">A few other Typst packages worth knowing about, from the wider ecosystem. My own packages already build on several of these internally, but each can also be imported directly on its own if needed. Browse more on <a href="https://typst.app/universe" target="_blank">Typst Universe</a>.</p>
