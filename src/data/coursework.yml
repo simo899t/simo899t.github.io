@@ -24,8 +24,18 @@ semesters:
         sections:
           - name: "Lectures"
             items:
+              - title: "Lecture 0"
+                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec00_notes."
               - title: "Lecture 1"
-                none: true
+                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec01_notes.pdf"
+              - title: "Lecture 2"
+                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec02_notes.pdf"
+              - title: "Lecture 3"
+                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec03_notes.pdf"
+              - title: "Lecture 4"
+                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec04_notes.pdf"
+              - title: "Lecture 5"
+                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec05_notes.pdf"
           - name: "Exercises"
             items:
               - title: "Exercise 1"
