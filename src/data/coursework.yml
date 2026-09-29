@@ -42,11 +42,13 @@ semesters:
           - name: "Lectures"
             items:
               - title: "Lecture 1"
+                pdf: 5sem/AI509-Natural_Language_Processing/Lectures/lec01/ai509-lec01_notes.pdf
+              - title: "Lecture 2"
+                pdf: 5sem/AI509-Natural_Language_Processing/Lectures/lec02/ai509-lec02_notes.pdf
+              - title: "Lecture 3"
                 none: true
-          - name: "Exercises"
-            items:
-              - title: "Exercise 1"
-                none: true
+              - title: "Lecture 4"
+                pdf: 5sem/AI509-Natural_Language_Processing/Lectures/lec04/ai509-lec04_notes.pdf
       - code: "AI510"
         name: "Cybersecurity & Innovation"
         sections:
@@ -57,11 +59,19 @@ semesters:
               - title: "Lecture 1"
                 pdf: "5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec01/ai510-lec01_notes.pdf"
               - title: "Lecture 2"
-                pdf: "5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec01/ai510-lec02_notes.pdf"
+                pdf: "5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec02/ai510-lec02_notes.pdf"
+              - title: "Lecture 3"
+                pdf: "5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec03/ai510-lec03_notes.pdf"
+              - title: "Lecture 4-5"
+                pdf: "5sem/AI510-Cybersecurity_and_Innovation/Lectures/lec04/ai510-lec04-05_notes.pdf"
           - name: "Exercises"
             items:
               - title: "Exercise 1"
                 pdf: "5sem/AI510-Cybersecurity_and_Innovation/Exercises/ex1/ai510-ex1.pdf"
+              - title: "Exercise 2"
+                pdf: "5sem/AI510-Cybersecurity_and_Innovation/Exercises/ex2/ai510-ex2.pdf"
+              - title: "Exercise 3"
+                pdf: "5sem/AI510-Cybersecurity_and_Innovation/Exercises/ex3/ai510-ex3.pdf"
       - code: "AI802"
         name: "Algorithmic Game Theory"
         sections:
@@ -70,7 +80,21 @@ semesters:
               - title: "Lecture 1"
                 pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec01/ai508-lec01_notes.pdf"
               - title: "Lecture 2"
-                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec01/ai508-lec02_notes.pdf"
+                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec02/ai508-lec02_notes.pdf"
+              - title: "Lecture 3"
+                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec03/ai508-lec03_notes.pdf"
+              - title: "Lecture 4"
+                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec04/ai508-lec04_notes.pdf"
+              - title: "Lecture 5"
+                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec05/ai508-lec05_notes.pdf"
+              - title: "Lecture 6"
+                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec06/ai508-lec06_notes.pdf"
+              - title: "Lecture 7"
+                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec07/ai508-lec07_notes.pdf"
+              - title: "Lecture 8"
+                none: true
+              - title: "Lecture 9"
+                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec09/ai508-lec09_notes.pdf"
   - name: "4. semester"
     courses:
       - code: "AI504"
