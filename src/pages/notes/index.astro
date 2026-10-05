@@ -200,10 +200,17 @@ const demosJson = JSON.stringify(demos);
 const packages = [
   {
     name: 'sdust',
-    repo: 'https://github.com/simo899t/sdust',
-    tag: 'SDU themed package',
+    repo: 'https://typst.app/universe/package/sdust',
+    tag: 'official · Typst Universe',
     desc: `SDU-branded document frontpages. <code>Thesis</code>, <code>report</code>, <code>exercise</code>, <code>assignment</code>, <code>project</code>, and <code>exam</code>, plus theorem-style cards like <code>#theorem</code> and <code>#definition</code>.`,
-    importCode: '#import "@local/sdust:0.1.0": *\n#show: note.with(\n  title:  "Lecture Notes",\n  course: "DM000 — Course Name",\n)',
+    importCode: '#import "@preview/sdust:0.1.0": *\n#show: note.with(\n  title:  "Lecture Notes",\n  course: "DM000 — Course Name",\n)',
+  },
+  {
+    name: 'algorythmst',
+    repo: 'https://typst.app/universe/package/algorythmst',
+    tag: 'official · Typst Universe',
+    desc: `Beautiful pseudocode blocks styled after LaTeX's <code>algorithm</code> + <code>algorithmicx</code> look, built on lovelace. Line numbers, indent guides, numbered titles like <strong>Algorithm 1:</strong>, captions, right-aligned <code>#comment[...]</code>, and <code>@label</code> references.`,
+    importCode: '#import "@preview/algorythmst:0.1.0": *\n#pseudo(title: [Binary Search])[\n  + $l <- 1$; $r <- n$ #comment[search window]\n  + *while* $l <= r$ *do*\n]',
   },
   {
     name: 'utilst',
@@ -403,9 +410,11 @@ const usefulPackages = [
       <!-- My Packages -->
       <div class="tab-panel" id="panel-my-packages">
         <p class="snippets-intro">
-          Everything on this page is built with three Typst packages I maintain myself: an
-          SDU themed package, a general-purpose academic toolkit, and a personal shortcut
-          package that ties the two together. All of them are free to use, and shown below.
+          Everything on this page is built with Typst packages I maintain myself. Two of them,
+          the SDU themed <code>sdust</code> and the pseudocode package <code>algorythmst</code>, are
+          published officially on <a href="https://typst.app/universe" target="_blank">Typst Universe</a>.
+          Alongside them are a general-purpose academic toolkit and a personal shortcut package
+          that ties everything together. All of them are free to use, and shown below.
         </p>
         <div class="package-list">
           {packages.map(p => (
@@ -432,7 +441,7 @@ const usefulPackages = [
             </div>
           ))}
         </div>
-        <p class="snippets-intro">All three packages are actively maintained and may introduce breaking changes.</p>
+        <p class="snippets-intro">All packages are actively maintained and may introduce breaking changes.</p>
 
         <h2 class="blurb-heading">Other useful packages</h2>
         <p class="snippets-intro">A few other Typst packages worth knowing about, from the wider ecosystem. My own packages already build on several of these internally, but each can also be imported directly on its own if needed. Browse more on <a href="https://typst.app/universe" target="_blank">Typst Universe</a>.</p>
