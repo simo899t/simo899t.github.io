@@ -84,7 +84,7 @@ const codeExamples = readdirSync(ceDir)
     const hasImg = readdirSync(ceDir).includes(imgFile);
     const raw = readFileSync(resolve(ceDir, f), 'utf8')
       .split('\n')
-      .filter(line => !/^\s*#import\s+"@local\/sdust/.test(line))
+      .filter(line => !/^\s*#import\s+"@(local|preview)\/sdust/.test(line))
       .join('\n')
       .replace(/^\n+/, '')
       .trimEnd();
@@ -170,7 +170,7 @@ function loadDemo(slug: string, title: string, course: string) {
   while (content.length && content[content.length - 1].trim() === '') content.pop();
 
   const animPreamble = [
-    '#import "@local/sdust:0.1.0": *',
+    '#import "@preview/sdust:0.1.0": *',
     '#show: note.with(',
     `  title:  "${title}",`,
     `  course: "${course}",`,
@@ -2032,10 +2032,12 @@ presizeWindow(DEMOS[di], function() { tick(); });
       logoBytes = new Uint8Array(await resp.arrayBuffer());
     } catch (e) { logoBytes = null; }
 
-    // Map sdust package so @local/sdust:0.1.0 resolves in the browser compiler
+    // Map sdust so @preview/sdust:0.1.0 (and legacy @local) resolves from the
+    // bundled copy instead of pulling its full dependency chain from the registry
     try {
       var sdustResp = await fetch('/sdust-lib.typ');
       var sdustBytes = new Uint8Array(await sdustResp.arrayBuffer());
+      typst.mapShadow('/packages/preview/sdust/0.1.0/lib.typ', sdustBytes);
       typst.mapShadow('/packages/local/sdust/0.1.0/lib.typ', sdustBytes);
     } catch (e) { /* non-fatal */ }
 
