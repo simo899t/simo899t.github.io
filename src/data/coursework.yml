@@ -24,8 +24,6 @@ semesters:
         sections:
           - name: "Lectures"
             items:
-              - title: "Lecture 0"
-                pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec00_notes.pdf"
               - title: "Lecture 1"
                 pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec01_notes.pdf"
               - title: "Lecture 2"
@@ -36,6 +34,8 @@ semesters:
                 pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec04_notes.pdf"
               - title: "Lecture 5"
                 pdf: "5sem/AI508-Computervision/Lectures/lec00/ai508-lec05_notes.pdf"
+              - title: "Lecture 6"
+                pdf: "5sem/AI508-Computervision/Lectures/lec06/ai508-lec06_notes.pdf"
       - code: "AI509"
         name: "Natural Language Processing"
         sections:
@@ -49,6 +49,10 @@ semesters:
                 none: true
               - title: "Lecture 4"
                 pdf: 5sem/AI509-Natural_Language_Processing/Lectures/lec04/ai509-lec04_notes.pdf
+              - title: "Lecture 5"
+                pdf: 5sem/AI509-Natural_Language_Processing/Lectures/lec05/ai509-lec05_notes.pdf
+              - title: "Lecture 6"
+                pdf: 5sem/AI509-Natural_Language_Processing/Lectures/lec06/ai509-lec06_notes.pdf
       - code: "AI510"
         name: "Cybersecurity & Innovation"
         sections:
@@ -95,6 +99,8 @@ semesters:
                 none: true
               - title: "Lecture 9"
                 pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec09/ai508-lec09_notes.pdf"
+              - title: "Lecture 10"
+                pdf: "5sem/AI802-Algorithmic_Game_Theory/Lectures/lec10/ai508-lec10_notes.pdf"
   - name: "4. semester"
     courses:
       - code: "AI504"
