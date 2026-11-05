@@ -220,6 +220,20 @@ const packages = [
     importCode: '#import "@local/utilst:0.1.0": *',
   },
   {
+    name: 'minutely',
+    repo: 'https://github.com/simo899t/minutely',
+    tag: 'meeting minutes &amp; agendas',
+    desc: `Minutes and agendas (referat/dagsorden) in Danish or English. One <code>#show: meeting</code> rule builds the formalia header, and <code>#vote</code>, <code>#proposal</code>, <code>#amendment</code>, <code>#resp</code> and <code>#next-meeting</code> handle the body.`,
+    importCode: '#import "@local/minutely:0.1.0": *\n#show: meeting.with(\n  organisation: "The Empire",\n  meeting-name: "board meeting",\n  kind:         "minutes",\n)',
+  },
+  {
+    name: 'statutely',
+    repo: 'https://github.com/simo899t/statutely',
+    tag: 'statutes &amp; bylaws',
+    desc: `Statutes and bylaws (vedtægter) in Danish or English. Headings become auto-numbered § sections and subsections, and <code>#sub[...]</code> adds numbered sub-clauses. Split out of <code>minutely</code>, which imports it for association statutes.`,
+    importCode: '#import "@local/statutely:0.1.0": *\n#show: statutes.with(\n  organisation: "The Empire",\n  updated:      "April 2026",\n)',
+  },
+  {
     name: 'tempst',
     repo: 'https://github.com/simo899t/tempst',
     tag: 'personal shortcut package',
@@ -413,8 +427,9 @@ const usefulPackages = [
           Everything on this page is built with Typst packages I maintain myself. Two of them,
           the SDU themed <code>sdust</code> and the pseudocode package <code>algorythmst</code>, are
           published officially on <a href="https://typst.app/universe" target="_blank">Typst Universe</a>.
-          Alongside them are a general-purpose academic toolkit and a personal shortcut package
-          that ties everything together. All of them are free to use, and shown below.
+          Alongside them are a general-purpose academic toolkit, templates for meeting minutes and
+          statutes, and a personal shortcut package that ties everything together. All of them are
+          free to use, and shown below.
         </p>
         <div class="package-list">
           {packages.map(p => (
